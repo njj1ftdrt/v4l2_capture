@@ -16,3 +16,20 @@ target_compile_options(v4l2_capture PRIVATE
     -Wextra
     -Wpedantic
 )
+
+
+add_executable(test_ring_buffer
+    tests/test_ring_buffer.cpp
+)
+
+target_include_directories(test_ring_buffer PRIVATE include)
+
+target_compile_options(test_ring_buffer PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
+enable_testing()
+
+add_test(NAME test_ring_buffer COMMAND test_ring_buffer)

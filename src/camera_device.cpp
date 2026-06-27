@@ -1,5 +1,6 @@
 #include "camera_device.hpp"
 
+#include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -54,6 +55,15 @@ void CameraDevice::print_capability_flag(__u32 caps, __u32 flag, const std::stri
     std::cout << "  " << name << ": " << ((caps & flag) ? "yes" : "no") << "\n";
 }
 
+std::string CameraDevice::fourcc_to_string(__u32 pixelformat) {
+    std::string s;
+    s.push_back(static_cast<char>(pixelformat & 0xFF));
+    s.push_back(static_cast<char>((pixelformat >> 8) & 0xFF));
+    s.push_back(static_cast<char>((pixelformat >> 16) & 0xFF));
+    s.push_back(static_cast<char>((pixelformat >> 24) & 0xFF));
+    return s;
+}
+
 void CameraDevice::query_capability() const {
     if (fd_ < 0) {
         throw std::runtime_error("Device is not opened");
@@ -91,7 +101,6 @@ void CameraDevice::query_capability() const {
 
     if (!(effective_caps & V4L2_CAP_VIDEO_CAPTURE)) {
         std::cout << "[WARN] This device does not report VIDEO_CAPTURE capability.\n";
-        std::cout << "[WARN] If this is v4l2loopback, start ffmpeg producer first and retry.\n";
     }
 
     if (!(effective_caps & V4L2_CAP_STREAMING)) {
@@ -99,4 +108,168 @@ void CameraDevice::query_capability() const {
     }
 
     std::cout << "=====================================\n";
+}
+
+void CameraDevice::list_formats() const {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    std::cout << "========== Supported Pixel Formats ==========\n";
+
+    bool found = false;
+
+    for (__u32 index = 0;; ++index) {
+        v4l2_fmtdesc fmt{};
+        fmt.index = index;
+        fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+        if (::ioctl(fd_, VIDIOC_ENUM_FMT, &fmt) < 0) {
+            if (errno == EINVAL) {
+                break;
+            }
+
+            throw std::runtime_error(
+                "VIDIOC_ENUM_FMT failed: " + std::string(std::strerror(errno))
+            );
+        }
+
+        found = true;
+
+        std::string fourcc = fourcc_to_string(fmt.pixelformat);
+
+        std::cout << "[" << index << "] "
+                  << fourcc
+                  << " - "
+                  << reinterpret_cast<const char*>(fmt.description);
+
+        if (fmt.flags & V4L2_FMT_FLAG_COMPRESSED) {
+            std::cout << " (compressed)";
+        }
+
+        if (fmt.flags & V4L2_FMT_FLAG_EMULATED) {
+            std::cout << " (emulated)";
+        }
+
+        std::cout << "\n";
+
+        list_frame_sizes(fmt.pixelformat);
+    }
+
+    if (!found) {
+        std::cout << "[WARN] No capture pixel format found.\n";
+        std::cout << "[HINT] For v4l2loopback, keep ffmpeg producer running and retry.\n";
+    }
+
+    std::cout << "=============================================\n";
+}
+
+void CameraDevice::list_frame_sizes(__u32 pixelformat) const {
+    bool found = false;
+
+    for (__u32 index = 0;; ++index) {
+        v4l2_frmsizeenum size{};
+        size.index = index;
+        size.pixel_format = pixelformat;
+
+        if (::ioctl(fd_, VIDIOC_ENUM_FRAMESIZES, &size) < 0) {
+            if (errno == EINVAL) {
+                break;
+            }
+
+            std::cout << "  [WARN] VIDIOC_ENUM_FRAMESIZES failed for "
+                      << fourcc_to_string(pixelformat)
+                      << ": "
+                      << std::strerror(errno)
+                      << "\n";
+            return;
+        }
+
+        found = true;
+
+        if (size.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+            std::cout << "  size[" << index << "]: "
+                      << size.discrete.width << "x"
+                      << size.discrete.height << "\n";
+
+            list_frame_intervals(
+                pixelformat,
+                size.discrete.width,
+                size.discrete.height
+            );
+        } else if (size.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
+            std::cout << "  size: stepwise "
+                      << size.stepwise.min_width << "x" << size.stepwise.min_height
+                      << " -> "
+                      << size.stepwise.max_width << "x" << size.stepwise.max_height
+                      << " step "
+                      << size.stepwise.step_width << "x" << size.stepwise.step_height
+                      << "\n";
+            break;
+        } else if (size.type == V4L2_FRMSIZE_TYPE_CONTINUOUS) {
+            std::cout << "  size: continuous "
+                      << size.stepwise.min_width << "x" << size.stepwise.min_height
+                      << " -> "
+                      << size.stepwise.max_width << "x" << size.stepwise.max_height
+                      << "\n";
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "  [WARN] No frame size info available for "
+                  << fourcc_to_string(pixelformat)
+                  << "\n";
+    }
+}
+
+void CameraDevice::list_frame_intervals(__u32 pixelformat, __u32 width, __u32 height) const {
+    bool found = false;
+
+    for (__u32 index = 0;; ++index) {
+        v4l2_frmivalenum interval{};
+        interval.index = index;
+        interval.pixel_format = pixelformat;
+        interval.width = width;
+        interval.height = height;
+
+        if (::ioctl(fd_, VIDIOC_ENUM_FRAMEINTERVALS, &interval) < 0) {
+            if (errno == EINVAL) {
+                break;
+            }
+
+            std::cout << "    [WARN] VIDIOC_ENUM_FRAMEINTERVALS failed: "
+                      << std::strerror(errno)
+                      << "\n";
+            return;
+        }
+
+        found = true;
+
+        if (interval.type == V4L2_FRMIVAL_TYPE_DISCRETE) {
+            const auto num = interval.discrete.numerator;
+            const auto den = interval.discrete.denominator;
+
+            double fps = 0.0;
+            if (num != 0) {
+                fps = static_cast<double>(den) / static_cast<double>(num);
+            }
+
+            std::cout << "    interval[" << index << "]: "
+                      << num << "/" << den
+                      << " s"
+                      << " (" << fps << " fps)"
+                      << "\n";
+        } else if (interval.type == V4L2_FRMIVAL_TYPE_STEPWISE) {
+            std::cout << "    interval: stepwise\n";
+            break;
+        } else if (interval.type == V4L2_FRMIVAL_TYPE_CONTINUOUS) {
+            std::cout << "    interval: continuous\n";
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "    [WARN] No frame interval info available\n";
+    }
 }

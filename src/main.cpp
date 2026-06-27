@@ -4,18 +4,24 @@
 
 #include <linux/videodev2.h>
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdlib>
 #include <exception>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
 #include <optional>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <vector>
 
 static __u32 parse_u32_arg(const std::string& value, const std::string& name) {
     try {
@@ -56,12 +62,160 @@ static int parse_int_arg(const std::string& value, const std::string& name) {
 }
 
 
+
+static std::string frame_fourcc_to_string(__u32 pixelformat) {
+    std::string s;
+    s.push_back(static_cast<char>(pixelformat & 0xFF));
+    s.push_back(static_cast<char>((pixelformat >> 8) & 0xFF));
+    s.push_back(static_cast<char>((pixelformat >> 16) & 0xFF));
+    s.push_back(static_cast<char>((pixelformat >> 24) & 0xFF));
+    return s;
+}
+
+static unsigned char frame_clamp_to_u8(int value) {
+    if (value < 0) {
+        return 0;
+    }
+    if (value > 255) {
+        return 255;
+    }
+    return static_cast<unsigned char>(value);
+}
+
+static void frame_yuyv_to_rgb(
+    const std::uint8_t* yuyv,
+    std::vector<std::uint8_t>& rgb,
+    __u32 width,
+    __u32 height
+) {
+    rgb.resize(static_cast<std::size_t>(width) * height * 3);
+
+    std::size_t in = 0;
+    std::size_t out = 0;
+    const std::size_t pixel_count = static_cast<std::size_t>(width) * height;
+
+    for (std::size_t i = 0; i + 1 < pixel_count; i += 2) {
+        int y0 = yuyv[in + 0];
+        int u  = yuyv[in + 1];
+        int y1 = yuyv[in + 2];
+        int v  = yuyv[in + 3];
+        in += 4;
+
+        auto convert = [](int y, int u_val, int v_val) {
+            int c = y - 16;
+            int d = u_val - 128;
+            int e = v_val - 128;
+
+            int r = (298 * c + 409 * e + 128) >> 8;
+            int g = (298 * c - 100 * d - 208 * e + 128) >> 8;
+            int b = (298 * c + 516 * d + 128) >> 8;
+
+            return std::array<std::uint8_t, 3>{
+                frame_clamp_to_u8(r),
+                frame_clamp_to_u8(g),
+                frame_clamp_to_u8(b)
+            };
+        };
+
+        auto rgb0 = convert(y0, u, v);
+        auto rgb1 = convert(y1, u, v);
+
+        rgb[out++] = rgb0[0];
+        rgb[out++] = rgb0[1];
+        rgb[out++] = rgb0[2];
+
+        rgb[out++] = rgb1[0];
+        rgb[out++] = rgb1[1];
+        rgb[out++] = rgb1[2];
+    }
+}
+
+static void save_frame_to_files(
+    const Frame& frame,
+    const std::string& output_dir,
+    int save_index
+) {
+    if (frame.data.empty()) {
+        throw std::runtime_error("Cannot save empty frame");
+    }
+
+    if (frame.width == 0 || frame.height == 0 || frame.pixel_format == 0) {
+        throw std::runtime_error("Cannot save frame with unknown format");
+    }
+
+    std::filesystem::create_directories(output_dir);
+
+    std::ostringstream base;
+    base << output_dir << "/pipeline_frame_"
+         << std::setw(6) << std::setfill('0') << save_index
+         << "_seq_" << frame.sequence;
+
+    const std::string fourcc = frame_fourcc_to_string(frame.pixel_format);
+    const std::string raw_path = base.str() + "." + fourcc;
+
+    {
+        std::ofstream raw(raw_path, std::ios::binary);
+        if (!raw) {
+            throw std::runtime_error("Failed to open raw output file: " + raw_path);
+        }
+
+        raw.write(
+            reinterpret_cast<const char*>(frame.data.data()),
+            static_cast<std::streamsize>(frame.data.size())
+        );
+
+        if (!raw) {
+            throw std::runtime_error("Failed to write raw output file: " + raw_path);
+        }
+    }
+
+    std::cout << "[SAVER] saved raw: " << raw_path
+              << " bytes=" << frame.data.size() << "\n";
+
+    if (frame.pixel_format == V4L2_PIX_FMT_YUYV) {
+        const std::size_t expected_yuyv_size =
+            static_cast<std::size_t>(frame.width) * frame.height * 2;
+
+        if (frame.data.size() < expected_yuyv_size) {
+            throw std::runtime_error("YUYV frame data is smaller than expected");
+        }
+
+        std::vector<std::uint8_t> rgb;
+        frame_yuyv_to_rgb(frame.data.data(), rgb, frame.width, frame.height);
+
+        const std::string ppm_path = base.str() + ".ppm";
+        std::ofstream ppm(ppm_path, std::ios::binary);
+        if (!ppm) {
+            throw std::runtime_error("Failed to open ppm output file: " + ppm_path);
+        }
+
+        ppm << "P6\n" << frame.width << " " << frame.height << "\n255\n";
+        ppm.write(
+            reinterpret_cast<const char*>(rgb.data()),
+            static_cast<std::streamsize>(rgb.size())
+        );
+
+        if (!ppm) {
+            throw std::runtime_error("Failed to write ppm output file: " + ppm_path);
+        }
+
+        std::cout << "[SAVER] saved ppm: " << ppm_path
+                  << " bytes=" << rgb.size() << "\n";
+    } else {
+        std::cout << "[SAVER] PPM conversion skipped for format "
+                  << fourcc << "\n";
+    }
+}
+
 static void run_pipeline(
     CameraDevice& camera,
     int frame_count,
     int timeout_ms,
     int ring_capacity,
-    int consumer_delay_ms
+    int consumer_delay_ms,
+    bool pipeline_save,
+    int save_limit,
+    const std::string& output_dir
 ) {
     if (frame_count <= 0) {
         throw std::runtime_error("Pipeline frame count must be positive");
@@ -76,6 +230,7 @@ static void run_pipeline(
     std::atomic<bool> producer_done{false};
     std::atomic<int> produced{0};
     std::atomic<int> consumed{0};
+    std::atomic<int> saved{0};
     std::atomic<std::uint64_t> consumed_bytes{0};
 
     std::mutex cv_mutex;
@@ -89,6 +244,9 @@ static void run_pipeline(
     std::cout << "ring capacity      : " << ring_capacity << "\n";
     std::cout << "poll timeout       : " << timeout_ms << " ms\n";
     std::cout << "consumer delay     : " << consumer_delay_ms << " ms\n";
+    std::cout << "pipeline save      : " << (pipeline_save ? "yes" : "no") << "\n";
+    std::cout << "save limit         : " << save_limit << "\n";
+    std::cout << "output dir         : " << output_dir << "\n";
 
     const auto start_time = std::chrono::steady_clock::now();
 
@@ -102,6 +260,14 @@ static void run_pipeline(
                     consumed_bytes += frame.bytesused;
 
                     const int count = consumed.load();
+
+                    if (pipeline_save && saved.load() < save_limit) {
+                        const int save_index = saved.fetch_add(1);
+                        if (save_index < save_limit) {
+                            save_frame_to_files(frame, output_dir, save_index);
+                        }
+                    }
+
                     if (count == 1 || count == frame_count || count % 50 == 0) {
                         std::cout << "[CONSUMER] consumed "
                                   << count
@@ -184,6 +350,7 @@ static void run_pipeline(
     std::cout << "elapsed seconds      : " << elapsed_s << "\n";
     std::cout << "producer FPS         : " << producer_fps << "\n";
     std::cout << "consumer FPS         : " << consumer_fps << "\n";
+    std::cout << "saved frames         : " << saved.load() << "\n";
     std::cout << "consumed bytes       : " << consumed_bytes.load() << "\n";
     std::cout << "=========================================\n";
     std::cout.unsetf(std::ios::floatfield);
@@ -200,7 +367,8 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --frames 300 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-frames 300 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --timeout-ms 2000\n"
-              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 2 --consumer-delay-ms 50 --timeout-ms 2000\n";
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 2 --consumer-delay-ms 50 --timeout-ms 2000\n"
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --pipeline-save --save-limit 5 --output output/pipeline --timeout-ms 2000\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -212,6 +380,8 @@ int main(int argc, char* argv[]) {
     int pipeline_frames = 0;
     int ring_capacity = 8;
     int consumer_delay_ms = 0;
+    bool pipeline_save = false;
+    int save_limit = 5;
     int timeout_ms = 2000;
     std::string output_dir = "output";
 
@@ -248,6 +418,10 @@ int main(int argc, char* argv[]) {
                 ring_capacity = parse_int_arg(argv[++i], arg);
             } else if (arg == "--consumer-delay-ms" && i + 1 < argc) {
                 consumer_delay_ms = parse_int_arg(argv[++i], arg);
+            } else if (arg == "--pipeline-save") {
+                pipeline_save = true;
+            } else if (arg == "--save-limit" && i + 1 < argc) {
+                save_limit = parse_int_arg(argv[++i], arg);
             } else if (arg == "--output" && i + 1 < argc) {
                 output_dir = argv[++i];
             } else if (arg == "--timeout-ms" && i + 1 < argc) {
@@ -322,7 +496,16 @@ int main(int argc, char* argv[]) {
             } else if (capture_frames > 0) {
                 camera.capture_frames(capture_frames, timeout_ms);
             } else {
-                run_pipeline(camera, pipeline_frames, timeout_ms, ring_capacity, consumer_delay_ms);
+                run_pipeline(
+                    camera,
+                    pipeline_frames,
+                    timeout_ms,
+                    ring_capacity,
+                    consumer_delay_ms,
+                    pipeline_save,
+                    save_limit,
+                    output_dir
+                );
             }
 
             camera.stop_streaming();

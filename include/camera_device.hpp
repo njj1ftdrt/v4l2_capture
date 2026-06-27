@@ -27,6 +27,7 @@ public:
     void stop_streaming();
     void capture_one_frame(int timeout_ms);
     void capture_one_frame_to_files(int timeout_ms, const std::string& output_dir);
+    void capture_frames(int frame_count, int timeout_ms);
 
 private:
     struct MappedBuffer {

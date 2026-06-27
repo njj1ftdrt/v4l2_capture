@@ -53,7 +53,9 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-one\n"
-              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --save-one --output output\n";
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --save-one --output output\n"
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --frames 300 --timeout-ms 2000\n"
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-frames 300 --timeout-ms 2000\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -61,6 +63,7 @@ int main(int argc, char* argv[]) {
     bool list_formats = false;
     bool capture_one = false;
     bool save_one = false;
+    int capture_frames = 0;
     int timeout_ms = 2000;
     std::string output_dir = "output";
 
@@ -89,6 +92,8 @@ int main(int argc, char* argv[]) {
                 capture_one = true;
             } else if (arg == "--save-one") {
                 save_one = true;
+            } else if ((arg == "--frames" || arg == "--capture-frames") && i + 1 < argc) {
+                capture_frames = parse_int_arg(argv[++i], arg);
             } else if (arg == "--output" && i + 1 < argc) {
                 output_dir = argv[++i];
             } else if (arg == "--timeout-ms" && i + 1 < argc) {
@@ -119,9 +124,20 @@ int main(int argc, char* argv[]) {
             );
         }
 
-        if ((capture_one || save_one) && !mmap_buffers.has_value()) {
+        const int capture_mode_count =
+            (capture_one ? 1 : 0) +
+            (save_one ? 1 : 0) +
+            (capture_frames > 0 ? 1 : 0);
+
+        if (capture_mode_count > 1) {
             throw std::runtime_error(
-                "Capturing or saving a frame requires --mmap-buffers"
+                "Use only one capture mode: --capture-one, --save-one, or --frames"
+            );
+        }
+
+        if (capture_mode_count > 0 && !mmap_buffers.has_value()) {
+            throw std::runtime_error(
+                "Capturing frames requires --mmap-buffers"
             );
         }
 
@@ -141,13 +157,15 @@ int main(int argc, char* argv[]) {
             camera.init_mmap_buffers(*mmap_buffers);
         }
 
-        if (capture_one || save_one) {
+        if (capture_mode_count > 0) {
             camera.start_streaming();
 
             if (save_one) {
                 camera.capture_one_frame_to_files(timeout_ms, output_dir);
-            } else {
+            } else if (capture_one) {
                 camera.capture_one_frame(timeout_ms);
+            } else {
+                camera.capture_frames(capture_frames, timeout_ms);
             }
 
             camera.stop_streaming();

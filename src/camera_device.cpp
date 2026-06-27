@@ -9,7 +9,9 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cctype>
+#include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -839,3 +841,206 @@ void CameraDevice::capture_one_frame_to_files(int timeout_ms, const std::string&
     std::cout << "requeued index : " << frame.index << "\n";
     std::cout << "===============================================\n";
 }
+
+void CameraDevice::capture_frames(int frame_count, int timeout_ms) {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    if (!streaming_) {
+        throw std::runtime_error("Cannot capture frames before streaming is started");
+    }
+
+    if (frame_count <= 0) {
+        throw std::runtime_error("Frame count must be positive");
+    }
+
+    std::cout << "========== Capture Frames ==========\n";
+    std::cout << "target frames : " << frame_count << "\n";
+    std::cout << "poll timeout  : " << timeout_ms << " ms\n";
+
+    using Clock = std::chrono::steady_clock;
+
+    std::vector<double> intervals_ms;
+    intervals_ms.reserve(static_cast<size_t>(frame_count > 1 ? frame_count - 1 : 0));
+
+    int captured = 0;
+    int poll_timeouts = 0;
+    int dqbuf_errors = 0;
+
+    std::uint64_t total_bytes = 0;
+    __u32 min_bytes = 0;
+    __u32 max_bytes = 0;
+
+    bool have_previous_time = false;
+    Clock::time_point previous_time{};
+    const auto start_time = Clock::now();
+
+    while (captured < frame_count) {
+        pollfd pfd{};
+        pfd.fd = fd_;
+        pfd.events = POLLIN;
+
+        int poll_ret = 0;
+        do {
+            poll_ret = ::poll(&pfd, 1, timeout_ms);
+        } while (poll_ret < 0 && errno == EINTR);
+
+        if (poll_ret < 0) {
+            throw std::runtime_error("poll failed: " + std::string(std::strerror(errno)));
+        }
+
+        if (poll_ret == 0) {
+            ++poll_timeouts;
+            continue;
+        }
+
+        if (pfd.revents & POLLERR) {
+            std::cout << "[WARN] poll returned POLLERR\n";
+        }
+
+        if (pfd.revents & POLLHUP) {
+            std::cout << "[WARN] poll returned POLLHUP\n";
+        }
+
+        if (pfd.revents & POLLNVAL) {
+            throw std::runtime_error("poll returned POLLNVAL: invalid file descriptor");
+        }
+
+        if (!(pfd.revents & POLLIN)) {
+            ++dqbuf_errors;
+            std::cout << "[WARN] poll returned without POLLIN, revents="
+                      << pfd.revents << "\n";
+            continue;
+        }
+
+        v4l2_buffer buf{};
+        buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        buf.memory = V4L2_MEMORY_MMAP;
+
+        if (::ioctl(fd_, VIDIOC_DQBUF, &buf) < 0) {
+            ++dqbuf_errors;
+
+            if (errno == EAGAIN) {
+                continue;
+            }
+
+            throw std::runtime_error(
+                "VIDIOC_DQBUF failed: " + std::string(std::strerror(errno))
+            );
+        }
+
+        if (buf.index >= buffers_.size()) {
+            throw std::runtime_error(
+                "VIDIOC_DQBUF returned invalid buffer index: " + std::to_string(buf.index)
+            );
+        }
+
+        if (buf.bytesused > buffers_[buf.index].length) {
+            requeue_buffer(buf.index);
+            throw std::runtime_error("bytesused is larger than mapped buffer length");
+        }
+
+        const auto now = Clock::now();
+
+        if (have_previous_time) {
+            const double interval_ms =
+                std::chrono::duration<double, std::milli>(now - previous_time).count();
+            intervals_ms.push_back(interval_ms);
+        }
+
+        previous_time = now;
+        have_previous_time = true;
+
+        total_bytes += buf.bytesused;
+
+        if (captured == 0) {
+            min_bytes = buf.bytesused;
+            max_bytes = buf.bytesused;
+        } else {
+            min_bytes = std::min(min_bytes, buf.bytesused);
+            max_bytes = std::max(max_bytes, buf.bytesused);
+        }
+
+        ++captured;
+
+        if (captured == 1 || captured == frame_count || captured % 50 == 0) {
+            std::cout << "[INFO] captured "
+                      << captured << "/" << frame_count
+                      << " sequence=" << buf.sequence
+                      << " bytesused=" << buf.bytesused
+                      << "\n";
+        }
+
+        requeue_buffer(buf.index);
+    }
+
+    const auto end_time = Clock::now();
+    const double elapsed_s =
+        std::chrono::duration<double>(end_time - start_time).count();
+
+    double avg_interval_ms = 0.0;
+    double max_interval_ms = 0.0;
+    double p50_ms = 0.0;
+    double p95_ms = 0.0;
+    double p99_ms = 0.0;
+
+    if (!intervals_ms.empty()) {
+        double sum = 0.0;
+        for (double v : intervals_ms) {
+            sum += v;
+            if (v > max_interval_ms) {
+                max_interval_ms = v;
+            }
+        }
+
+        avg_interval_ms = sum / static_cast<double>(intervals_ms.size());
+
+        std::vector<double> sorted = intervals_ms;
+        std::sort(sorted.begin(), sorted.end());
+
+        auto percentile = [&sorted](double p) {
+            if (sorted.empty()) {
+                return 0.0;
+            }
+
+            const double rank =
+                (p / 100.0) * static_cast<double>(sorted.size() - 1);
+            const size_t index = static_cast<size_t>(rank);
+            return sorted[index];
+        };
+
+        p50_ms = percentile(50.0);
+        p95_ms = percentile(95.0);
+        p99_ms = percentile(99.0);
+    }
+
+    const double fps = elapsed_s > 0.0
+        ? static_cast<double>(captured) / elapsed_s
+        : 0.0;
+
+    const double avg_bytes = captured > 0
+        ? static_cast<double>(total_bytes) / static_cast<double>(captured)
+        : 0.0;
+
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << "========== Capture Statistics ==========\n";
+    std::cout << "requested frames      : " << frame_count << "\n";
+    std::cout << "captured frames       : " << captured << "\n";
+    std::cout << "elapsed seconds       : " << elapsed_s << "\n";
+    std::cout << "actual FPS            : " << fps << "\n";
+    std::cout << "interval samples      : " << intervals_ms.size() << "\n";
+    std::cout << "avg interval ms       : " << avg_interval_ms << "\n";
+    std::cout << "p50 interval ms       : " << p50_ms << "\n";
+    std::cout << "p95 interval ms       : " << p95_ms << "\n";
+    std::cout << "p99 interval ms       : " << p99_ms << "\n";
+    std::cout << "max interval ms       : " << max_interval_ms << "\n";
+    std::cout << "poll timeouts         : " << poll_timeouts << "\n";
+    std::cout << "dqbuf errors          : " << dqbuf_errors << "\n";
+    std::cout << "min bytesused         : " << min_bytes << "\n";
+    std::cout << "max bytesused         : " << max_bytes << "\n";
+    std::cout << "avg bytesused         : " << avg_bytes << "\n";
+    std::cout << "========================================\n";
+    std::cout.unsetf(std::ios::floatfield);
+}
+

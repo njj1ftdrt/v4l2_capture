@@ -842,6 +842,43 @@ void CameraDevice::capture_one_frame_to_files(int timeout_ms, const std::string&
     std::cout << "===============================================\n";
 }
 
+
+Frame CameraDevice::capture_frame_copy(int timeout_ms) {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    if (!streaming_) {
+        throw std::runtime_error("Cannot capture frame before streaming is started");
+    }
+
+    if (current_width_ == 0 || current_height_ == 0 || current_pixelformat_ == 0) {
+        throw std::runtime_error("Current format is unknown, set format before capturing frame copy");
+    }
+
+    CapturedFrameInfo info = dequeue_frame(timeout_ms);
+
+    try {
+        const auto* data = static_cast<const std::uint8_t*>(buffers_[info.index].start);
+
+        Frame frame;
+        frame.data.assign(data, data + info.bytesused);
+        frame.width = current_width_;
+        frame.height = current_height_;
+        frame.pixel_format = current_pixelformat_;
+        frame.bytesused = info.bytesused;
+        frame.sequence = info.sequence;
+        frame.v4l2_timestamp = info.timestamp;
+        frame.host_receive_time = std::chrono::steady_clock::now();
+
+        requeue_buffer(info.index);
+        return frame;
+    } catch (...) {
+        requeue_buffer(info.index);
+        throw;
+    }
+}
+
 void CameraDevice::capture_frames(int frame_count, int timeout_ms) {
     if (fd_ < 0) {
         throw std::runtime_error("Device is not opened");

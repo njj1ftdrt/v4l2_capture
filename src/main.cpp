@@ -60,7 +60,8 @@ static void run_pipeline(
     CameraDevice& camera,
     int frame_count,
     int timeout_ms,
-    int ring_capacity
+    int ring_capacity,
+    int consumer_delay_ms
 ) {
     if (frame_count <= 0) {
         throw std::runtime_error("Pipeline frame count must be positive");
@@ -84,9 +85,10 @@ static void run_pipeline(
     std::exception_ptr consumer_error = nullptr;
 
     std::cout << "========== Pipeline Capture ==========\n";
-    std::cout << "target frames : " << frame_count << "\n";
-    std::cout << "ring capacity : " << ring_capacity << "\n";
-    std::cout << "poll timeout  : " << timeout_ms << " ms\n";
+    std::cout << "target frames      : " << frame_count << "\n";
+    std::cout << "ring capacity      : " << ring_capacity << "\n";
+    std::cout << "poll timeout       : " << timeout_ms << " ms\n";
+    std::cout << "consumer delay     : " << consumer_delay_ms << " ms\n";
 
     const auto start_time = std::chrono::steady_clock::now();
 
@@ -106,6 +108,12 @@ static void run_pipeline(
                                   << " sequence=" << frame.sequence
                                   << " bytesused=" << frame.bytesused
                                   << "\n";
+                    }
+
+                    if (consumer_delay_ms > 0) {
+                        std::this_thread::sleep_for(
+                            std::chrono::milliseconds(consumer_delay_ms)
+                        );
                     }
 
                     continue;
@@ -191,7 +199,8 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --save-one --output output\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --frames 300 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-frames 300 --timeout-ms 2000\n"
-              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --timeout-ms 2000\n";
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --timeout-ms 2000\n"
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 2 --consumer-delay-ms 50 --timeout-ms 2000\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -202,6 +211,7 @@ int main(int argc, char* argv[]) {
     int capture_frames = 0;
     int pipeline_frames = 0;
     int ring_capacity = 8;
+    int consumer_delay_ms = 0;
     int timeout_ms = 2000;
     std::string output_dir = "output";
 
@@ -236,6 +246,8 @@ int main(int argc, char* argv[]) {
                 pipeline_frames = parse_int_arg(argv[++i], arg);
             } else if (arg == "--ring-capacity" && i + 1 < argc) {
                 ring_capacity = parse_int_arg(argv[++i], arg);
+            } else if (arg == "--consumer-delay-ms" && i + 1 < argc) {
+                consumer_delay_ms = parse_int_arg(argv[++i], arg);
             } else if (arg == "--output" && i + 1 < argc) {
                 output_dir = argv[++i];
             } else if (arg == "--timeout-ms" && i + 1 < argc) {
@@ -310,7 +322,7 @@ int main(int argc, char* argv[]) {
             } else if (capture_frames > 0) {
                 camera.capture_frames(capture_frames, timeout_ms);
             } else {
-                run_pipeline(camera, pipeline_frames, timeout_ms, ring_capacity);
+                run_pipeline(camera, pipeline_frames, timeout_ms, ring_capacity, consumer_delay_ms);
             }
 
             camera.stop_streaming();

@@ -228,6 +228,7 @@ static void run_pipeline(
     RingBuffer<Frame> ring(static_cast<std::size_t>(ring_capacity));
 
     std::atomic<bool> producer_done{false};
+    std::atomic<bool> stop_requested{false};
     std::atomic<int> produced{0};
     std::atomic<int> consumed{0};
     std::atomic<int> saved{0};
@@ -290,12 +291,14 @@ static void run_pipeline(
             }
         } catch (...) {
             consumer_error = std::current_exception();
+            stop_requested = true;
+            cv.notify_all();
         }
     });
 
     std::thread producer_thread([&]() {
         try {
-            for (int i = 0; i < frame_count; ++i) {
+            for (int i = 0; i < frame_count && !stop_requested.load(); ++i) {
                 Frame frame = camera.capture_frame_copy(timeout_ms);
                 ring.push(std::move(frame));
 

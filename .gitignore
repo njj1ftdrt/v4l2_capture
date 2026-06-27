@@ -1,0 +1,13 @@
+build/
+output/
+*.o
+*.d
+*.a
+*.so
+*.ko
+*.jpg
+*.jpeg
+*.png
+*.raw
+*.yuyv
+*.ppm

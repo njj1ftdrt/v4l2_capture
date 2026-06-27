@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/v4l2_capture.dir/src/main.cpp.o CMakeFiles/v4l2_capture.dir/src/camera_device.cpp.o -o v4l2_capture 

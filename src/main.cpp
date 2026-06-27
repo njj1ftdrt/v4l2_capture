@@ -207,6 +207,33 @@ static void save_frame_to_files(
     }
 }
 
+
+static void prepare_output_directory(const std::string& output_dir) {
+    if (output_dir.empty()) {
+        throw std::invalid_argument("Output directory must not be empty");
+    }
+
+    std::filesystem::create_directories(output_dir);
+
+    const auto probe_path =
+        std::filesystem::path(output_dir) / ".v4l2_capture_write_test";
+
+    {
+        std::ofstream probe(probe_path, std::ios::binary | std::ios::trunc);
+        if (!probe) {
+            throw std::runtime_error("Output directory is not writable: " + output_dir);
+        }
+
+        probe << "test";
+        if (!probe) {
+            throw std::runtime_error("Failed to write test file in output directory: " + output_dir);
+        }
+    }
+
+    std::error_code ec;
+    std::filesystem::remove(probe_path, ec);
+}
+
 static void run_pipeline(
     CameraDevice& camera,
     int frame_count,
@@ -490,6 +517,10 @@ int main(int argc, char* argv[]) {
         }
 
         if (capture_mode_count > 0) {
+            if (save_one || (pipeline_frames > 0 && pipeline_save)) {
+                prepare_output_directory(output_dir);
+            }
+
             camera.start_streaming();
 
             if (save_one) {

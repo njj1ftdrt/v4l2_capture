@@ -52,14 +52,17 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --list-formats\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4\n"
-              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-one\n";
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-one\n"
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --save-one --output output\n";
 }
 
 int main(int argc, char* argv[]) {
     std::string device = "/dev/video10";
     bool list_formats = false;
     bool capture_one = false;
+    bool save_one = false;
     int timeout_ms = 2000;
+    std::string output_dir = "output";
 
     std::optional<__u32> width;
     std::optional<__u32> height;
@@ -84,6 +87,10 @@ int main(int argc, char* argv[]) {
                 mmap_buffers = parse_u32_arg(argv[++i], "--mmap-buffers");
             } else if (arg == "--capture-one") {
                 capture_one = true;
+            } else if (arg == "--save-one") {
+                save_one = true;
+            } else if (arg == "--output" && i + 1 < argc) {
+                output_dir = argv[++i];
             } else if (arg == "--timeout-ms" && i + 1 < argc) {
                 timeout_ms = parse_int_arg(argv[++i], "--timeout-ms");
             } else if (arg == "--help" || arg == "-h") {
@@ -112,9 +119,9 @@ int main(int argc, char* argv[]) {
             );
         }
 
-        if (capture_one && !mmap_buffers.has_value()) {
+        if ((capture_one || save_one) && !mmap_buffers.has_value()) {
             throw std::runtime_error(
-                "Capturing a frame requires --mmap-buffers"
+                "Capturing or saving a frame requires --mmap-buffers"
             );
         }
 
@@ -134,9 +141,15 @@ int main(int argc, char* argv[]) {
             camera.init_mmap_buffers(*mmap_buffers);
         }
 
-        if (capture_one) {
+        if (capture_one || save_one) {
             camera.start_streaming();
-            camera.capture_one_frame(timeout_ms);
+
+            if (save_one) {
+                camera.capture_one_frame_to_files(timeout_ms, output_dir);
+            } else {
+                camera.capture_one_frame(timeout_ms);
+            }
+
             camera.stop_streaming();
         }
     } catch (const std::exception& e) {

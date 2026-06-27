@@ -8,10 +8,14 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <utility>
 
@@ -378,6 +382,11 @@ void CameraDevice::set_format(__u32 width, __u32 height, const std::string& pixe
         );
     }
 
+    current_width_ = current.fmt.pix.width;
+    current_height_ = current.fmt.pix.height;
+    current_pixelformat_ = current.fmt.pix.pixelformat;
+    current_sizeimage_ = current.fmt.pix.sizeimage;
+
     std::cout << "---------- Current Format ----------\n";
     std::cout << "current     : "
               << current.fmt.pix.width << "x" << current.fmt.pix.height
@@ -613,4 +622,220 @@ void CameraDevice::capture_one_frame(int timeout_ms) {
     requeue_buffer(buf.index);
     std::cout << "requeued index : " << buf.index << "\n";
     std::cout << "=======================================\n";
+}
+
+
+CameraDevice::CapturedFrameInfo CameraDevice::dequeue_frame(int timeout_ms) {
+    pollfd pfd{};
+    pfd.fd = fd_;
+    pfd.events = POLLIN;
+
+    int poll_ret = 0;
+    do {
+        poll_ret = ::poll(&pfd, 1, timeout_ms);
+    } while (poll_ret < 0 && errno == EINTR);
+
+    if (poll_ret < 0) {
+        throw std::runtime_error("poll failed: " + std::string(std::strerror(errno)));
+    }
+
+    if (poll_ret == 0) {
+        throw std::runtime_error("poll timed out: no frame received");
+    }
+
+    if (pfd.revents & POLLERR) {
+        std::cout << "[WARN] poll returned POLLERR\n";
+    }
+
+    if (!(pfd.revents & POLLIN)) {
+        throw std::runtime_error(
+            "poll returned but POLLIN is not set, revents=" + std::to_string(pfd.revents)
+        );
+    }
+
+    v4l2_buffer buf{};
+    buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    buf.memory = V4L2_MEMORY_MMAP;
+
+    if (::ioctl(fd_, VIDIOC_DQBUF, &buf) < 0) {
+        if (errno == EAGAIN) {
+            throw std::runtime_error("VIDIOC_DQBUF returned EAGAIN: no buffer ready");
+        }
+
+        throw std::runtime_error(
+            "VIDIOC_DQBUF failed: " + std::string(std::strerror(errno))
+        );
+    }
+
+    if (buf.index >= buffers_.size()) {
+        throw std::runtime_error(
+            "VIDIOC_DQBUF returned invalid buffer index: " + std::to_string(buf.index)
+        );
+    }
+
+    if (buf.bytesused == 0) {
+        std::cout << "[WARN] Captured frame has 0 bytes.\n";
+    }
+
+    if (buf.bytesused > buffers_[buf.index].length) {
+        throw std::runtime_error("bytesused is larger than mapped buffer length");
+    }
+
+    CapturedFrameInfo info{};
+    info.index = buf.index;
+    info.bytesused = buf.bytesused;
+    info.sequence = buf.sequence;
+    info.timestamp = buf.timestamp;
+    return info;
+}
+
+unsigned char CameraDevice::clamp_to_u8(int value) {
+    if (value < 0) {
+        return 0;
+    }
+    if (value > 255) {
+        return 255;
+    }
+    return static_cast<unsigned char>(value);
+}
+
+void CameraDevice::yuyv_to_rgb(
+    const unsigned char* yuyv,
+    std::vector<unsigned char>& rgb,
+    __u32 width,
+    __u32 height
+) {
+    rgb.resize(static_cast<size_t>(width) * height * 3);
+
+    size_t in = 0;
+    size_t out = 0;
+    const size_t pixel_count = static_cast<size_t>(width) * height;
+
+    for (size_t i = 0; i + 1 < pixel_count; i += 2) {
+        int y0 = yuyv[in + 0];
+        int u  = yuyv[in + 1];
+        int y1 = yuyv[in + 2];
+        int v  = yuyv[in + 3];
+        in += 4;
+
+        auto convert = [](int y, int u_val, int v_val) {
+            int c = y - 16;
+            int d = u_val - 128;
+            int e = v_val - 128;
+
+            int r = (298 * c + 409 * e + 128) >> 8;
+            int g = (298 * c - 100 * d - 208 * e + 128) >> 8;
+            int b = (298 * c + 516 * d + 128) >> 8;
+
+            return std::array<unsigned char, 3>{
+                CameraDevice::clamp_to_u8(r),
+                CameraDevice::clamp_to_u8(g),
+                CameraDevice::clamp_to_u8(b)
+            };
+        };
+
+        auto rgb0 = convert(y0, u, v);
+        auto rgb1 = convert(y1, u, v);
+
+        rgb[out++] = rgb0[0];
+        rgb[out++] = rgb0[1];
+        rgb[out++] = rgb0[2];
+
+        rgb[out++] = rgb1[0];
+        rgb[out++] = rgb1[1];
+        rgb[out++] = rgb1[2];
+    }
+}
+
+void CameraDevice::save_current_frame_to_files(
+    const CapturedFrameInfo& frame,
+    const std::string& output_dir
+) const {
+    if (frame.index >= buffers_.size()) {
+        throw std::runtime_error("Invalid frame buffer index when saving");
+    }
+
+    if (current_width_ == 0 || current_height_ == 0 || current_pixelformat_ == 0) {
+        throw std::runtime_error("Current format is unknown, set format before saving");
+    }
+
+    std::filesystem::create_directories(output_dir);
+
+    std::ostringstream base;
+    base << output_dir << "/frame_"
+         << std::setw(6) << std::setfill('0') << frame.sequence;
+
+    const auto* data = static_cast<const unsigned char*>(buffers_[frame.index].start);
+
+    const std::string raw_path = base.str() + "." + fourcc_to_string(current_pixelformat_);
+    {
+        std::ofstream raw(raw_path, std::ios::binary);
+        if (!raw) {
+            throw std::runtime_error("Failed to open raw output file: " + raw_path);
+        }
+
+        raw.write(reinterpret_cast<const char*>(data), frame.bytesused);
+        if (!raw) {
+            throw std::runtime_error("Failed to write raw output file: " + raw_path);
+        }
+    }
+
+    std::cout << "[INFO] Saved raw frame: " << raw_path
+              << " bytes=" << frame.bytesused << "\n";
+
+    if (current_pixelformat_ == string_to_fourcc("YUYV")) {
+        std::vector<unsigned char> rgb;
+        yuyv_to_rgb(data, rgb, current_width_, current_height_);
+
+        const std::string ppm_path = base.str() + ".ppm";
+        std::ofstream ppm(ppm_path, std::ios::binary);
+        if (!ppm) {
+            throw std::runtime_error("Failed to open ppm output file: " + ppm_path);
+        }
+
+        ppm << "P6\n" << current_width_ << " " << current_height_ << "\n255\n";
+        ppm.write(
+            reinterpret_cast<const char*>(rgb.data()),
+            static_cast<std::streamsize>(rgb.size())
+        );
+
+        if (!ppm) {
+            throw std::runtime_error("Failed to write ppm output file: " + ppm_path);
+        }
+
+        std::cout << "[INFO] Saved PPM frame: " << ppm_path
+                  << " bytes=" << rgb.size() << "\n";
+    } else {
+        std::cout << "[WARN] PPM conversion is only implemented for YUYV.\n";
+    }
+}
+
+void CameraDevice::capture_one_frame_to_files(int timeout_ms, const std::string& output_dir) {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    if (!streaming_) {
+        throw std::runtime_error("Cannot capture frame before streaming is started");
+    }
+
+    std::cout << "========== Capture One Frame To Files ==========\n";
+    std::cout << "poll timeout: " << timeout_ms << " ms\n";
+
+    CapturedFrameInfo frame = dequeue_frame(timeout_ms);
+
+    std::cout << "dequeued index : " << frame.index << "\n";
+    std::cout << "bytesused      : " << frame.bytesused << "\n";
+    std::cout << "buffer length  : " << buffers_[frame.index].length << "\n";
+    std::cout << "sequence       : " << frame.sequence << "\n";
+    std::cout << "timestamp      : "
+              << frame.timestamp.tv_sec << "."
+              << std::setw(6) << std::setfill('0') << frame.timestamp.tv_usec
+              << std::setfill(' ') << "\n";
+
+    save_current_frame_to_files(frame, output_dir);
+
+    requeue_buffer(frame.index);
+    std::cout << "requeued index : " << frame.index << "\n";
+    std::cout << "===============================================\n";
 }

@@ -5,6 +5,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include <algorithm>
+#include <cctype>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
@@ -62,6 +64,25 @@ std::string CameraDevice::fourcc_to_string(__u32 pixelformat) {
     s.push_back(static_cast<char>((pixelformat >> 16) & 0xFF));
     s.push_back(static_cast<char>((pixelformat >> 24) & 0xFF));
     return s;
+}
+
+__u32 CameraDevice::string_to_fourcc(const std::string& fourcc) {
+    if (fourcc.size() != 4) {
+        throw std::runtime_error("Pixel format must be a 4-character FourCC, for example YUYV or MJPG");
+    }
+
+    std::string normalized = fourcc;
+    std::transform(
+        normalized.begin(),
+        normalized.end(),
+        normalized.begin(),
+        [](unsigned char c) { return static_cast<char>(std::toupper(c)); }
+    );
+
+    return static_cast<__u32>(normalized[0])
+        | (static_cast<__u32>(normalized[1]) << 8)
+        | (static_cast<__u32>(normalized[2]) << 16)
+        | (static_cast<__u32>(normalized[3]) << 24);
 }
 
 void CameraDevice::query_capability() const {
@@ -272,4 +293,63 @@ void CameraDevice::list_frame_intervals(__u32 pixelformat, __u32 width, __u32 he
     if (!found) {
         std::cout << "    [WARN] No frame interval info available\n";
     }
+}
+
+void CameraDevice::set_format(__u32 width, __u32 height, const std::string& pixel_format) const {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    const __u32 requested_fourcc = string_to_fourcc(pixel_format);
+
+    v4l2_format fmt{};
+    fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    fmt.fmt.pix.width = width;
+    fmt.fmt.pix.height = height;
+    fmt.fmt.pix.pixelformat = requested_fourcc;
+    fmt.fmt.pix.field = V4L2_FIELD_ANY;
+
+    std::cout << "========== Set Format ==========\n";
+    std::cout << "requested   : "
+              << width << "x" << height
+              << " " << fourcc_to_string(requested_fourcc)
+              << "\n";
+
+    if (::ioctl(fd_, VIDIOC_S_FMT, &fmt) < 0) {
+        throw std::runtime_error(
+            "VIDIOC_S_FMT failed: " + std::string(std::strerror(errno))
+        );
+    }
+
+    std::cout << "accepted    : "
+              << fmt.fmt.pix.width << "x" << fmt.fmt.pix.height
+              << " " << fourcc_to_string(fmt.fmt.pix.pixelformat)
+              << "\n";
+    std::cout << "bytesperline: " << fmt.fmt.pix.bytesperline << "\n";
+    std::cout << "sizeimage   : " << fmt.fmt.pix.sizeimage << "\n";
+    std::cout << "colorspace  : " << fmt.fmt.pix.colorspace << "\n";
+
+    if (fmt.fmt.pix.width != width ||
+        fmt.fmt.pix.height != height ||
+        fmt.fmt.pix.pixelformat != requested_fourcc) {
+        std::cout << "[WARN] Driver adjusted the requested format.\n";
+    }
+
+    v4l2_format current{};
+    current.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    if (::ioctl(fd_, VIDIOC_G_FMT, &current) < 0) {
+        throw std::runtime_error(
+            "VIDIOC_G_FMT failed: " + std::string(std::strerror(errno))
+        );
+    }
+
+    std::cout << "---------- Current Format ----------\n";
+    std::cout << "current     : "
+              << current.fmt.pix.width << "x" << current.fmt.pix.height
+              << " " << fourcc_to_string(current.fmt.pix.pixelformat)
+              << "\n";
+    std::cout << "bytesperline: " << current.fmt.pix.bytesperline << "\n";
+    std::cout << "sizeimage   : " << current.fmt.pix.sizeimage << "\n";
+    std::cout << "================================\n";
 }

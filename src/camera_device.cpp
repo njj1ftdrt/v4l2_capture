@@ -2,12 +2,15 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <unistd.h>
 
 #include <algorithm>
 #include <cctype>
 #include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
@@ -16,29 +19,60 @@ CameraDevice::CameraDevice(std::string device_path)
     : device_path_(std::move(device_path)) {}
 
 CameraDevice::~CameraDevice() {
+    stop_streaming();
+    release_mmap_buffers();
+    close_device();
+}
+
+CameraDevice::CameraDevice(CameraDevice&& other) noexcept
+    : device_path_(std::move(other.device_path_)),
+      fd_(other.fd_),
+      buffers_(std::move(other.buffers_)),
+      streaming_(other.streaming_) {
+    other.fd_ = -1;
+    other.streaming_ = false;
+    other.buffers_.clear();
+}
+
+CameraDevice& CameraDevice::operator=(CameraDevice&& other) noexcept {
+    if (this != &other) {
+        stop_streaming();
+        release_mmap_buffers();
+        close_device();
+
+        device_path_ = std::move(other.device_path_);
+        fd_ = other.fd_;
+        buffers_ = std::move(other.buffers_);
+        streaming_ = other.streaming_;
+
+        other.fd_ = -1;
+        other.streaming_ = false;
+        other.buffers_.clear();
+    }
+
+    return *this;
+}
+
+void CameraDevice::close_device() {
     if (fd_ >= 0) {
         ::close(fd_);
         fd_ = -1;
     }
 }
 
-CameraDevice::CameraDevice(CameraDevice&& other) noexcept
-    : device_path_(std::move(other.device_path_)), fd_(other.fd_) {
-    other.fd_ = -1;
-}
-
-CameraDevice& CameraDevice::operator=(CameraDevice&& other) noexcept {
-    if (this != &other) {
-        if (fd_ >= 0) {
-            ::close(fd_);
+void CameraDevice::release_mmap_buffers() {
+    for (auto& buffer : buffers_) {
+        if (buffer.start != nullptr && buffer.start != MAP_FAILED && buffer.length > 0) {
+            if (::munmap(buffer.start, buffer.length) < 0) {
+                std::cerr << "[WARN] munmap failed: " << std::strerror(errno) << "\n";
+            }
         }
 
-        device_path_ = std::move(other.device_path_);
-        fd_ = other.fd_;
-        other.fd_ = -1;
+        buffer.start = nullptr;
+        buffer.length = 0;
     }
 
-    return *this;
+    buffers_.clear();
 }
 
 void CameraDevice::open_device() {
@@ -295,7 +329,7 @@ void CameraDevice::list_frame_intervals(__u32 pixelformat, __u32 width, __u32 he
     }
 }
 
-void CameraDevice::set_format(__u32 width, __u32 height, const std::string& pixel_format) const {
+void CameraDevice::set_format(__u32 width, __u32 height, const std::string& pixel_format) {
     if (fd_ < 0) {
         throw std::runtime_error("Device is not opened");
     }
@@ -352,4 +386,231 @@ void CameraDevice::set_format(__u32 width, __u32 height, const std::string& pixe
     std::cout << "bytesperline: " << current.fmt.pix.bytesperline << "\n";
     std::cout << "sizeimage   : " << current.fmt.pix.sizeimage << "\n";
     std::cout << "================================\n";
+}
+
+void CameraDevice::init_mmap_buffers(__u32 requested_buffer_count) {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    if (requested_buffer_count == 0 || requested_buffer_count > 32) {
+        throw std::runtime_error("Requested buffer count must be in range [1, 32]");
+    }
+
+    release_mmap_buffers();
+
+    v4l2_requestbuffers req{};
+    req.count = requested_buffer_count;
+    req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    req.memory = V4L2_MEMORY_MMAP;
+
+    std::cout << "========== Init MMAP Buffers ==========\n";
+    std::cout << "requested buffers: " << requested_buffer_count << "\n";
+
+    if (::ioctl(fd_, VIDIOC_REQBUFS, &req) < 0) {
+        throw std::runtime_error(
+            "VIDIOC_REQBUFS failed: " + std::string(std::strerror(errno))
+        );
+    }
+
+    std::cout << "driver buffers   : " << req.count << "\n";
+
+    if (req.count < 2) {
+        throw std::runtime_error("Insufficient buffer memory: driver returned fewer than 2 buffers");
+    }
+
+    buffers_.resize(req.count);
+
+    for (__u32 i = 0; i < req.count; ++i) {
+        v4l2_buffer buf{};
+        buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        buf.memory = V4L2_MEMORY_MMAP;
+        buf.index = i;
+
+        if (::ioctl(fd_, VIDIOC_QUERYBUF, &buf) < 0) {
+            throw std::runtime_error(
+                "VIDIOC_QUERYBUF failed at index " + std::to_string(i) +
+                ": " + std::string(std::strerror(errno))
+            );
+        }
+
+        void* start = ::mmap(
+            nullptr,
+            buf.length,
+            PROT_READ | PROT_WRITE,
+            MAP_SHARED,
+            fd_,
+            buf.m.offset
+        );
+
+        if (start == MAP_FAILED) {
+            throw std::runtime_error(
+                "mmap failed at index " + std::to_string(i) +
+                ": " + std::string(std::strerror(errno))
+            );
+        }
+
+        buffers_[i].start = start;
+        buffers_[i].length = buf.length;
+
+        std::cout << "buffer[" << i << "]"
+                  << " length=" << buf.length
+                  << " offset=" << buf.m.offset
+                  << " mapped_addr=" << start
+                  << "\n";
+    }
+
+    for (__u32 i = 0; i < req.count; ++i) {
+        requeue_buffer(i);
+        std::cout << "queued buffer[" << i << "]\n";
+    }
+
+    std::cout << "MMAP buffer initialization done.\n";
+    std::cout << "=======================================\n";
+}
+
+void CameraDevice::requeue_buffer(__u32 index) {
+    if (index >= buffers_.size()) {
+        throw std::runtime_error("Cannot queue invalid buffer index: " + std::to_string(index));
+    }
+
+    v4l2_buffer buf{};
+    buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    buf.memory = V4L2_MEMORY_MMAP;
+    buf.index = index;
+
+    if (::ioctl(fd_, VIDIOC_QBUF, &buf) < 0) {
+        throw std::runtime_error(
+            "VIDIOC_QBUF failed at index " + std::to_string(index) +
+            ": " + std::string(std::strerror(errno))
+        );
+    }
+}
+
+void CameraDevice::start_streaming() {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    if (buffers_.empty()) {
+        throw std::runtime_error("Cannot start streaming before MMAP buffers are initialized");
+    }
+
+    if (streaming_) {
+        return;
+    }
+
+    v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    if (::ioctl(fd_, VIDIOC_STREAMON, &type) < 0) {
+        throw std::runtime_error(
+            "VIDIOC_STREAMON failed: " + std::string(std::strerror(errno))
+        );
+    }
+
+    streaming_ = true;
+    std::cout << "[INFO] Streaming started.\n";
+}
+
+void CameraDevice::stop_streaming() {
+    if (fd_ < 0 || !streaming_) {
+        return;
+    }
+
+    v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    if (::ioctl(fd_, VIDIOC_STREAMOFF, &type) < 0) {
+        std::cerr << "[WARN] VIDIOC_STREAMOFF failed: " << std::strerror(errno) << "\n";
+    } else {
+        std::cout << "[INFO] Streaming stopped.\n";
+    }
+
+    streaming_ = false;
+}
+
+void CameraDevice::capture_one_frame(int timeout_ms) {
+    if (fd_ < 0) {
+        throw std::runtime_error("Device is not opened");
+    }
+
+    if (!streaming_) {
+        throw std::runtime_error("Cannot capture frame before streaming is started");
+    }
+
+    pollfd pfd{};
+    pfd.fd = fd_;
+    pfd.events = POLLIN;
+
+    std::cout << "========== Capture One Frame ==========\n";
+    std::cout << "poll timeout: " << timeout_ms << " ms\n";
+
+    int poll_ret = 0;
+    do {
+        poll_ret = ::poll(&pfd, 1, timeout_ms);
+    } while (poll_ret < 0 && errno == EINTR);
+
+    if (poll_ret < 0) {
+        throw std::runtime_error("poll failed: " + std::string(std::strerror(errno)));
+    }
+
+    if (poll_ret == 0) {
+        throw std::runtime_error("poll timed out: no frame received");
+    }
+
+    if (pfd.revents & POLLERR) {
+        std::cout << "[WARN] poll returned POLLERR\n";
+    }
+
+    if (!(pfd.revents & POLLIN)) {
+        throw std::runtime_error("poll returned but POLLIN is not set, revents=" + std::to_string(pfd.revents));
+    }
+
+    v4l2_buffer buf{};
+    buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    buf.memory = V4L2_MEMORY_MMAP;
+
+    if (::ioctl(fd_, VIDIOC_DQBUF, &buf) < 0) {
+        if (errno == EAGAIN) {
+            throw std::runtime_error("VIDIOC_DQBUF returned EAGAIN: no buffer ready");
+        }
+
+        throw std::runtime_error(
+            "VIDIOC_DQBUF failed: " + std::string(std::strerror(errno))
+        );
+    }
+
+    if (buf.index >= buffers_.size()) {
+        throw std::runtime_error("VIDIOC_DQBUF returned invalid buffer index: " + std::to_string(buf.index));
+    }
+
+    std::cout << "dequeued index : " << buf.index << "\n";
+    std::cout << "bytesused      : " << buf.bytesused << "\n";
+    std::cout << "buffer length  : " << buffers_[buf.index].length << "\n";
+    std::cout << "sequence       : " << buf.sequence << "\n";
+    std::cout << "timestamp      : "
+              << buf.timestamp.tv_sec << "."
+              << std::setw(6) << std::setfill('0') << buf.timestamp.tv_usec
+              << std::setfill(' ') << "\n";
+
+    if (buf.bytesused == 0) {
+        std::cout << "[WARN] Captured frame has 0 bytes.\n";
+    } else if (buf.bytesused > buffers_[buf.index].length) {
+        std::cout << "[WARN] bytesused is larger than mapped buffer length.\n";
+    } else {
+        const auto* data = static_cast<const unsigned char*>(buffers_[buf.index].start);
+        const size_t preview_count = std::min<size_t>(16, buf.bytesused);
+
+        std::cout << "first bytes    :";
+        for (size_t i = 0; i < preview_count; ++i) {
+            std::cout << " "
+                      << std::hex << std::setw(2) << std::setfill('0')
+                      << static_cast<int>(data[i])
+                      << std::dec << std::setfill(' ');
+        }
+        std::cout << "\n";
+    }
+
+    requeue_buffer(buf.index);
+    std::cout << "requeued index : " << buf.index << "\n";
+    std::cout << "=======================================\n";
 }

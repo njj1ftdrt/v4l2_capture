@@ -3,6 +3,7 @@
 #include <linux/videodev2.h>
 
 #include <string>
+#include <vector>
 
 class CameraDevice {
 public:
@@ -18,11 +19,27 @@ public:
     void open_device();
     void query_capability() const;
     void list_formats() const;
-    void set_format(__u32 width, __u32 height, const std::string& pixel_format) const;
+    void set_format(__u32 width, __u32 height, const std::string& pixel_format);
+    void init_mmap_buffers(__u32 requested_buffer_count);
+
+    void start_streaming();
+    void stop_streaming();
+    void capture_one_frame(int timeout_ms);
 
 private:
+    struct MappedBuffer {
+        void* start{nullptr};
+        size_t length{0};
+    };
+
     std::string device_path_;
     int fd_{-1};
+    std::vector<MappedBuffer> buffers_;
+    bool streaming_{false};
+
+    void close_device();
+    void release_mmap_buffers();
+    void requeue_buffer(__u32 index);
 
     static void print_capability_flag(__u32 caps, __u32 flag, const std::string& name);
     static std::string fourcc_to_string(__u32 pixelformat);

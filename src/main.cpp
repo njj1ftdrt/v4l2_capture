@@ -27,20 +27,44 @@ static __u32 parse_u32_arg(const std::string& value, const std::string& name) {
     }
 }
 
+static int parse_int_arg(const std::string& value, const std::string& name) {
+    try {
+        size_t pos = 0;
+        long parsed = std::stol(value, &pos, 10);
+
+        if (pos != value.size()) {
+            throw std::runtime_error("invalid trailing characters");
+        }
+
+        if (parsed <= 0 || parsed > 60000) {
+            throw std::runtime_error("out of valid range");
+        }
+
+        return static_cast<int>(parsed);
+    } catch (const std::exception&) {
+        throw std::runtime_error("Invalid value for " + name + ": " + value);
+    }
+}
+
 static void print_usage(const char* program) {
     std::cout << "Usage:\n"
               << "  " << program << " --device /dev/video10\n"
               << "  " << program << " --device /dev/video10 --list-formats\n"
-              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV\n";
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV\n"
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4\n"
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-one\n";
 }
 
 int main(int argc, char* argv[]) {
     std::string device = "/dev/video10";
     bool list_formats = false;
+    bool capture_one = false;
+    int timeout_ms = 2000;
 
     std::optional<__u32> width;
     std::optional<__u32> height;
     std::optional<std::string> pixel_format;
+    std::optional<__u32> mmap_buffers;
 
     try {
         for (int i = 1; i < argc; ++i) {
@@ -56,6 +80,12 @@ int main(int argc, char* argv[]) {
                 height = parse_u32_arg(argv[++i], "--height");
             } else if (arg == "--format" && i + 1 < argc) {
                 pixel_format = argv[++i];
+            } else if (arg == "--mmap-buffers" && i + 1 < argc) {
+                mmap_buffers = parse_u32_arg(argv[++i], "--mmap-buffers");
+            } else if (arg == "--capture-one") {
+                capture_one = true;
+            } else if (arg == "--timeout-ms" && i + 1 < argc) {
+                timeout_ms = parse_int_arg(argv[++i], "--timeout-ms");
             } else if (arg == "--help" || arg == "-h") {
                 print_usage(argv[0]);
                 return 0;
@@ -76,6 +106,18 @@ int main(int argc, char* argv[]) {
             );
         }
 
+        if (mmap_buffers.has_value() && !wants_set_format) {
+            throw std::runtime_error(
+                "Initializing MMAP buffers requires setting format first"
+            );
+        }
+
+        if (capture_one && !mmap_buffers.has_value()) {
+            throw std::runtime_error(
+                "Capturing a frame requires --mmap-buffers"
+            );
+        }
+
         CameraDevice camera(device);
         camera.open_device();
         camera.query_capability();
@@ -86,6 +128,16 @@ int main(int argc, char* argv[]) {
 
         if (wants_set_format) {
             camera.set_format(*width, *height, *pixel_format);
+        }
+
+        if (mmap_buffers.has_value()) {
+            camera.init_mmap_buffers(*mmap_buffers);
+        }
+
+        if (capture_one) {
+            camera.start_streaming();
+            camera.capture_one_frame(timeout_ms);
+            camera.stop_streaming();
         }
     } catch (const std::exception& e) {
         std::cerr << "[ERROR] " << e.what() << "\n";

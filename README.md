@@ -145,20 +145,21 @@ g++ -std=c++17 -Wall -Wextra -Iinclude tests/test_ring_buffer.cpp -o build/test_
 结果：[ERROR] filesystem error: cannot create directories: Permission denied [/root/v4l2_pipeline_test]
 
 修复后，consumer 保存失败时会通知 producer 尽快停止，避免继续无意义采集。
+### 真实 USB 摄像头测试
 
-## 当前不能夸大的地方
+项目已接入真实 UVC USB 摄像头 `/dev/video0` 进行验证。
 
-当前不能说：
-- 已完成真实 USB 摄像头测试
-- 已经验证真实摄像头拔出异常
-- 已经完成量产级摄像头系统
-- 已经精确统计硬件丢帧率
+在 VMware USB 3.0 透传环境下，使用 `640x360 YUYV` 格式、4 个 MMAP buffer 连续采集 300 帧，测试结果如下：
 
-当前可以说：
-- 已实现 Linux V4L2 用户态采集链路
-- 已使用 open/ioctl/mmap/poll 完成帧采集
-- 已实现 YUYV 保存和 PPM 转换
-- 已实现连续帧性能统计
-- 已实现多线程生产者消费者 Pipeline
-- 已通过慢 consumer 测试验证 RingBuffer 覆盖策略
-- 已完成设备不存在、格式不支持、输出目录不可写等异常测试
+* 实际 FPS：29.059
+* 平均帧间隔：33.322 ms
+* P95 帧间隔：36.157 ms
+* P99 帧间隔：36.277 ms
+* poll timeout：0
+* DQBUF error：0
+* bytesused 稳定为 460800 字节
+
+同时验证了 producer-consumer pipeline 在真实摄像头下的保存功能，成功保存 5 张 `.YUYV` 原始图像和 5 张 `.ppm` 可视化图片。
+
+测试过程中曾遇到 VMware USB 透传导致的花屏和帧数据异常问题，切换到 USB 3.0 后恢复正常。详细过程见 `docs/real_usb_camera_test.md`。
+

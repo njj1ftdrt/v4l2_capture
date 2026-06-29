@@ -11,3 +11,6 @@ output/
 *.raw
 *.yuyv
 *.ppm
+
+# Camera test outputs
+output_usb_cam/

@@ -130,6 +130,43 @@ static void frame_yuyv_to_rgb(
     }
 }
 
+
+static std::size_t expected_frame_size_bytes(const Frame& frame) {
+    if (frame.pixel_format == V4L2_PIX_FMT_YUYV) {
+        return static_cast<std::size_t>(frame.width) *
+               static_cast<std::size_t>(frame.height) * 2;
+    }
+
+    // MJPG is compressed, so bytesused changes from frame to frame.
+    // Do not validate MJPG with width * height * 2.
+    return 0;
+}
+
+static bool is_frame_usable(const Frame& frame, std::string& reason) {
+    if (frame.data.empty()) {
+        reason = "empty frame data";
+        return false;
+    }
+
+    if (frame.width == 0 || frame.height == 0 || frame.pixel_format == 0) {
+        reason = "unknown frame format or size";
+        return false;
+    }
+
+    if (frame.pixel_format == V4L2_PIX_FMT_YUYV) {
+        const std::size_t expected = expected_frame_size_bytes(frame);
+        if (frame.data.size() < expected) {
+            reason = "incomplete YUYV frame: got=" +
+                     std::to_string(frame.data.size()) +
+                     ", expected=" +
+                     std::to_string(expected);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 static void save_frame_to_files(
     const Frame& frame,
     const std::string& output_dir,
@@ -258,6 +295,7 @@ static void run_pipeline(
     std::atomic<bool> stop_requested{false};
     std::atomic<int> produced{0};
     std::atomic<int> consumed{0};
+    std::atomic<int> invalid_frames{0};
     std::atomic<int> saved{0};
     std::atomic<std::uint64_t> consumed_bytes{0};
 
@@ -288,6 +326,22 @@ static void run_pipeline(
                     consumed_bytes += frame.bytesused;
 
                     const int count = consumed.load();
+
+                    std::string invalid_reason;
+                    if (!is_frame_usable(frame, invalid_reason)) {
+                        const int invalid_count = ++invalid_frames;
+
+                        if (invalid_count <= 5 || invalid_count % 50 == 0) {
+                            std::cout << "[WARN] skip invalid frame"
+                                      << " sequence=" << frame.sequence
+                                      << " bytesused=" << frame.bytesused
+                                      << " data_size=" << frame.data.size()
+                                      << " reason=" << invalid_reason
+                                      << "\n";
+                        }
+
+                        continue;
+                    }
 
                     if (pipeline_save && saved.load() < save_limit) {
                         const int save_index = saved.fetch_add(1);
@@ -381,6 +435,7 @@ static void run_pipeline(
     std::cout << "producer FPS         : " << producer_fps << "\n";
     std::cout << "consumer FPS         : " << consumer_fps << "\n";
     std::cout << "saved frames         : " << saved.load() << "\n";
+    std::cout << "invalid frames       : " << invalid_frames.load() << "\n";
     std::cout << "consumed bytes       : " << consumed_bytes.load() << "\n";
     std::cout << "=========================================\n";
     std::cout.unsetf(std::ios::floatfield);

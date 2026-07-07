@@ -1,0 +1,51 @@
+[INFO] Opened device: /dev/video0
+========== V4L2 Capability ==========
+driver      : uvcvideo
+card        : Web Camera: Web Camera
+bus_info    : usb-0000:03:00.0-2
+version     : 6.17.13
+capabilities: 0x84a00001
+device_caps : 0x4200001
+---------- Effective Capabilities ----------
+  V4L2_CAP_VIDEO_CAPTURE: yes
+  V4L2_CAP_VIDEO_OUTPUT: no
+  V4L2_CAP_READWRITE: no
+  V4L2_CAP_STREAMING: yes
+=====================================
+========== Set Format ==========
+requested   : 640x360 YUYV
+accepted    : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+colorspace  : 8
+---------- Current Format ----------
+current     : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+================================
+========== Init MMAP Buffers ==========
+requested buffers: 4
+driver buffers   : 4
+buffer[0] length=460800 offset=0 mapped_addr=0x71f8428a6000
+buffer[1] length=460800 offset=32768 mapped_addr=0x71f842835000
+buffer[2] length=460800 offset=65536 mapped_addr=0x71f84258f000
+buffer[3] length=460800 offset=98304 mapped_addr=0x71f84251e000
+queued buffer[0]
+queued buffer[1]
+queued buffer[2]
+queued buffer[3]
+MMAP buffer initialization done.
+=======================================
+[INFO] Streaming started.
+========== Pipeline Capture ==========
+target frames      : 300
+ring capacity      : 8
+poll timeout       : 2000 ms
+consumer delay     : 0 ms
+pipeline save      : yes
+save limit         : 5
+output dir         : output/day2_pipeline
+[PRODUCER] produced 1/300 ring_size=1 dropped=0
+[SAVER] saved raw: output/day2_pipeline/pipeline_frame_000000_seq_0.YUYV bytes=3060
+[INFO] Streaming stopped.
+[ERROR] YUYV frame data is smaller than expected

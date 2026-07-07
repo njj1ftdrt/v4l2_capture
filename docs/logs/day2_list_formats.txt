@@ -1,0 +1,38 @@
+[INFO] Opened device: /dev/video0
+========== V4L2 Capability ==========
+driver      : uvcvideo
+card        : Web Camera: Web Camera
+bus_info    : usb-0000:03:00.0-2
+version     : 6.17.13
+capabilities: 0x84a00001
+device_caps : 0x4200001
+---------- Effective Capabilities ----------
+  V4L2_CAP_VIDEO_CAPTURE: yes
+  V4L2_CAP_VIDEO_OUTPUT: no
+  V4L2_CAP_READWRITE: no
+  V4L2_CAP_STREAMING: yes
+=====================================
+========== Supported Pixel Formats ==========
+[0] MJPG - Motion-JPEG (compressed)
+  size[0]: 1920x1080
+    interval[0]: 1/30 s (30 fps)
+  size[1]: 1280x720
+    interval[0]: 1/30 s (30 fps)
+  size[2]: 960x544
+    interval[0]: 1/30 s (30 fps)
+  size[3]: 800x480
+    interval[0]: 1/30 s (30 fps)
+  size[4]: 640x360
+    interval[0]: 1/30 s (30 fps)
+[1] YUYV - YUYV 4:2:2
+  size[0]: 1920x1080
+    interval[0]: 1/10 s (10 fps)
+  size[1]: 1280x720
+    interval[0]: 1/15 s (15 fps)
+  size[2]: 960x544
+    interval[0]: 1/30 s (30 fps)
+  size[3]: 800x480
+    interval[0]: 1/30 s (30 fps)
+  size[4]: 640x360
+    interval[0]: 1/30 s (30 fps)
+=============================================

@@ -1,0 +1,51 @@
+[INFO] Opened device: /dev/video0
+========== V4L2 Capability ==========
+driver      : uvcvideo
+card        : Web Camera: Web Camera
+bus_info    : usb-0000:03:00.0-2
+version     : 6.17.13
+capabilities: 0x84a00001
+device_caps : 0x4200001
+---------- Effective Capabilities ----------
+  V4L2_CAP_VIDEO_CAPTURE: yes
+  V4L2_CAP_VIDEO_OUTPUT: no
+  V4L2_CAP_READWRITE: no
+  V4L2_CAP_STREAMING: yes
+=====================================
+========== Set Format ==========
+requested   : 640x360 YUYV
+accepted    : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+colorspace  : 8
+---------- Current Format ----------
+current     : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+================================
+========== Init MMAP Buffers ==========
+requested buffers: 4
+driver buffers   : 4
+buffer[0] length=460800 offset=0 mapped_addr=0x700291ca6000
+buffer[1] length=460800 offset=32768 mapped_addr=0x700291c35000
+buffer[2] length=460800 offset=65536 mapped_addr=0x70029198f000
+buffer[3] length=460800 offset=98304 mapped_addr=0x70029191e000
+queued buffer[0]
+queued buffer[1]
+queued buffer[2]
+queued buffer[3]
+MMAP buffer initialization done.
+=======================================
+[INFO] Streaming started.
+========== Capture One Frame To Files ==========
+poll timeout: 2000 ms
+dequeued index : 0
+bytesused      : 460800
+buffer length  : 460800
+sequence       : 0
+timestamp      : 2299.299187
+[INFO] Saved raw frame: output/day2_one/frame_000000.YUYV bytes=460800
+[INFO] Saved PPM frame: output/day2_one/frame_000000.ppm bytes=691200
+requeued index : 0
+===============================================
+[INFO] Streaming stopped.

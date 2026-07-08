@@ -33,3 +33,31 @@ target_compile_options(test_ring_buffer PRIVATE
 enable_testing()
 
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
+
+
+add_executable(tcp_receiver
+    src/tcp_receiver.cpp
+)
+
+target_include_directories(tcp_receiver PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(tcp_receiver PRIVATE cxx_std_17)
+
+
+add_executable(tcp_sender
+    src/tcp_sender.cpp
+)
+
+target_include_directories(tcp_sender PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_compile_features(tcp_sender PRIVATE cxx_std_17)
+
+target_compile_options(tcp_sender PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)

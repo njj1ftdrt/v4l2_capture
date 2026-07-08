@@ -1,11 +1,17 @@
 #include "camera_device.hpp"
 #include "frame.hpp"
+#include "frame_protocol.hpp"
 #include "ring_buffer.hpp"
 
 #include <linux/videodev2.h>
 
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include <array>
 #include <atomic>
+#include <cerrno>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
@@ -15,10 +21,12 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <mutex>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
+#include <cstring>
 #include <string>
 #include <thread>
 #include <vector>
@@ -62,6 +70,101 @@ static int parse_int_arg(const std::string& value, const std::string& name) {
 }
 
 
+
+
+static void close_socket_fd(int fd) {
+    if (fd >= 0) {
+        close(fd);
+    }
+}
+
+static std::uint64_t current_system_time_ns() {
+    const auto now = std::chrono::system_clock::now().time_since_epoch();
+    return static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(now).count()
+    );
+}
+
+static int connect_to_tcp_receiver(const std::string& host, int port) {
+    const int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        throw std::runtime_error(
+            std::string("socket failed: ") + std::strerror(errno)
+        );
+    }
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(static_cast<std::uint16_t>(port));
+
+    if (inet_pton(AF_INET, host.c_str(), &addr.sin_addr) != 1) {
+        close_socket_fd(fd);
+        throw std::runtime_error("Invalid IPv4 address for --tcp-host: " + host);
+    }
+
+    if (connect(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
+        close_socket_fd(fd);
+        throw std::runtime_error(
+            std::string("connect failed: ") + std::strerror(errno)
+        );
+    }
+
+    return fd;
+}
+
+static void send_all_tcp(int fd, const void* data, std::size_t size) {
+    const auto* ptr = static_cast<const std::uint8_t*>(data);
+    std::size_t sent = 0;
+
+    while (sent < size) {
+        const ssize_t n = send(
+            fd,
+            ptr + sent,
+            size - sent,
+#ifdef MSG_NOSIGNAL
+            MSG_NOSIGNAL
+#else
+            0
+#endif
+        );
+
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+
+            throw std::runtime_error(
+                std::string("send failed: ") + std::strerror(errno)
+            );
+        }
+
+        if (n == 0) {
+            throw std::runtime_error("send returned 0, peer may have closed connection");
+        }
+
+        sent += static_cast<std::size_t>(n);
+    }
+}
+
+static std::uint64_t send_frame_over_tcp(int fd, const Frame& frame) {
+    if (frame.data.size() > std::numeric_limits<std::uint32_t>::max()) {
+        throw std::runtime_error("Frame payload is too large for FrameHeader payload_size");
+    }
+
+    const auto header = frame_protocol::make_header(
+        static_cast<std::uint64_t>(frame.sequence),
+        current_system_time_ns(),
+        frame.width,
+        frame.height,
+        frame.pixel_format,
+        static_cast<std::uint32_t>(frame.data.size())
+    );
+
+    send_all_tcp(fd, &header, sizeof(header));
+    send_all_tcp(fd, frame.data.data(), frame.data.size());
+
+    return static_cast<std::uint64_t>(sizeof(header)) + frame.data.size();
+}
 
 static std::string frame_fourcc_to_string(__u32 pixelformat) {
     std::string s;
@@ -279,7 +382,9 @@ static void run_pipeline(
     int consumer_delay_ms,
     bool pipeline_save,
     int save_limit,
-    const std::string& output_dir
+    const std::string& output_dir,
+    const std::optional<std::string>& tcp_host,
+    int tcp_port
 ) {
     if (frame_count <= 0) {
         throw std::runtime_error("Pipeline frame count must be positive");
@@ -289,6 +394,8 @@ static void run_pipeline(
         throw std::runtime_error("Ring capacity must be positive");
     }
 
+    const bool tcp_enabled = tcp_host.has_value() && tcp_port > 0;
+
     RingBuffer<Frame> ring(static_cast<std::size_t>(ring_capacity));
 
     std::atomic<bool> producer_done{false};
@@ -297,7 +404,9 @@ static void run_pipeline(
     std::atomic<int> consumed{0};
     std::atomic<int> invalid_frames{0};
     std::atomic<int> saved{0};
+    std::atomic<int> tcp_sent_frames{0};
     std::atomic<std::uint64_t> consumed_bytes{0};
+    std::atomic<std::uint64_t> tcp_sent_bytes{0};
 
     std::mutex cv_mutex;
     std::condition_variable cv;
@@ -313,11 +422,22 @@ static void run_pipeline(
     std::cout << "pipeline save      : " << (pipeline_save ? "yes" : "no") << "\n";
     std::cout << "save limit         : " << save_limit << "\n";
     std::cout << "output dir         : " << output_dir << "\n";
+    std::cout << "tcp send           : " << (tcp_enabled ? "yes" : "no") << "\n";
+    if (tcp_enabled) {
+        std::cout << "tcp target         : " << *tcp_host << ":" << tcp_port << "\n";
+    }
 
     const auto start_time = std::chrono::steady_clock::now();
 
     std::thread consumer_thread([&]() {
+        int tcp_fd = -1;
+
         try {
+            if (tcp_enabled) {
+                tcp_fd = connect_to_tcp_receiver(*tcp_host, tcp_port);
+                std::cout << "[TCP] connected to " << *tcp_host << ":" << tcp_port << "\n";
+            }
+
             while (!producer_done.load() || !ring.empty()) {
                 Frame frame;
 
@@ -341,6 +461,20 @@ static void run_pipeline(
                         }
 
                         continue;
+                    }
+
+                    if (tcp_enabled) {
+                        const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
+                        tcp_sent_bytes += bytes;
+                        const int tcp_count = ++tcp_sent_frames;
+
+                        if (tcp_count == 1 || tcp_count == frame_count || tcp_count % 50 == 0) {
+                            std::cout << "[TCP] sent "
+                                      << tcp_count
+                                      << " frame_id=" << frame.sequence
+                                      << " bytes=" << bytes
+                                      << "\n";
+                        }
                     }
 
                     if (pipeline_save && saved.load() < save_limit) {
@@ -370,7 +504,10 @@ static void run_pipeline(
                 std::unique_lock<std::mutex> lock(cv_mutex);
                 cv.wait_for(lock, std::chrono::milliseconds(100));
             }
+
+            close_socket_fd(tcp_fd);
         } catch (...) {
+            close_socket_fd(tcp_fd);
             consumer_error = std::current_exception();
             stop_requested = true;
             cv.notify_all();
@@ -435,6 +572,8 @@ static void run_pipeline(
     std::cout << "producer FPS         : " << producer_fps << "\n";
     std::cout << "consumer FPS         : " << consumer_fps << "\n";
     std::cout << "saved frames         : " << saved.load() << "\n";
+    std::cout << "tcp sent frames      : " << tcp_sent_frames.load() << "\n";
+    std::cout << "tcp sent bytes       : " << tcp_sent_bytes.load() << "\n";
     std::cout << "invalid frames       : " << invalid_frames.load() << "\n";
     std::cout << "consumed bytes       : " << consumed_bytes.load() << "\n";
     std::cout << "=========================================\n";
@@ -453,7 +592,8 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --capture-frames 300 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 2 --consumer-delay-ms 50 --timeout-ms 2000\n"
-              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --pipeline-save --save-limit 5 --output output/pipeline --timeout-ms 2000\n";
+              << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --pipeline-save --save-limit 5 --output output/pipeline --timeout-ms 2000\n"
+              << "  " << program << " --device /dev/video0 --width 640 --height 360 --format YUYV --mmap-buffers 4 --pipeline-frames 30 --ring-capacity 8 --tcp-host 127.0.0.1 --tcp-port 9000 --timeout-ms 2000\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -469,6 +609,8 @@ int main(int argc, char* argv[]) {
     int save_limit = 5;
     int timeout_ms = 2000;
     std::string output_dir = "output";
+    std::optional<std::string> tcp_host;
+    int tcp_port = 0;
 
     std::optional<__u32> width;
     std::optional<__u32> height;
@@ -509,6 +651,10 @@ int main(int argc, char* argv[]) {
                 save_limit = parse_int_arg(argv[++i], arg);
             } else if (arg == "--output" && i + 1 < argc) {
                 output_dir = argv[++i];
+            } else if (arg == "--tcp-host" && i + 1 < argc) {
+                tcp_host = argv[++i];
+            } else if (arg == "--tcp-port" && i + 1 < argc) {
+                tcp_port = parse_int_arg(argv[++i], "--tcp-port");
             } else if (arg == "--timeout-ms" && i + 1 < argc) {
                 timeout_ms = parse_int_arg(argv[++i], "--timeout-ms");
             } else if (arg == "--help" || arg == "-h") {
@@ -546,6 +692,19 @@ int main(int argc, char* argv[]) {
         if (capture_mode_count > 1) {
             throw std::runtime_error(
                 "Use only one capture mode: --capture-one, --save-one, --frames, or --pipeline-frames"
+            );
+        }
+
+        const bool tcp_enabled = tcp_host.has_value() || tcp_port > 0;
+        if (tcp_enabled && !(tcp_host.has_value() && tcp_port > 0)) {
+            throw std::runtime_error(
+                "TCP sending requires --tcp-host and --tcp-port together"
+            );
+        }
+
+        if (tcp_enabled && pipeline_frames <= 0) {
+            throw std::runtime_error(
+                "TCP sending is currently supported only with --pipeline-frames"
             );
         }
 
@@ -593,7 +752,9 @@ int main(int argc, char* argv[]) {
                     consumer_delay_ms,
                     pipeline_save,
                     save_limit,
-                    output_dir
+                    output_dir,
+                    tcp_host,
+                    tcp_port
                 );
             }
 

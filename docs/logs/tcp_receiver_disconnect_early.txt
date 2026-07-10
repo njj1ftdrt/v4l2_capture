@@ -1,0 +1,67 @@
+[INFO] tcp_receiver listening on port 9000
+[INFO] output dir: output/tcp_recv_disconnect
+[INFO] client connected
+[RECV] frame=1 frame_id=0 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_1_id_0.YUYV bytes=460800
+[RECV] frame=2 frame_id=1 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_2_id_1.YUYV bytes=460800
+[RECV] frame=3 frame_id=2 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_3_id_2.YUYV bytes=460800
+[RECV] frame=4 frame_id=3 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_4_id_3.YUYV bytes=460800
+[RECV] frame=5 frame_id=4 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_5_id_4.YUYV bytes=460800
+[RECV] frame=6 frame_id=5 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_6_id_5.YUYV bytes=460800
+[RECV] frame=7 frame_id=6 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_7_id_6.YUYV bytes=460800
+[RECV] frame=8 frame_id=7 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_8_id_7.YUYV bytes=460800
+[RECV] frame=9 frame_id=8 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_9_id_8.YUYV bytes=460800
+[RECV] frame=10 frame_id=9 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_10_id_9.YUYV bytes=460800
+[RECV] frame=11 frame_id=10 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_11_id_10.YUYV bytes=460800
+[RECV] frame=12 frame_id=11 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_12_id_11.YUYV bytes=460800
+[RECV] frame=13 frame_id=12 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_13_id_12.YUYV bytes=460800
+[RECV] frame=14 frame_id=13 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_14_id_13.YUYV bytes=460800
+[RECV] frame=15 frame_id=14 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_15_id_14.YUYV bytes=460800
+[RECV] frame=16 frame_id=15 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_16_id_15.YUYV bytes=460800
+[RECV] frame=17 frame_id=16 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_17_id_16.YUYV bytes=460800
+[RECV] frame=18 frame_id=17 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_18_id_17.YUYV bytes=460800
+[RECV] frame=19 frame_id=18 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_19_id_18.YUYV bytes=460800
+[RECV] frame=20 frame_id=19 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_20_id_19.YUYV bytes=460800
+[RECV] frame=21 frame_id=20 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_21_id_20.YUYV bytes=460800
+[RECV] frame=22 frame_id=21 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_22_id_21.YUYV bytes=460800
+[RECV] frame=23 frame_id=22 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_23_id_22.YUYV bytes=460800
+[RECV] frame=24 frame_id=23 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_24_id_23.YUYV bytes=460800
+[RECV] frame=25 frame_id=24 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_25_id_24.YUYV bytes=460800
+[RECV] frame=26 frame_id=25 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_26_id_25.YUYV bytes=460800
+[RECV] frame=27 frame_id=26 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_27_id_26.YUYV bytes=460800
+[RECV] frame=28 frame_id=27 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_28_id_27.YUYV bytes=460800
+[RECV] frame=29 frame_id=28 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_29_id_28.YUYV bytes=460800
+[RECV] frame=30 frame_id=29 size=640x360 format=YUYV payload=460800
+[RECV] saved output/tcp_recv_disconnect/recv_frame_30_id_29.YUYV bytes=460800
+========== TCP Receiver Statistics ==========
+received frames : 30
+received bytes  : 13824000
+=============================================

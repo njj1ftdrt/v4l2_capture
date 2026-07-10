@@ -405,8 +405,10 @@ static void run_pipeline(
     std::atomic<int> invalid_frames{0};
     std::atomic<int> saved{0};
     std::atomic<int> tcp_sent_frames{0};
+    std::atomic<int> tcp_send_errors{0};
     std::atomic<std::uint64_t> consumed_bytes{0};
     std::atomic<std::uint64_t> tcp_sent_bytes{0};
+    std::string tcp_error_message;
 
     std::mutex cv_mutex;
     std::condition_variable cv;
@@ -434,8 +436,17 @@ static void run_pipeline(
 
         try {
             if (tcp_enabled) {
-                tcp_fd = connect_to_tcp_receiver(*tcp_host, tcp_port);
-                std::cout << "[TCP] connected to " << *tcp_host << ":" << tcp_port << "\n";
+                try {
+                    tcp_fd = connect_to_tcp_receiver(*tcp_host, tcp_port);
+                    std::cout << "[TCP] connected to " << *tcp_host << ":" << tcp_port << "\n";
+                } catch (const std::exception& e) {
+                    ++tcp_send_errors;
+                    tcp_error_message = std::string("connect to ") + *tcp_host + ":" +
+                                        std::to_string(tcp_port) + " failed: " + e.what();
+                    std::cerr << "[TCP][ERROR] " << tcp_error_message << "\n";
+                    stop_requested = true;
+                    return;
+                }
             }
 
             while (!producer_done.load() || !ring.empty()) {
@@ -464,16 +475,28 @@ static void run_pipeline(
                     }
 
                     if (tcp_enabled) {
-                        const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
-                        tcp_sent_bytes += bytes;
-                        const int tcp_count = ++tcp_sent_frames;
+                        try {
+                            const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
+                            tcp_sent_bytes += bytes;
+                            const int tcp_count = ++tcp_sent_frames;
 
-                        if (tcp_count == 1 || tcp_count == frame_count || tcp_count % 50 == 0) {
-                            std::cout << "[TCP] sent "
-                                      << tcp_count
-                                      << " frame_id=" << frame.sequence
-                                      << " bytes=" << bytes
-                                      << "\n";
+                            if (tcp_count == 1 || tcp_count == frame_count || tcp_count % 50 == 0) {
+                                std::cout << "[TCP] sent "
+                                          << tcp_count
+                                          << " frame_id=" << frame.sequence
+                                          << " bytes=" << bytes
+                                          << "\n";
+                            }
+                        } catch (const std::exception& e) {
+                            ++tcp_send_errors;
+                            tcp_error_message = "send frame_id=" +
+                                                std::to_string(frame.sequence) +
+                                                " failed after tcp_sent_frames=" +
+                                                std::to_string(tcp_sent_frames.load()) +
+                                                ": " + e.what();
+                            std::cerr << "[TCP][ERROR] " << tcp_error_message << "\n";
+                            stop_requested = true;
+                            break;
                         }
                     }
 
@@ -542,14 +565,6 @@ static void run_pipeline(
     producer_thread.join();
     consumer_thread.join();
 
-    if (producer_error) {
-        std::rethrow_exception(producer_error);
-    }
-
-    if (consumer_error) {
-        std::rethrow_exception(consumer_error);
-    }
-
     const auto end_time = std::chrono::steady_clock::now();
     const double elapsed_s =
         std::chrono::duration<double>(end_time - start_time).count();
@@ -574,10 +589,26 @@ static void run_pipeline(
     std::cout << "saved frames         : " << saved.load() << "\n";
     std::cout << "tcp sent frames      : " << tcp_sent_frames.load() << "\n";
     std::cout << "tcp sent bytes       : " << tcp_sent_bytes.load() << "\n";
+    std::cout << "tcp send errors      : " << tcp_send_errors.load() << "\n";
+    if (!tcp_error_message.empty()) {
+        std::cout << "tcp last error       : " << tcp_error_message << "\n";
+    }
     std::cout << "invalid frames       : " << invalid_frames.load() << "\n";
     std::cout << "consumed bytes       : " << consumed_bytes.load() << "\n";
     std::cout << "=========================================\n";
     std::cout.unsetf(std::ios::floatfield);
+
+    if (producer_error) {
+        std::rethrow_exception(producer_error);
+    }
+
+    if (consumer_error) {
+        std::rethrow_exception(consumer_error);
+    }
+
+    if (tcp_send_errors.load() > 0) {
+        throw std::runtime_error("TCP transmission failed: " + tcp_error_message);
+    }
 }
 
 static void print_usage(const char* program) {

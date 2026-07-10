@@ -3,6 +3,7 @@
 #include "frame.hpp"
 #include "frame_protocol.hpp"
 #include "logger.hpp"
+#include "pipeline_stats.hpp"
 #include "ring_buffer.hpp"
 
 #include <linux/videodev2.h>
@@ -365,16 +366,7 @@ static void run_pipeline(
     std::atomic<bool> producer_done{false};
     std::atomic<bool> consumer_done{false};
     std::atomic<bool> stop_requested{false};
-    std::atomic<int> produced{0};
-    std::atomic<int> consumed{0};
-    std::atomic<int> invalid_frames{0};
-    std::atomic<int> saved{0};
-    std::atomic<int> tcp_enqueued_frames{0};
-    std::atomic<int> tcp_sent_frames{0};
-    std::atomic<int> tcp_send_errors{0};
-    std::atomic<std::uint64_t> consumed_bytes{0};
-    std::atomic<std::uint64_t> tcp_sent_bytes{0};
-    std::string tcp_error_message;
+    PipelineStats stats;
 
     std::mutex cv_mutex;
     std::condition_variable cv;
@@ -411,10 +403,10 @@ static void run_pipeline(
                     tcp_fd = connect_to_tcp_receiver(*tcp_host, tcp_port);
                     log_info("TCP", "connected to ", *tcp_host, ":", tcp_port);
                 } catch (const std::exception& e) {
-                    ++tcp_send_errors;
-                    tcp_error_message = std::string("connect to ") + *tcp_host + ":" +
-                                        std::to_string(tcp_port) + " failed: " + e.what();
-                    log_error("TCP", tcp_error_message);
+                    ++stats.tcp_send_errors;
+                    stats.set_last_error(std::string("connect to ") + *tcp_host + ":" +
+                                         std::to_string(tcp_port) + " failed: " + e.what());
+                    log_error("TCP", stats.last_error());
                     stop_requested = true;
                     cv.notify_all();
                     tcp_cv.notify_all();
@@ -427,8 +419,8 @@ static void run_pipeline(
                     if (tcp_ring.try_pop_oldest(frame)) {
                         try {
                             const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
-                            tcp_sent_bytes += bytes;
-                            const int tcp_count = ++tcp_sent_frames;
+                            stats.tcp_sent_bytes += bytes;
+                            const int tcp_count = static_cast<int>(++stats.tcp_sent);
 
                             if (tcp_count == 1 || tcp_count == frame_count || tcp_count % 50 == 0) {
                                 log_info("TCP", "sent ", tcp_count,
@@ -436,13 +428,13 @@ static void run_pipeline(
                                          " bytes=", bytes);
                             }
                         } catch (const std::exception& e) {
-                            ++tcp_send_errors;
-                            tcp_error_message = "send frame_id=" +
-                                                std::to_string(frame.sequence) +
-                                                " failed after tcp_sent_frames=" +
-                                                std::to_string(tcp_sent_frames.load()) +
-                                                ": " + e.what();
-                            log_error("TCP", tcp_error_message);
+                            ++stats.tcp_send_errors;
+                            stats.set_last_error("send frame_id=" +
+                                                 std::to_string(frame.sequence) +
+                                                 " failed after tcp_sent_frames=" +
+                                                 std::to_string(stats.tcp_sent.load()) +
+                                                 ": " + e.what());
+                            log_error("TCP", stats.last_error());
                             stop_requested = true;
                             cv.notify_all();
                             tcp_cv.notify_all();
@@ -473,14 +465,14 @@ static void run_pipeline(
                 Frame frame;
 
                 if (ring.try_pop_oldest(frame)) {
-                    ++consumed;
-                    consumed_bytes += frame.bytesused;
+                    ++stats.consumed;
+                    stats.consumed_bytes += frame.bytesused;
 
-                    const int count = consumed.load();
+                    const int count = static_cast<int>(stats.consumed.load());
 
                     std::string invalid_reason;
                     if (!is_frame_usable(frame, invalid_reason)) {
-                        const int invalid_count = ++invalid_frames;
+                        const int invalid_count = static_cast<int>(++stats.invalid);
 
                         if (invalid_count <= 5 || invalid_count % 50 == 0) {
                             log_warn("PIPELINE", "skip invalid frame",
@@ -493,8 +485,8 @@ static void run_pipeline(
                         continue;
                     }
 
-                    if (pipeline_save && saved.load() < save_limit) {
-                        const int save_index = saved.fetch_add(1);
+                    if (pipeline_save && stats.saved.load() < static_cast<std::uint64_t>(save_limit)) {
+                        const int save_index = static_cast<int>(stats.saved.fetch_add(1));
                         if (save_index < save_limit) {
                             save_frame_to_files(frame, output_dir, save_index);
                         }
@@ -502,7 +494,7 @@ static void run_pipeline(
 
                     if (tcp_enabled) {
                         tcp_ring.push(std::move(frame));
-                        const int queued = ++tcp_enqueued_frames;
+                        const int queued = static_cast<int>(++stats.tcp_queued);
                         tcp_cv.notify_one();
 
                         if (queued == 1 || queued == frame_count || queued % 50 == 0) {
@@ -548,7 +540,7 @@ static void run_pipeline(
                 Frame frame = camera.capture_frame_copy(timeout_ms);
                 ring.push(std::move(frame));
 
-                const int count = ++produced;
+                const int count = static_cast<int>(++stats.captured);
                 if (count == 1 || count == frame_count || count % 50 == 0) {
                     log_debug("PRODUCER", "produced ", count, "/", frame_count,
                               " ring_size=", ring.size(),
@@ -575,41 +567,42 @@ static void run_pipeline(
     const double elapsed_s =
         std::chrono::duration<double>(end_time - start_time).count();
 
-    const double producer_fps = elapsed_s > 0.0
-        ? static_cast<double>(produced.load()) / elapsed_s
-        : 0.0;
+    stats.capture_dropped = ring.dropped_count();
+    stats.capture_queue_remaining = ring.size();
+    stats.tcp_dropped = tcp_ring.dropped_count();
+    stats.tcp_queue_remaining = tcp_ring.size();
 
-    const double consumer_fps = elapsed_s > 0.0
-        ? static_cast<double>(consumed.load()) / elapsed_s
-        : 0.0;
+    const PipelineStatsSnapshot snapshot = stats.snapshot(elapsed_s);
 
     std::ostringstream elapsed_text;
-    elapsed_text << std::fixed << std::setprecision(3) << elapsed_s;
+    elapsed_text << std::fixed << std::setprecision(3) << snapshot.elapsed_seconds;
     std::ostringstream producer_fps_text;
-    producer_fps_text << std::fixed << std::setprecision(3) << producer_fps;
+    producer_fps_text << std::fixed << std::setprecision(3) << snapshot.producer_fps;
     std::ostringstream consumer_fps_text;
-    consumer_fps_text << std::fixed << std::setprecision(3) << consumer_fps;
+    consumer_fps_text << std::fixed << std::setprecision(3) << snapshot.consumer_fps;
 
     log_info("STATS", "========== Pipeline Statistics ==========");
-    log_info("STATS", "produced frames      : ", produced.load());
-    log_info("STATS", "consumed frames      : ", consumed.load());
-    log_info("STATS", "ring dropped frames  : ", ring.dropped_count());
-    log_info("STATS", "remaining ring size  : ", ring.size());
+    log_info("STATS", "produced frames      : ", snapshot.captured);
+    log_info("STATS", "consumed frames      : ", snapshot.consumed);
+    log_info("STATS", "ring dropped frames  : ", snapshot.capture_dropped);
+    log_info("STATS", "remaining ring size  : ", snapshot.capture_queue_remaining);
     log_info("STATS", "elapsed seconds      : ", elapsed_text.str());
     log_info("STATS", "producer FPS         : ", producer_fps_text.str());
     log_info("STATS", "consumer FPS         : ", consumer_fps_text.str());
-    log_info("STATS", "saved frames         : ", saved.load());
-    log_info("STATS", "tcp queued frames    : ", tcp_enqueued_frames.load());
-    log_info("STATS", "tcp queue dropped    : ", tcp_ring.dropped_count());
-    log_info("STATS", "tcp queue remaining  : ", tcp_ring.size());
-    log_info("STATS", "tcp sent frames      : ", tcp_sent_frames.load());
-    log_info("STATS", "tcp sent bytes       : ", tcp_sent_bytes.load());
-    log_info("STATS", "tcp send errors      : ", tcp_send_errors.load());
-    if (!tcp_error_message.empty()) {
-        log_info("STATS", "tcp last error       : ", tcp_error_message);
+    log_info("STATS", "saved frames         : ", snapshot.saved);
+    log_info("STATS", "tcp queued frames    : ", snapshot.tcp_queued);
+    log_info("STATS", "tcp queue dropped    : ", snapshot.tcp_dropped);
+    log_info("STATS", "tcp queue remaining  : ", snapshot.tcp_queue_remaining);
+    log_info("STATS", "tcp sent frames      : ", snapshot.tcp_sent);
+    log_info("STATS", "tcp sent bytes       : ", snapshot.tcp_sent_bytes);
+    log_info("STATS", "tcp send errors      : ", snapshot.tcp_send_errors);
+    log_info("STATS", "received frames      : ", snapshot.received);
+    log_info("STATS", "reconnect count      : ", snapshot.reconnect_count);
+    if (!snapshot.last_error.empty()) {
+        log_info("STATS", "tcp last error       : ", snapshot.last_error);
     }
-    log_info("STATS", "invalid frames       : ", invalid_frames.load());
-    log_info("STATS", "consumed bytes       : ", consumed_bytes.load());
+    log_info("STATS", "invalid frames       : ", snapshot.invalid);
+    log_info("STATS", "consumed bytes       : ", snapshot.consumed_bytes);
     log_info("STATS", "=========================================");
 
     if (producer_error) {
@@ -624,8 +617,8 @@ static void run_pipeline(
         std::rethrow_exception(tcp_thread_error);
     }
 
-    if (tcp_send_errors.load() > 0) {
-        throw std::runtime_error("TCP transmission failed: " + tcp_error_message);
+    if (stats.tcp_send_errors.load() > 0) {
+        throw std::runtime_error("TCP transmission failed: " + stats.last_error());
     }
 }
 

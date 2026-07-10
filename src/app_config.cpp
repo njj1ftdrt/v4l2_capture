@@ -1,4 +1,5 @@
 #include "app_config.hpp"
+#include "logger.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -333,27 +334,27 @@ void validate_app_config(const AppConfig& config) {
 }
 
 void print_app_config(const AppConfig& config) {
-    std::cout << "========== Effective AppConfig ==========" << "\n";
-    std::cout << "config path        : " << config.config_path << "\n";
-    std::cout << "device             : " << config.device << "\n";
-    std::cout << "list formats       : " << (config.list_formats ? "yes" : "no") << "\n";
-    std::cout << "width              : " << optional_u32_to_string(config.width) << "\n";
-    std::cout << "height             : " << optional_u32_to_string(config.height) << "\n";
-    std::cout << "format             : " << optional_string_to_string(config.pixel_format) << "\n";
-    std::cout << "mmap buffers       : " << optional_u32_to_string(config.mmap_buffers) << "\n";
-    std::cout << "capture one        : " << (config.capture_one ? "yes" : "no") << "\n";
-    std::cout << "save one           : " << (config.save_one ? "yes" : "no") << "\n";
-    std::cout << "capture frames     : " << config.capture_frames << "\n";
-    std::cout << "pipeline frames    : " << config.pipeline_frames << "\n";
-    std::cout << "ring capacity      : " << config.ring_capacity << "\n";
-    std::cout << "tcp queue capacity : " << config.tcp_queue_capacity << "\n";
-    std::cout << "consumer delay ms  : " << config.consumer_delay_ms << "\n";
-    std::cout << "pipeline save      : " << (config.pipeline_save ? "yes" : "no") << "\n";
-    std::cout << "save limit         : " << config.save_limit << "\n";
-    std::cout << "output dir         : " << config.output_dir << "\n";
-    std::cout << "tcp host           : " << optional_string_to_string(config.tcp_host) << "\n";
-    std::cout << "tcp port           : " << config.tcp_port << "\n";
-    std::cout << "timeout ms         : " << config.timeout_ms << "\n";
-    std::cout << "log level          : " << config.log_level << "\n";
-    std::cout << "=========================================" << "\n";
+    log_info("CONFIG", "========== Effective AppConfig ==========");
+    log_info("CONFIG", "config path        : ", config.config_path);
+    log_info("CONFIG", "device             : ", config.device);
+    log_info("CONFIG", "list formats       : ", (config.list_formats ? "yes" : "no"));
+    log_info("CONFIG", "width              : ", optional_u32_to_string(config.width));
+    log_info("CONFIG", "height             : ", optional_u32_to_string(config.height));
+    log_info("CONFIG", "format             : ", optional_string_to_string(config.pixel_format));
+    log_info("CONFIG", "mmap buffers       : ", optional_u32_to_string(config.mmap_buffers));
+    log_info("CONFIG", "capture one        : ", (config.capture_one ? "yes" : "no"));
+    log_info("CONFIG", "save one           : ", (config.save_one ? "yes" : "no"));
+    log_info("CONFIG", "capture frames     : ", config.capture_frames);
+    log_info("CONFIG", "pipeline frames    : ", config.pipeline_frames);
+    log_info("CONFIG", "ring capacity      : ", config.ring_capacity);
+    log_info("CONFIG", "tcp queue capacity : ", config.tcp_queue_capacity);
+    log_info("CONFIG", "consumer delay ms  : ", config.consumer_delay_ms);
+    log_info("CONFIG", "pipeline save      : ", (config.pipeline_save ? "yes" : "no"));
+    log_info("CONFIG", "save limit         : ", config.save_limit);
+    log_info("CONFIG", "output dir         : ", config.output_dir);
+    log_info("CONFIG", "tcp host           : ", optional_string_to_string(config.tcp_host));
+    log_info("CONFIG", "tcp port           : ", config.tcp_port);
+    log_info("CONFIG", "timeout ms         : ", config.timeout_ms);
+    log_info("CONFIG", "log level          : ", config.log_level);
+    log_info("CONFIG", "=========================================");
 }

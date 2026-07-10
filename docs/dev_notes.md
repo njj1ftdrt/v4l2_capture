@@ -44,3 +44,61 @@ Embedded Linux V4L2 Camera Capture and TCP Frame Transport System
 ## One-Sentence Version
 
 基于 Linux V4L2 实现 USB 摄像头 YUYV 原始帧采集，设计多线程 RingBuffer Pipeline 与 FrameHeader + Payload TCP 协议，完成真实摄像头图像帧的稳定传输、断线处理和自动化回归测试。
+
+## Lightweight Thread-Safe Logger
+
+The project now includes a lightweight thread-safe Logger.
+
+Supported levels:
+
+```text
+DEBUG < INFO < WARN < ERROR
+[timestamp][level][module] message
+[2026-07-10 19:30:21.123][INFO][PIPELINE] tcp sent frames      : 300
+config/v4l2_tcp_pipeline.conf
+./build/v4l2_capture --config config/v4l2_tcp_pipeline.conf --log-level DEBUG
+
+追加到 `docs/test_report.md`：
+
+```bash
+cat >> docs/test_report.md <<'EOF'
+
+## Logger Integration Test
+
+### Purpose
+
+This test verifies that the project can use a lightweight thread-safe Logger without changing the V4L2 + dual RingBuffer + TCP three-thread pipeline behavior.
+
+### Verified Items
+
+- Build passed.
+- RingBuffer unit test passed.
+- Logger prints timestamp, level, module and message.
+- `log_level=INFO` prints normal pipeline information.
+- `log_level=DEBUG` prints producer and consumer debug logs.
+- TCP/V4L2 300-frame transmission still passes.
+- Receiver reconstructs complete YUYV payload files.
+
+### Expected Payload Size
+
+```text
+640 * 360 * 2 = 460800 bytes
+
+---
+
+## 第 10 步：提交
+
+```bash
+git add CMakeLists.txt \
+  include/logger.hpp \
+  src/logger.cpp \
+  src/app_config.cpp \
+  src/main.cpp \
+  docs/dev_notes.md \
+  docs/test_report.md \
+  docs/logs/logger_test_ring_buffer.txt \
+  docs/logs/logger_receiver_300.txt \
+  docs/logs/logger_sender_300.txt \
+  docs/logs/logger_debug_sender_30.txt
+
+git commit -m "feat: add lightweight thread safe logger"

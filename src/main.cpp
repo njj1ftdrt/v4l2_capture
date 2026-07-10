@@ -2,6 +2,7 @@
 #include "camera_device.hpp"
 #include "frame.hpp"
 #include "frame_protocol.hpp"
+#include "logger.hpp"
 #include "ring_buffer.hpp"
 
 #include <linux/videodev2.h>
@@ -269,8 +270,7 @@ static void save_frame_to_files(
         }
     }
 
-    std::cout << "[SAVER] saved raw: " << raw_path
-              << " bytes=" << frame.data.size() << "\n";
+    log_info("SAVER", "saved raw: ", raw_path, " bytes=", frame.data.size());
 
     if (frame.pixel_format == V4L2_PIX_FMT_YUYV) {
         const std::size_t expected_yuyv_size =
@@ -299,11 +299,9 @@ static void save_frame_to_files(
             throw std::runtime_error("Failed to write ppm output file: " + ppm_path);
         }
 
-        std::cout << "[SAVER] saved ppm: " << ppm_path
-                  << " bytes=" << rgb.size() << "\n";
+        log_info("SAVER", "saved ppm: ", ppm_path, " bytes=", rgb.size());
     } else {
-        std::cout << "[SAVER] PPM conversion skipped for format "
-                  << fourcc << "\n";
+        log_warn("SAVER", "PPM conversion skipped for format ", fourcc);
     }
 }
 
@@ -387,18 +385,18 @@ static void run_pipeline(
     std::exception_ptr consumer_error = nullptr;
     std::exception_ptr tcp_thread_error = nullptr;
 
-    std::cout << "========== Pipeline Capture ==========\n";
-    std::cout << "target frames      : " << frame_count << "\n";
-    std::cout << "ring capacity      : " << ring_capacity << "\n";
-    std::cout << "poll timeout       : " << timeout_ms << " ms\n";
-    std::cout << "consumer delay     : " << consumer_delay_ms << " ms\n";
-    std::cout << "pipeline save      : " << (pipeline_save ? "yes" : "no") << "\n";
-    std::cout << "save limit         : " << save_limit << "\n";
-    std::cout << "output dir         : " << output_dir << "\n";
-    std::cout << "tcp send           : " << (tcp_enabled ? "yes" : "no") << "\n";
+    log_info("PIPELINE", "========== Pipeline Capture ==========");
+    log_info("PIPELINE", "target frames      : ", frame_count);
+    log_info("PIPELINE", "ring capacity      : ", ring_capacity);
+    log_info("PIPELINE", "poll timeout       : ", timeout_ms, " ms");
+    log_info("PIPELINE", "consumer delay     : ", consumer_delay_ms, " ms");
+    log_info("PIPELINE", "pipeline save      : ", (pipeline_save ? "yes" : "no"));
+    log_info("PIPELINE", "save limit         : ", save_limit);
+    log_info("PIPELINE", "output dir         : ", output_dir);
+    log_info("PIPELINE", "tcp send           : ", (tcp_enabled ? "yes" : "no"));
     if (tcp_enabled) {
-        std::cout << "tcp target         : " << *tcp_host << ":" << tcp_port << "\n";
-        std::cout << "tcp queue capacity : " << tcp_queue_capacity << "\n";
+        log_info("PIPELINE", "tcp target         : ", *tcp_host, ":", tcp_port);
+        log_info("PIPELINE", "tcp queue capacity : ", tcp_queue_capacity);
     }
 
     const auto start_time = std::chrono::steady_clock::now();
@@ -411,12 +409,12 @@ static void run_pipeline(
             try {
                 try {
                     tcp_fd = connect_to_tcp_receiver(*tcp_host, tcp_port);
-                    std::cout << "[TCP] connected to " << *tcp_host << ":" << tcp_port << "\n";
+                    log_info("TCP", "connected to ", *tcp_host, ":", tcp_port);
                 } catch (const std::exception& e) {
                     ++tcp_send_errors;
                     tcp_error_message = std::string("connect to ") + *tcp_host + ":" +
                                         std::to_string(tcp_port) + " failed: " + e.what();
-                    std::cerr << "[TCP][ERROR] " << tcp_error_message << "\n";
+                    log_error("TCP", tcp_error_message);
                     stop_requested = true;
                     cv.notify_all();
                     tcp_cv.notify_all();
@@ -433,11 +431,9 @@ static void run_pipeline(
                             const int tcp_count = ++tcp_sent_frames;
 
                             if (tcp_count == 1 || tcp_count == frame_count || tcp_count % 50 == 0) {
-                                std::cout << "[TCP] sent "
-                                          << tcp_count
-                                          << " frame_id=" << frame.sequence
-                                          << " bytes=" << bytes
-                                          << "\n";
+                                log_info("TCP", "sent ", tcp_count,
+                                         " frame_id=", frame.sequence,
+                                         " bytes=", bytes);
                             }
                         } catch (const std::exception& e) {
                             ++tcp_send_errors;
@@ -446,7 +442,7 @@ static void run_pipeline(
                                                 " failed after tcp_sent_frames=" +
                                                 std::to_string(tcp_sent_frames.load()) +
                                                 ": " + e.what();
-                            std::cerr << "[TCP][ERROR] " << tcp_error_message << "\n";
+                            log_error("TCP", tcp_error_message);
                             stop_requested = true;
                             cv.notify_all();
                             tcp_cv.notify_all();
@@ -487,12 +483,11 @@ static void run_pipeline(
                         const int invalid_count = ++invalid_frames;
 
                         if (invalid_count <= 5 || invalid_count % 50 == 0) {
-                            std::cout << "[WARN] skip invalid frame"
-                                      << " sequence=" << frame.sequence
-                                      << " bytesused=" << frame.bytesused
-                                      << " data_size=" << frame.data.size()
-                                      << " reason=" << invalid_reason
-                                      << "\n";
+                            log_warn("PIPELINE", "skip invalid frame",
+                                 " sequence=", frame.sequence,
+                                 " bytesused=", frame.bytesused,
+                                 " data_size=", frame.data.size(),
+                                 " reason=", invalid_reason);
                         }
 
                         continue;
@@ -511,20 +506,16 @@ static void run_pipeline(
                         tcp_cv.notify_one();
 
                         if (queued == 1 || queued == frame_count || queued % 50 == 0) {
-                            std::cout << "[TCP_QUEUE] enqueued "
-                                      << queued
-                                      << " queue_size=" << tcp_ring.size()
-                                      << " queue_dropped=" << tcp_ring.dropped_count()
-                                      << "\n";
+                            log_info("TCP_QUEUE", "enqueued ", queued,
+                                     " queue_size=", tcp_ring.size(),
+                                     " queue_dropped=", tcp_ring.dropped_count());
                         }
                     }
 
                     if (count == 1 || count == frame_count || count % 50 == 0) {
-                        std::cout << "[CONSUMER] consumed "
-                                  << count
-                                  << " sequence=" << frame.sequence
-                                  << " bytesused=" << frame.bytesused
-                                  << "\n";
+                        log_debug("CONSUMER", "consumed ", count,
+                                  " sequence=", frame.sequence,
+                                  " bytesused=", frame.bytesused);
                     }
 
                     if (consumer_delay_ms > 0) {
@@ -559,11 +550,9 @@ static void run_pipeline(
 
                 const int count = ++produced;
                 if (count == 1 || count == frame_count || count % 50 == 0) {
-                    std::cout << "[PRODUCER] produced "
-                              << count << "/" << frame_count
-                              << " ring_size=" << ring.size()
-                              << " dropped=" << ring.dropped_count()
-                              << "\n";
+                    log_debug("PRODUCER", "produced ", count, "/", frame_count,
+                              " ring_size=", ring.size(),
+                              " dropped=", ring.dropped_count());
                 }
 
                 cv.notify_one();
@@ -594,29 +583,34 @@ static void run_pipeline(
         ? static_cast<double>(consumed.load()) / elapsed_s
         : 0.0;
 
-    std::cout << std::fixed << std::setprecision(3);
-    std::cout << "========== Pipeline Statistics ==========\n";
-    std::cout << "produced frames      : " << produced.load() << "\n";
-    std::cout << "consumed frames      : " << consumed.load() << "\n";
-    std::cout << "ring dropped frames  : " << ring.dropped_count() << "\n";
-    std::cout << "remaining ring size  : " << ring.size() << "\n";
-    std::cout << "elapsed seconds      : " << elapsed_s << "\n";
-    std::cout << "producer FPS         : " << producer_fps << "\n";
-    std::cout << "consumer FPS         : " << consumer_fps << "\n";
-    std::cout << "saved frames         : " << saved.load() << "\n";
-    std::cout << "tcp queued frames    : " << tcp_enqueued_frames.load() << "\n";
-    std::cout << "tcp queue dropped    : " << tcp_ring.dropped_count() << "\n";
-    std::cout << "tcp queue remaining  : " << tcp_ring.size() << "\n";
-    std::cout << "tcp sent frames      : " << tcp_sent_frames.load() << "\n";
-    std::cout << "tcp sent bytes       : " << tcp_sent_bytes.load() << "\n";
-    std::cout << "tcp send errors      : " << tcp_send_errors.load() << "\n";
+    std::ostringstream elapsed_text;
+    elapsed_text << std::fixed << std::setprecision(3) << elapsed_s;
+    std::ostringstream producer_fps_text;
+    producer_fps_text << std::fixed << std::setprecision(3) << producer_fps;
+    std::ostringstream consumer_fps_text;
+    consumer_fps_text << std::fixed << std::setprecision(3) << consumer_fps;
+
+    log_info("STATS", "========== Pipeline Statistics ==========");
+    log_info("STATS", "produced frames      : ", produced.load());
+    log_info("STATS", "consumed frames      : ", consumed.load());
+    log_info("STATS", "ring dropped frames  : ", ring.dropped_count());
+    log_info("STATS", "remaining ring size  : ", ring.size());
+    log_info("STATS", "elapsed seconds      : ", elapsed_text.str());
+    log_info("STATS", "producer FPS         : ", producer_fps_text.str());
+    log_info("STATS", "consumer FPS         : ", consumer_fps_text.str());
+    log_info("STATS", "saved frames         : ", saved.load());
+    log_info("STATS", "tcp queued frames    : ", tcp_enqueued_frames.load());
+    log_info("STATS", "tcp queue dropped    : ", tcp_ring.dropped_count());
+    log_info("STATS", "tcp queue remaining  : ", tcp_ring.size());
+    log_info("STATS", "tcp sent frames      : ", tcp_sent_frames.load());
+    log_info("STATS", "tcp sent bytes       : ", tcp_sent_bytes.load());
+    log_info("STATS", "tcp send errors      : ", tcp_send_errors.load());
     if (!tcp_error_message.empty()) {
-        std::cout << "tcp last error       : " << tcp_error_message << "\n";
+        log_info("STATS", "tcp last error       : ", tcp_error_message);
     }
-    std::cout << "invalid frames       : " << invalid_frames.load() << "\n";
-    std::cout << "consumed bytes       : " << consumed_bytes.load() << "\n";
-    std::cout << "=========================================\n";
-    std::cout.unsetf(std::ios::floatfield);
+    log_info("STATS", "invalid frames       : ", invalid_frames.load());
+    log_info("STATS", "consumed bytes       : ", consumed_bytes.load());
+    log_info("STATS", "=========================================");
 
     if (producer_error) {
         std::rethrow_exception(producer_error);
@@ -664,6 +658,8 @@ int main(int argc, char* argv[]) {
         }
 
         const AppConfig config = load_app_config(argc, argv);
+        Logger::instance().set_level(parse_log_level(config.log_level));
+        log_info("MAIN", "logger initialized with level=", config.log_level);
         print_app_config(config);
 
         CameraDevice camera(config.device);
@@ -720,7 +716,7 @@ int main(int argc, char* argv[]) {
             camera.stop_streaming();
         }
     } catch (const std::exception& e) {
-        std::cerr << "[ERROR] " << e.what() << "\n";
+        log_error("MAIN", e.what());
         return 1;
     }
 

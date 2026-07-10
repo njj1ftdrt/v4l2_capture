@@ -384,7 +384,8 @@ static void run_pipeline(
     int save_limit,
     const std::string& output_dir,
     const std::optional<std::string>& tcp_host,
-    int tcp_port
+    int tcp_port,
+    int tcp_queue_capacity
 ) {
     if (frame_count <= 0) {
         throw std::runtime_error("Pipeline frame count must be positive");
@@ -394,16 +395,23 @@ static void run_pipeline(
         throw std::runtime_error("Ring capacity must be positive");
     }
 
+    if (tcp_queue_capacity <= 0) {
+        throw std::runtime_error("TCP queue capacity must be positive");
+    }
+
     const bool tcp_enabled = tcp_host.has_value() && tcp_port > 0;
 
     RingBuffer<Frame> ring(static_cast<std::size_t>(ring_capacity));
+    RingBuffer<Frame> tcp_ring(static_cast<std::size_t>(tcp_queue_capacity));
 
     std::atomic<bool> producer_done{false};
+    std::atomic<bool> consumer_done{false};
     std::atomic<bool> stop_requested{false};
     std::atomic<int> produced{0};
     std::atomic<int> consumed{0};
     std::atomic<int> invalid_frames{0};
     std::atomic<int> saved{0};
+    std::atomic<int> tcp_enqueued_frames{0};
     std::atomic<int> tcp_sent_frames{0};
     std::atomic<int> tcp_send_errors{0};
     std::atomic<std::uint64_t> consumed_bytes{0};
@@ -412,9 +420,12 @@ static void run_pipeline(
 
     std::mutex cv_mutex;
     std::condition_variable cv;
+    std::mutex tcp_cv_mutex;
+    std::condition_variable tcp_cv;
 
     std::exception_ptr producer_error = nullptr;
     std::exception_ptr consumer_error = nullptr;
+    std::exception_ptr tcp_thread_error = nullptr;
 
     std::cout << "========== Pipeline Capture ==========\n";
     std::cout << "target frames      : " << frame_count << "\n";
@@ -427,15 +438,17 @@ static void run_pipeline(
     std::cout << "tcp send           : " << (tcp_enabled ? "yes" : "no") << "\n";
     if (tcp_enabled) {
         std::cout << "tcp target         : " << *tcp_host << ":" << tcp_port << "\n";
+        std::cout << "tcp queue capacity : " << tcp_queue_capacity << "\n";
     }
 
     const auto start_time = std::chrono::steady_clock::now();
 
-    std::thread consumer_thread([&]() {
-        int tcp_fd = -1;
+    std::thread tcp_sender_thread;
+    if (tcp_enabled) {
+        tcp_sender_thread = std::thread([&]() {
+            int tcp_fd = -1;
 
-        try {
-            if (tcp_enabled) {
+            try {
                 try {
                     tcp_fd = connect_to_tcp_receiver(*tcp_host, tcp_port);
                     std::cout << "[TCP] connected to " << *tcp_host << ":" << tcp_port << "\n";
@@ -445,11 +458,62 @@ static void run_pipeline(
                                         std::to_string(tcp_port) + " failed: " + e.what();
                     std::cerr << "[TCP][ERROR] " << tcp_error_message << "\n";
                     stop_requested = true;
+                    cv.notify_all();
+                    tcp_cv.notify_all();
                     return;
                 }
-            }
 
-            while (!producer_done.load() || !ring.empty()) {
+                while (!consumer_done.load() || !tcp_ring.empty()) {
+                    Frame frame;
+
+                    if (tcp_ring.try_pop_oldest(frame)) {
+                        try {
+                            const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
+                            tcp_sent_bytes += bytes;
+                            const int tcp_count = ++tcp_sent_frames;
+
+                            if (tcp_count == 1 || tcp_count == frame_count || tcp_count % 50 == 0) {
+                                std::cout << "[TCP] sent "
+                                          << tcp_count
+                                          << " frame_id=" << frame.sequence
+                                          << " bytes=" << bytes
+                                          << "\n";
+                            }
+                        } catch (const std::exception& e) {
+                            ++tcp_send_errors;
+                            tcp_error_message = "send frame_id=" +
+                                                std::to_string(frame.sequence) +
+                                                " failed after tcp_sent_frames=" +
+                                                std::to_string(tcp_sent_frames.load()) +
+                                                ": " + e.what();
+                            std::cerr << "[TCP][ERROR] " << tcp_error_message << "\n";
+                            stop_requested = true;
+                            cv.notify_all();
+                            tcp_cv.notify_all();
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    std::unique_lock<std::mutex> lock(tcp_cv_mutex);
+                    tcp_cv.wait_for(lock, std::chrono::milliseconds(100));
+                }
+
+                close_socket_fd(tcp_fd);
+            } catch (...) {
+                close_socket_fd(tcp_fd);
+                tcp_thread_error = std::current_exception();
+                stop_requested = true;
+                cv.notify_all();
+                tcp_cv.notify_all();
+            }
+        });
+    }
+
+    std::thread consumer_thread([&]() {
+        try {
+            while (!stop_requested.load() && (!producer_done.load() || !ring.empty())) {
                 Frame frame;
 
                 if (ring.try_pop_oldest(frame)) {
@@ -474,36 +538,24 @@ static void run_pipeline(
                         continue;
                     }
 
-                    if (tcp_enabled) {
-                        try {
-                            const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
-                            tcp_sent_bytes += bytes;
-                            const int tcp_count = ++tcp_sent_frames;
-
-                            if (tcp_count == 1 || tcp_count == frame_count || tcp_count % 50 == 0) {
-                                std::cout << "[TCP] sent "
-                                          << tcp_count
-                                          << " frame_id=" << frame.sequence
-                                          << " bytes=" << bytes
-                                          << "\n";
-                            }
-                        } catch (const std::exception& e) {
-                            ++tcp_send_errors;
-                            tcp_error_message = "send frame_id=" +
-                                                std::to_string(frame.sequence) +
-                                                " failed after tcp_sent_frames=" +
-                                                std::to_string(tcp_sent_frames.load()) +
-                                                ": " + e.what();
-                            std::cerr << "[TCP][ERROR] " << tcp_error_message << "\n";
-                            stop_requested = true;
-                            break;
-                        }
-                    }
-
                     if (pipeline_save && saved.load() < save_limit) {
                         const int save_index = saved.fetch_add(1);
                         if (save_index < save_limit) {
                             save_frame_to_files(frame, output_dir, save_index);
+                        }
+                    }
+
+                    if (tcp_enabled) {
+                        tcp_ring.push(std::move(frame));
+                        const int queued = ++tcp_enqueued_frames;
+                        tcp_cv.notify_one();
+
+                        if (queued == 1 || queued == frame_count || queued % 50 == 0) {
+                            std::cout << "[TCP_QUEUE] enqueued "
+                                      << queued
+                                      << " queue_size=" << tcp_ring.size()
+                                      << " queue_dropped=" << tcp_ring.dropped_count()
+                                      << "\n";
                         }
                     }
 
@@ -528,12 +580,14 @@ static void run_pipeline(
                 cv.wait_for(lock, std::chrono::milliseconds(100));
             }
 
-            close_socket_fd(tcp_fd);
+            consumer_done = true;
+            tcp_cv.notify_all();
         } catch (...) {
-            close_socket_fd(tcp_fd);
             consumer_error = std::current_exception();
+            consumer_done = true;
             stop_requested = true;
             cv.notify_all();
+            tcp_cv.notify_all();
         }
     });
 
@@ -564,6 +618,9 @@ static void run_pipeline(
 
     producer_thread.join();
     consumer_thread.join();
+    if (tcp_sender_thread.joinable()) {
+        tcp_sender_thread.join();
+    }
 
     const auto end_time = std::chrono::steady_clock::now();
     const double elapsed_s =
@@ -587,6 +644,9 @@ static void run_pipeline(
     std::cout << "producer FPS         : " << producer_fps << "\n";
     std::cout << "consumer FPS         : " << consumer_fps << "\n";
     std::cout << "saved frames         : " << saved.load() << "\n";
+    std::cout << "tcp queued frames    : " << tcp_enqueued_frames.load() << "\n";
+    std::cout << "tcp queue dropped    : " << tcp_ring.dropped_count() << "\n";
+    std::cout << "tcp queue remaining  : " << tcp_ring.size() << "\n";
     std::cout << "tcp sent frames      : " << tcp_sent_frames.load() << "\n";
     std::cout << "tcp sent bytes       : " << tcp_sent_bytes.load() << "\n";
     std::cout << "tcp send errors      : " << tcp_send_errors.load() << "\n";
@@ -604,6 +664,10 @@ static void run_pipeline(
 
     if (consumer_error) {
         std::rethrow_exception(consumer_error);
+    }
+
+    if (tcp_thread_error) {
+        std::rethrow_exception(tcp_thread_error);
     }
 
     if (tcp_send_errors.load() > 0) {
@@ -624,7 +688,7 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 2 --consumer-delay-ms 50 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --pipeline-save --save-limit 5 --output output/pipeline --timeout-ms 2000\n"
-              << "  " << program << " --device /dev/video0 --width 640 --height 360 --format YUYV --mmap-buffers 4 --pipeline-frames 30 --ring-capacity 8 --tcp-host 127.0.0.1 --tcp-port 9000 --timeout-ms 2000\n";
+              << "  " << program << " --device /dev/video0 --width 640 --height 360 --format YUYV --mmap-buffers 4 --pipeline-frames 30 --ring-capacity 8 --tcp-host 127.0.0.1 --tcp-port 9000 --tcp-queue-capacity 8 --timeout-ms 2000\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -642,6 +706,7 @@ int main(int argc, char* argv[]) {
     std::string output_dir = "output";
     std::optional<std::string> tcp_host;
     int tcp_port = 0;
+    int tcp_queue_capacity = 8;
 
     std::optional<__u32> width;
     std::optional<__u32> height;
@@ -686,6 +751,8 @@ int main(int argc, char* argv[]) {
                 tcp_host = argv[++i];
             } else if (arg == "--tcp-port" && i + 1 < argc) {
                 tcp_port = parse_int_arg(argv[++i], "--tcp-port");
+            } else if (arg == "--tcp-queue-capacity" && i + 1 < argc) {
+                tcp_queue_capacity = parse_int_arg(argv[++i], "--tcp-queue-capacity");
             } else if (arg == "--timeout-ms" && i + 1 < argc) {
                 timeout_ms = parse_int_arg(argv[++i], "--timeout-ms");
             } else if (arg == "--help" || arg == "-h") {
@@ -785,7 +852,8 @@ int main(int argc, char* argv[]) {
                     save_limit,
                     output_dir,
                     tcp_host,
-                    tcp_port
+                    tcp_port,
+                    tcp_queue_capacity
                 );
             }
 

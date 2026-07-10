@@ -1,0 +1,98 @@
+[INFO] Opened device: /dev/video0
+========== V4L2 Capability ==========
+driver      : uvcvideo
+card        : HP Wide Vision HD Camera: HP Wi
+bus_info    : usb-0000:03:00.0-2
+version     : 6.17.13
+capabilities: 0x84a00001
+device_caps : 0x4200001
+---------- Effective Capabilities ----------
+  V4L2_CAP_VIDEO_CAPTURE: yes
+  V4L2_CAP_VIDEO_OUTPUT: no
+  V4L2_CAP_READWRITE: no
+  V4L2_CAP_STREAMING: yes
+=====================================
+========== Set Format ==========
+requested   : 640x360 YUYV
+accepted    : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+colorspace  : 8
+---------- Current Format ----------
+current     : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+================================
+========== Init MMAP Buffers ==========
+requested buffers: 4
+driver buffers   : 4
+buffer[0] length=460800 offset=0 mapped_addr=0x7d80cfae6000
+buffer[1] length=460800 offset=32768 mapped_addr=0x7d80cf78f000
+buffer[2] length=460800 offset=65536 mapped_addr=0x7d80cf71e000
+buffer[3] length=460800 offset=98304 mapped_addr=0x7d80cf6ad000
+queued buffer[0]
+queued buffer[1]
+queued buffer[2]
+queued buffer[3]
+MMAP buffer initialization done.
+=======================================
+[INFO] Streaming started.
+========== Pipeline Capture ==========
+target frames      : 300
+ring capacity      : 8
+poll timeout       : 2000 ms
+consumer delay     : 0 ms
+pipeline save      : no
+save limit         : 5
+output dir         : output
+tcp send           : yes
+tcp target         : 127.0.0.1:9000
+tcp queue capacity : 8
+[TCP] connected to 127.0.0.1:9000
+[PRODUCER] produced 1/300 ring_size=1 dropped=0
+[TCP_QUEUE] enqueued 1 queue_size=1 queue_dropped=0
+[CONSUMER] consumed 1 sequence=0 bytesused=460800
+[TCP] sent 1 frame_id=0 bytes=460840
+[PRODUCER] produced 50/300 ring_size=1 dropped=0
+[TCP_QUEUE] enqueued 50 queue_size=1 queue_dropped=0
+[CONSUMER] consumed 50 sequence=49 bytesused=460800
+[TCP] sent 50 frame_id=49 bytes=460840
+[PRODUCER] produced 100/300 ring_size=1 dropped=0
+[TCP_QUEUE] enqueued 100 queue_size=1 queue_dropped=0
+[CONSUMER] consumed 100 sequence=99 bytesused=460800
+[TCP] sent 100 frame_id=99 bytes=460840
+[PRODUCER] produced 150/300 ring_size=1 dropped=0
+[TCP_QUEUE] enqueued 150 queue_size=1 queue_dropped=0
+[CONSUMER] consumed 150 sequence=149 bytesused=460800
+[TCP] sent 150 frame_id=149 bytes=460840
+[PRODUCER] produced 200/300 ring_size=1 dropped=0
+[TCP_QUEUE] enqueued 200 queue_size=1 queue_dropped=0
+[CONSUMER] consumed 200 sequence=199 bytesused=460800
+[TCP] sent 200 frame_id=199 bytes=460840
+[PRODUCER] produced 250/300 ring_size=1 dropped=0
+[TCP_QUEUE] enqueued 250 queue_size=1 queue_dropped=0
+[CONSUMER] consumed 250 sequence=249 bytesused=460800
+[TCP] sent 250 frame_id=249 bytes=460840
+[PRODUCER] produced 300/300 ring_size=1 dropped=0
+[TCP_QUEUE] enqueued 300 queue_size=1 queue_dropped=0
+[CONSUMER] consumed 300 sequence=299 bytesused=460800
+[TCP] sent 300 frame_id=299 bytes=460840
+========== Pipeline Statistics ==========
+produced frames      : 300
+consumed frames      : 300
+ring dropped frames  : 0
+remaining ring size  : 0
+elapsed seconds      : 10.289
+producer FPS         : 29.156
+consumer FPS         : 29.156
+saved frames         : 0
+tcp queued frames    : 300
+tcp queue dropped    : 0
+tcp queue remaining  : 0
+tcp sent frames      : 300
+tcp sent bytes       : 138252000
+tcp send errors      : 0
+invalid frames       : 0
+consumed bytes       : 138240000
+=========================================
+[INFO] Streaming stopped.

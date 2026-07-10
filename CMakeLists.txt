@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(v4l2_capture
     src/main.cpp
     src/camera_device.cpp
+    src/app_config.cpp
 )
 
 target_include_directories(v4l2_capture PRIVATE include)

@@ -109,6 +109,8 @@ void apply_key_value(AppConfig& config, const std::string& key, const std::strin
         config.save_limit = parse_positive_int(value, key);
     } else if (key == "output_dir") {
         config.output_dir = value;
+    } else if (key == "stats_output") {
+        config.stats_output = value;
     } else if (key == "tcp_host") {
         if (value.empty()) {
             config.tcp_host.reset();
@@ -229,6 +231,8 @@ void apply_cli_args(AppConfig& config, int argc, char* argv[]) {
             config.save_limit = parse_positive_int(argv[++i], arg);
         } else if (arg == "--output" && i + 1 < argc) {
             config.output_dir = argv[++i];
+        } else if (arg == "--stats-output" && i + 1 < argc) {
+            config.stats_output = argv[++i];
         } else if (arg == "--tcp-host" && i + 1 < argc) {
             config.tcp_host = argv[++i];
         } else if (arg == "--tcp-port" && i + 1 < argc) {
@@ -319,6 +323,10 @@ void validate_app_config(const AppConfig& config) {
         throw std::runtime_error("output_dir must not be empty");
     }
 
+    if (config.stats_output.empty()) {
+        throw std::runtime_error("stats_output must not be empty");
+    }
+
     if (config.tcp_port < 0 || config.tcp_port > 65535) {
         throw std::runtime_error("tcp_port must be between 0 and 65535");
     }
@@ -352,6 +360,7 @@ void print_app_config(const AppConfig& config) {
     log_info("CONFIG", "pipeline save      : ", (config.pipeline_save ? "yes" : "no"));
     log_info("CONFIG", "save limit         : ", config.save_limit);
     log_info("CONFIG", "output dir         : ", config.output_dir);
+    log_info("CONFIG", "stats output       : ", config.stats_output);
     log_info("CONFIG", "tcp host           : ", optional_string_to_string(config.tcp_host));
     log_info("CONFIG", "tcp port           : ", config.tcp_port);
     log_info("CONFIG", "timeout ms         : ", config.timeout_ms);

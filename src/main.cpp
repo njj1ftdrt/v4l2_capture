@@ -4,6 +4,7 @@
 #include "frame_protocol.hpp"
 #include "logger.hpp"
 #include "pipeline_stats.hpp"
+#include "stats_json.hpp"
 #include "ring_buffer.hpp"
 
 #include <linux/videodev2.h>
@@ -350,7 +351,8 @@ static void run_pipeline(
     const std::string& output_dir,
     const std::optional<std::string>& tcp_host,
     int tcp_port,
-    int tcp_queue_capacity
+    int tcp_queue_capacity,
+    const std::string& stats_output
 ) {
     if (frame_count <= 0) {
         throw std::runtime_error("Pipeline frame count must be positive");
@@ -391,6 +393,7 @@ static void run_pipeline(
     log_info("PIPELINE", "pipeline save      : ", (pipeline_save ? "yes" : "no"));
     log_info("PIPELINE", "save limit         : ", save_limit);
     log_info("PIPELINE", "output dir         : ", output_dir);
+    log_info("PIPELINE", "stats output       : ", stats_output);
     log_info("PIPELINE", "tcp send           : ", (tcp_enabled ? "yes" : "no"));
     if (tcp_enabled) {
         log_info("PIPELINE", "tcp target         : ", *tcp_host, ":", tcp_port);
@@ -611,6 +614,9 @@ static void run_pipeline(
     log_info("STATS", "consumed bytes       : ", snapshot.consumed_bytes);
     log_info("STATS", "=========================================");
 
+    write_pipeline_stats_json(stats_output, snapshot);
+    log_info("STATS", "wrote machine-readable stats to ", stats_output);
+
     if (producer_error) {
         std::rethrow_exception(producer_error);
     }
@@ -708,7 +714,8 @@ int main(int argc, char* argv[]) {
                     config.output_dir,
                     config.tcp_host,
                     config.tcp_port,
-                    config.tcp_queue_capacity
+                    config.tcp_queue_capacity,
+                    config.stats_output
                 );
             }
 

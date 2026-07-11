@@ -1,0 +1,11 @@
+[INFO] tcp_sender connecting to 127.0.0.1:9001
+[INFO] test frame: 640x360 format=YUYV frames=3
+[INFO] connected
+[SEND] frame_id=0 size=640x360 format=YUYV payload=460800 crc32=0x953554f0
+[SEND] frame_id=1 size=640x360 format=YUYV payload=460800 crc32=0x8b7e5db2
+[TEST] intentionally corrupted frame_id=2 after CRC calculation
+[SEND] frame_id=2 size=640x360 format=YUYV payload=460800 crc32=0x9cc7044e
+========== TCP Sender Statistics ==========
+sent frames : 3
+sent bytes  : 1382532
+===========================================

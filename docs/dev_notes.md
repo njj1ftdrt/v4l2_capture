@@ -159,3 +159,23 @@ git add include/frame_protocol.hpp \
   docs/logs/crc_pipeline_sender_300.txt
 
 git commit -m "feat: add tcp payload crc32 verification"
+
+## Machine-Readable JSON Statistics
+
+The project now separates human-readable logs from machine-readable runtime statistics.
+
+Sender-side pipeline statistics are exported to a JSON file, for example:
+
+```text
+output/stats/pipeline_stats.json
+```
+
+Receiver-side statistics are exported to:
+
+```text
+output/stats/receiver_stats.json
+```
+
+Both files are written by first creating a temporary `.tmp` file and then atomically renaming it to the final path. This avoids partially written JSON files being read by automation.
+
+The automated regression script now reads JSON statistics with Python's standard `json` module instead of parsing text logs. This removes coupling between the regression test and Logger output format.

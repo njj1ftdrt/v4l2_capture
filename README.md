@@ -112,3 +112,25 @@ invalid frames       : 0
 consumed bytes       : 138240000
 300 YUYV files
 each file size = 460800 bytes
+
+## Machine-Readable Statistics
+
+`v4l2_capture` can export sender-side JSON statistics:
+
+```bash
+./build/v4l2_capture \
+  --config config/v4l2_tcp_pipeline.conf \
+  --stats-output output/stats/pipeline_stats.json
+```
+
+`tcp_receiver` can export receiver-side JSON statistics:
+
+```bash
+./build/tcp_receiver \
+  --port 9000 \
+  --output output/tcp_recv \
+  --max-frames 300 \
+  --stats-output output/stats/receiver_stats.json
+```
+
+The automated regression script uses these JSON files instead of parsing Logger text output.

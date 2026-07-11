@@ -9,6 +9,7 @@ add_executable(v4l2_capture
     src/camera_device.cpp
     src/app_config.cpp
     src/logger.cpp
+    src/stats_json.cpp
 )
 
 target_include_directories(v4l2_capture PRIVATE include)
@@ -39,6 +40,7 @@ add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
 
 add_executable(tcp_receiver
     src/tcp_receiver.cpp
+    src/stats_json.cpp
 )
 
 target_include_directories(tcp_receiver PRIVATE

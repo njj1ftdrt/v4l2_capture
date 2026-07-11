@@ -20,6 +20,7 @@ struct AppConfig {
     int save_limit = 5;
     int timeout_ms = 2000;
     std::string output_dir = "output";
+    std::string stats_output = "output/stats/pipeline_stats.json";
 
     std::optional<std::string> tcp_host;
     int tcp_port = 0;

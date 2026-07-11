@@ -1,0 +1,609 @@
+[INFO] tcp_receiver listening on port 9002
+[INFO] output dir: output/stage7_pipeline/recv
+[INFO] stats output: output/stage7_pipeline/receiver_stats.json
+[INFO] client connected
+[RECV] frame=1 frame_id=0 size=640x360 format=YUYV payload=460800 crc32=0xc1795c02
+[RECV] saved output/stage7_pipeline/recv/recv_frame_1_id_0.YUYV bytes=460800
+[RECV] frame=2 frame_id=1 size=640x360 format=YUYV payload=460800 crc32=0x3400e8e3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_2_id_1.YUYV bytes=460800
+[RECV] frame=3 frame_id=2 size=640x360 format=YUYV payload=460800 crc32=0xe6b4bba8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_3_id_2.YUYV bytes=460800
+[RECV] frame=4 frame_id=3 size=640x360 format=YUYV payload=460800 crc32=0x88d56ec0
+[RECV] saved output/stage7_pipeline/recv/recv_frame_4_id_3.YUYV bytes=460800
+[RECV] frame=5 frame_id=4 size=640x360 format=YUYV payload=460800 crc32=0x15d4ad3a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_5_id_4.YUYV bytes=460800
+[RECV] frame=6 frame_id=5 size=640x360 format=YUYV payload=460800 crc32=0x66cfbebe
+[RECV] saved output/stage7_pipeline/recv/recv_frame_6_id_5.YUYV bytes=460800
+[RECV] frame=7 frame_id=6 size=640x360 format=YUYV payload=460800 crc32=0x479f4c6f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_7_id_6.YUYV bytes=460800
+[RECV] frame=8 frame_id=7 size=640x360 format=YUYV payload=460800 crc32=0x8eb21093
+[RECV] saved output/stage7_pipeline/recv/recv_frame_8_id_7.YUYV bytes=460800
+[RECV] frame=9 frame_id=8 size=640x360 format=YUYV payload=460800 crc32=0x3e0e5fea
+[RECV] saved output/stage7_pipeline/recv/recv_frame_9_id_8.YUYV bytes=460800
+[RECV] frame=10 frame_id=9 size=640x360 format=YUYV payload=460800 crc32=0x29cf8103
+[RECV] saved output/stage7_pipeline/recv/recv_frame_10_id_9.YUYV bytes=460800
+[RECV] frame=11 frame_id=10 size=640x360 format=YUYV payload=460800 crc32=0xf19cad75
+[RECV] saved output/stage7_pipeline/recv/recv_frame_11_id_10.YUYV bytes=460800
+[RECV] frame=12 frame_id=11 size=640x360 format=YUYV payload=460800 crc32=0xd51c4546
+[RECV] saved output/stage7_pipeline/recv/recv_frame_12_id_11.YUYV bytes=460800
+[RECV] frame=13 frame_id=12 size=640x360 format=YUYV payload=460800 crc32=0x5907b95a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_13_id_12.YUYV bytes=460800
+[RECV] frame=14 frame_id=13 size=640x360 format=YUYV payload=460800 crc32=0x5c1fb1b5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_14_id_13.YUYV bytes=460800
+[RECV] frame=15 frame_id=14 size=640x360 format=YUYV payload=460800 crc32=0x518dca1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_15_id_14.YUYV bytes=460800
+[RECV] frame=16 frame_id=15 size=640x360 format=YUYV payload=460800 crc32=0xc1a5594
+[RECV] saved output/stage7_pipeline/recv/recv_frame_16_id_15.YUYV bytes=460800
+[RECV] frame=17 frame_id=16 size=640x360 format=YUYV payload=460800 crc32=0xa1d410af
+[RECV] saved output/stage7_pipeline/recv/recv_frame_17_id_16.YUYV bytes=460800
+[RECV] frame=18 frame_id=17 size=640x360 format=YUYV payload=460800 crc32=0x35a1c3e8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_18_id_17.YUYV bytes=460800
+[RECV] frame=19 frame_id=18 size=640x360 format=YUYV payload=460800 crc32=0x3526ba3b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_19_id_18.YUYV bytes=460800
+[RECV] frame=20 frame_id=19 size=640x360 format=YUYV payload=460800 crc32=0xffb26712
+[RECV] saved output/stage7_pipeline/recv/recv_frame_20_id_19.YUYV bytes=460800
+[RECV] frame=21 frame_id=20 size=640x360 format=YUYV payload=460800 crc32=0x4750e2b2
+[RECV] saved output/stage7_pipeline/recv/recv_frame_21_id_20.YUYV bytes=460800
+[RECV] frame=22 frame_id=21 size=640x360 format=YUYV payload=460800 crc32=0xfc9e6e60
+[RECV] saved output/stage7_pipeline/recv/recv_frame_22_id_21.YUYV bytes=460800
+[RECV] frame=23 frame_id=22 size=640x360 format=YUYV payload=460800 crc32=0x85e3a304
+[RECV] saved output/stage7_pipeline/recv/recv_frame_23_id_22.YUYV bytes=460800
+[RECV] frame=24 frame_id=23 size=640x360 format=YUYV payload=460800 crc32=0xf545f756
+[RECV] saved output/stage7_pipeline/recv/recv_frame_24_id_23.YUYV bytes=460800
+[RECV] frame=25 frame_id=24 size=640x360 format=YUYV payload=460800 crc32=0xecf6d2ff
+[RECV] saved output/stage7_pipeline/recv/recv_frame_25_id_24.YUYV bytes=460800
+[RECV] frame=26 frame_id=25 size=640x360 format=YUYV payload=460800 crc32=0x699973c8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_26_id_25.YUYV bytes=460800
+[RECV] frame=27 frame_id=26 size=640x360 format=YUYV payload=460800 crc32=0x7b8653f6
+[RECV] saved output/stage7_pipeline/recv/recv_frame_27_id_26.YUYV bytes=460800
+[RECV] frame=28 frame_id=27 size=640x360 format=YUYV payload=460800 crc32=0x6e9e06d2
+[RECV] saved output/stage7_pipeline/recv/recv_frame_28_id_27.YUYV bytes=460800
+[RECV] frame=29 frame_id=28 size=640x360 format=YUYV payload=460800 crc32=0x1a5a29e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_29_id_28.YUYV bytes=460800
+[RECV] frame=30 frame_id=29 size=640x360 format=YUYV payload=460800 crc32=0xd336bc04
+[RECV] saved output/stage7_pipeline/recv/recv_frame_30_id_29.YUYV bytes=460800
+[RECV] frame=31 frame_id=30 size=640x360 format=YUYV payload=460800 crc32=0x4d295a06
+[RECV] saved output/stage7_pipeline/recv/recv_frame_31_id_30.YUYV bytes=460800
+[RECV] frame=32 frame_id=31 size=640x360 format=YUYV payload=460800 crc32=0x3c15182c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_32_id_31.YUYV bytes=460800
+[RECV] frame=33 frame_id=32 size=640x360 format=YUYV payload=460800 crc32=0xf6cd4799
+[RECV] saved output/stage7_pipeline/recv/recv_frame_33_id_32.YUYV bytes=460800
+[RECV] frame=34 frame_id=33 size=640x360 format=YUYV payload=460800 crc32=0x28d30589
+[RECV] saved output/stage7_pipeline/recv/recv_frame_34_id_33.YUYV bytes=460800
+[RECV] frame=35 frame_id=34 size=640x360 format=YUYV payload=460800 crc32=0xdbad198a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_35_id_34.YUYV bytes=460800
+[RECV] frame=36 frame_id=35 size=640x360 format=YUYV payload=460800 crc32=0xdc7b36e3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_36_id_35.YUYV bytes=460800
+[RECV] frame=37 frame_id=36 size=640x360 format=YUYV payload=460800 crc32=0x92db41b5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_37_id_36.YUYV bytes=460800
+[RECV] frame=38 frame_id=37 size=640x360 format=YUYV payload=460800 crc32=0xa80231e5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_38_id_37.YUYV bytes=460800
+[RECV] frame=39 frame_id=38 size=640x360 format=YUYV payload=460800 crc32=0x7e4e4f5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_39_id_38.YUYV bytes=460800
+[RECV] frame=40 frame_id=39 size=640x360 format=YUYV payload=460800 crc32=0x6d12398
+[RECV] saved output/stage7_pipeline/recv/recv_frame_40_id_39.YUYV bytes=460800
+[RECV] frame=41 frame_id=40 size=640x360 format=YUYV payload=460800 crc32=0x43157fd9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_41_id_40.YUYV bytes=460800
+[RECV] frame=42 frame_id=41 size=640x360 format=YUYV payload=460800 crc32=0x35511c37
+[RECV] saved output/stage7_pipeline/recv/recv_frame_42_id_41.YUYV bytes=460800
+[RECV] frame=43 frame_id=42 size=640x360 format=YUYV payload=460800 crc32=0xa4e66cb0
+[RECV] saved output/stage7_pipeline/recv/recv_frame_43_id_42.YUYV bytes=460800
+[RECV] frame=44 frame_id=43 size=640x360 format=YUYV payload=460800 crc32=0xc7216db8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_44_id_43.YUYV bytes=460800
+[RECV] frame=45 frame_id=44 size=640x360 format=YUYV payload=460800 crc32=0x323b79df
+[RECV] saved output/stage7_pipeline/recv/recv_frame_45_id_44.YUYV bytes=460800
+[RECV] frame=46 frame_id=45 size=640x360 format=YUYV payload=460800 crc32=0x8d096827
+[RECV] saved output/stage7_pipeline/recv/recv_frame_46_id_45.YUYV bytes=460800
+[RECV] frame=47 frame_id=46 size=640x360 format=YUYV payload=460800 crc32=0x93af446
+[RECV] saved output/stage7_pipeline/recv/recv_frame_47_id_46.YUYV bytes=460800
+[RECV] frame=48 frame_id=47 size=640x360 format=YUYV payload=460800 crc32=0xe9dac440
+[RECV] saved output/stage7_pipeline/recv/recv_frame_48_id_47.YUYV bytes=460800
+[RECV] frame=49 frame_id=48 size=640x360 format=YUYV payload=460800 crc32=0x3b61c6ad
+[RECV] saved output/stage7_pipeline/recv/recv_frame_49_id_48.YUYV bytes=460800
+[RECV] frame=50 frame_id=49 size=640x360 format=YUYV payload=460800 crc32=0x278a4bbb
+[RECV] saved output/stage7_pipeline/recv/recv_frame_50_id_49.YUYV bytes=460800
+[RECV] frame=51 frame_id=50 size=640x360 format=YUYV payload=460800 crc32=0x57684aad
+[RECV] saved output/stage7_pipeline/recv/recv_frame_51_id_50.YUYV bytes=460800
+[RECV] frame=52 frame_id=51 size=640x360 format=YUYV payload=460800 crc32=0x723da8d4
+[RECV] saved output/stage7_pipeline/recv/recv_frame_52_id_51.YUYV bytes=460800
+[RECV] frame=53 frame_id=52 size=640x360 format=YUYV payload=460800 crc32=0xc97178b9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_53_id_52.YUYV bytes=460800
+[RECV] frame=54 frame_id=53 size=640x360 format=YUYV payload=460800 crc32=0x7db6b36d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_54_id_53.YUYV bytes=460800
+[RECV] frame=55 frame_id=54 size=640x360 format=YUYV payload=460800 crc32=0xbb356340
+[RECV] saved output/stage7_pipeline/recv/recv_frame_55_id_54.YUYV bytes=460800
+[RECV] frame=56 frame_id=55 size=640x360 format=YUYV payload=460800 crc32=0x75e757a1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_56_id_55.YUYV bytes=460800
+[RECV] frame=57 frame_id=56 size=640x360 format=YUYV payload=460800 crc32=0xaab18860
+[RECV] saved output/stage7_pipeline/recv/recv_frame_57_id_56.YUYV bytes=460800
+[RECV] frame=58 frame_id=57 size=640x360 format=YUYV payload=460800 crc32=0x3f363b79
+[RECV] saved output/stage7_pipeline/recv/recv_frame_58_id_57.YUYV bytes=460800
+[RECV] frame=59 frame_id=58 size=640x360 format=YUYV payload=460800 crc32=0x36d669b2
+[RECV] saved output/stage7_pipeline/recv/recv_frame_59_id_58.YUYV bytes=460800
+[RECV] frame=60 frame_id=59 size=640x360 format=YUYV payload=460800 crc32=0xa74cd336
+[RECV] saved output/stage7_pipeline/recv/recv_frame_60_id_59.YUYV bytes=460800
+[RECV] frame=61 frame_id=60 size=640x360 format=YUYV payload=460800 crc32=0xf2587a63
+[RECV] saved output/stage7_pipeline/recv/recv_frame_61_id_60.YUYV bytes=460800
+[RECV] frame=62 frame_id=61 size=640x360 format=YUYV payload=460800 crc32=0xa5118c22
+[RECV] saved output/stage7_pipeline/recv/recv_frame_62_id_61.YUYV bytes=460800
+[RECV] frame=63 frame_id=62 size=640x360 format=YUYV payload=460800 crc32=0x86a75f28
+[RECV] saved output/stage7_pipeline/recv/recv_frame_63_id_62.YUYV bytes=460800
+[RECV] frame=64 frame_id=63 size=640x360 format=YUYV payload=460800 crc32=0x46a1ab93
+[RECV] saved output/stage7_pipeline/recv/recv_frame_64_id_63.YUYV bytes=460800
+[RECV] frame=65 frame_id=64 size=640x360 format=YUYV payload=460800 crc32=0x80f9bda9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_65_id_64.YUYV bytes=460800
+[RECV] frame=66 frame_id=65 size=640x360 format=YUYV payload=460800 crc32=0x87c523d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_66_id_65.YUYV bytes=460800
+[RECV] frame=67 frame_id=66 size=640x360 format=YUYV payload=460800 crc32=0x97b98334
+[RECV] saved output/stage7_pipeline/recv/recv_frame_67_id_66.YUYV bytes=460800
+[RECV] frame=68 frame_id=67 size=640x360 format=YUYV payload=460800 crc32=0xfb2886c2
+[RECV] saved output/stage7_pipeline/recv/recv_frame_68_id_67.YUYV bytes=460800
+[RECV] frame=69 frame_id=68 size=640x360 format=YUYV payload=460800 crc32=0xb764ac29
+[RECV] saved output/stage7_pipeline/recv/recv_frame_69_id_68.YUYV bytes=460800
+[RECV] frame=70 frame_id=69 size=640x360 format=YUYV payload=460800 crc32=0xd35ee7e5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_70_id_69.YUYV bytes=460800
+[RECV] frame=71 frame_id=70 size=640x360 format=YUYV payload=460800 crc32=0xc26da2b7
+[RECV] saved output/stage7_pipeline/recv/recv_frame_71_id_70.YUYV bytes=460800
+[RECV] frame=72 frame_id=71 size=640x360 format=YUYV payload=460800 crc32=0x360683e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_72_id_71.YUYV bytes=460800
+[RECV] frame=73 frame_id=72 size=640x360 format=YUYV payload=460800 crc32=0x30e7d4ca
+[RECV] saved output/stage7_pipeline/recv/recv_frame_73_id_72.YUYV bytes=460800
+[RECV] frame=74 frame_id=73 size=640x360 format=YUYV payload=460800 crc32=0xab26888b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_74_id_73.YUYV bytes=460800
+[RECV] frame=75 frame_id=74 size=640x360 format=YUYV payload=460800 crc32=0x2fa6ebe6
+[RECV] saved output/stage7_pipeline/recv/recv_frame_75_id_74.YUYV bytes=460800
+[RECV] frame=76 frame_id=75 size=640x360 format=YUYV payload=460800 crc32=0xe3c0c025
+[RECV] saved output/stage7_pipeline/recv/recv_frame_76_id_75.YUYV bytes=460800
+[RECV] frame=77 frame_id=76 size=640x360 format=YUYV payload=460800 crc32=0x4e17ff94
+[RECV] saved output/stage7_pipeline/recv/recv_frame_77_id_76.YUYV bytes=460800
+[RECV] frame=78 frame_id=77 size=640x360 format=YUYV payload=460800 crc32=0xc73397a3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_78_id_77.YUYV bytes=460800
+[RECV] frame=79 frame_id=78 size=640x360 format=YUYV payload=460800 crc32=0xa4237f75
+[RECV] saved output/stage7_pipeline/recv/recv_frame_79_id_78.YUYV bytes=460800
+[RECV] frame=80 frame_id=79 size=640x360 format=YUYV payload=460800 crc32=0x598988ad
+[RECV] saved output/stage7_pipeline/recv/recv_frame_80_id_79.YUYV bytes=460800
+[RECV] frame=81 frame_id=80 size=640x360 format=YUYV payload=460800 crc32=0x56fd76bb
+[RECV] saved output/stage7_pipeline/recv/recv_frame_81_id_80.YUYV bytes=460800
+[RECV] frame=82 frame_id=81 size=640x360 format=YUYV payload=460800 crc32=0x5efd94d1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_82_id_81.YUYV bytes=460800
+[RECV] frame=83 frame_id=82 size=640x360 format=YUYV payload=460800 crc32=0x4135d01b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_83_id_82.YUYV bytes=460800
+[RECV] frame=84 frame_id=83 size=640x360 format=YUYV payload=460800 crc32=0xf5acb7f0
+[RECV] saved output/stage7_pipeline/recv/recv_frame_84_id_83.YUYV bytes=460800
+[RECV] frame=85 frame_id=84 size=640x360 format=YUYV payload=460800 crc32=0x9d30adf0
+[RECV] saved output/stage7_pipeline/recv/recv_frame_85_id_84.YUYV bytes=460800
+[RECV] frame=86 frame_id=85 size=640x360 format=YUYV payload=460800 crc32=0x11e0ebd6
+[RECV] saved output/stage7_pipeline/recv/recv_frame_86_id_85.YUYV bytes=460800
+[RECV] frame=87 frame_id=86 size=640x360 format=YUYV payload=460800 crc32=0x104be421
+[RECV] saved output/stage7_pipeline/recv/recv_frame_87_id_86.YUYV bytes=460800
+[RECV] frame=88 frame_id=87 size=640x360 format=YUYV payload=460800 crc32=0xa0c5d84d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_88_id_87.YUYV bytes=460800
+[RECV] frame=89 frame_id=88 size=640x360 format=YUYV payload=460800 crc32=0x6e976091
+[RECV] saved output/stage7_pipeline/recv/recv_frame_89_id_88.YUYV bytes=460800
+[RECV] frame=90 frame_id=89 size=640x360 format=YUYV payload=460800 crc32=0xafb83607
+[RECV] saved output/stage7_pipeline/recv/recv_frame_90_id_89.YUYV bytes=460800
+[RECV] frame=91 frame_id=90 size=640x360 format=YUYV payload=460800 crc32=0x6d6fd289
+[RECV] saved output/stage7_pipeline/recv/recv_frame_91_id_90.YUYV bytes=460800
+[RECV] frame=92 frame_id=91 size=640x360 format=YUYV payload=460800 crc32=0x151a683f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_92_id_91.YUYV bytes=460800
+[RECV] frame=93 frame_id=92 size=640x360 format=YUYV payload=460800 crc32=0xc865c71a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_93_id_92.YUYV bytes=460800
+[RECV] frame=94 frame_id=93 size=640x360 format=YUYV payload=460800 crc32=0xa48fbc8e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_94_id_93.YUYV bytes=460800
+[RECV] frame=95 frame_id=94 size=640x360 format=YUYV payload=460800 crc32=0xf42af492
+[RECV] saved output/stage7_pipeline/recv/recv_frame_95_id_94.YUYV bytes=460800
+[RECV] frame=96 frame_id=95 size=640x360 format=YUYV payload=460800 crc32=0xc8f4e98a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_96_id_95.YUYV bytes=460800
+[RECV] frame=97 frame_id=96 size=640x360 format=YUYV payload=460800 crc32=0x3a623da9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_97_id_96.YUYV bytes=460800
+[RECV] frame=98 frame_id=97 size=640x360 format=YUYV payload=460800 crc32=0xfcf4c07c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_98_id_97.YUYV bytes=460800
+[RECV] frame=99 frame_id=98 size=640x360 format=YUYV payload=460800 crc32=0x651d668b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_99_id_98.YUYV bytes=460800
+[RECV] frame=100 frame_id=99 size=640x360 format=YUYV payload=460800 crc32=0x5443f4e4
+[RECV] saved output/stage7_pipeline/recv/recv_frame_100_id_99.YUYV bytes=460800
+[RECV] frame=101 frame_id=100 size=640x360 format=YUYV payload=460800 crc32=0x1733a8b5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_101_id_100.YUYV bytes=460800
+[RECV] frame=102 frame_id=101 size=640x360 format=YUYV payload=460800 crc32=0xaf301a0b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_102_id_101.YUYV bytes=460800
+[RECV] frame=103 frame_id=102 size=640x360 format=YUYV payload=460800 crc32=0x2b94db8a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_103_id_102.YUYV bytes=460800
+[RECV] frame=104 frame_id=103 size=640x360 format=YUYV payload=460800 crc32=0x9b90fcfe
+[RECV] saved output/stage7_pipeline/recv/recv_frame_104_id_103.YUYV bytes=460800
+[RECV] frame=105 frame_id=104 size=640x360 format=YUYV payload=460800 crc32=0x2709378a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_105_id_104.YUYV bytes=460800
+[RECV] frame=106 frame_id=105 size=640x360 format=YUYV payload=460800 crc32=0x34dffb57
+[RECV] saved output/stage7_pipeline/recv/recv_frame_106_id_105.YUYV bytes=460800
+[RECV] frame=107 frame_id=106 size=640x360 format=YUYV payload=460800 crc32=0x6c2dabf7
+[RECV] saved output/stage7_pipeline/recv/recv_frame_107_id_106.YUYV bytes=460800
+[RECV] frame=108 frame_id=107 size=640x360 format=YUYV payload=460800 crc32=0x29f3995f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_108_id_107.YUYV bytes=460800
+[RECV] frame=109 frame_id=108 size=640x360 format=YUYV payload=460800 crc32=0xf2c3c929
+[RECV] saved output/stage7_pipeline/recv/recv_frame_109_id_108.YUYV bytes=460800
+[RECV] frame=110 frame_id=109 size=640x360 format=YUYV payload=460800 crc32=0x2e8b273c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_110_id_109.YUYV bytes=460800
+[RECV] frame=111 frame_id=110 size=640x360 format=YUYV payload=460800 crc32=0x6d4adbb0
+[RECV] saved output/stage7_pipeline/recv/recv_frame_111_id_110.YUYV bytes=460800
+[RECV] frame=112 frame_id=111 size=640x360 format=YUYV payload=460800 crc32=0x581372c7
+[RECV] saved output/stage7_pipeline/recv/recv_frame_112_id_111.YUYV bytes=460800
+[RECV] frame=113 frame_id=112 size=640x360 format=YUYV payload=460800 crc32=0x9c25c31b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_113_id_112.YUYV bytes=460800
+[RECV] frame=114 frame_id=113 size=640x360 format=YUYV payload=460800 crc32=0x17d296a3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_114_id_113.YUYV bytes=460800
+[RECV] frame=115 frame_id=114 size=640x360 format=YUYV payload=460800 crc32=0xabaa21e6
+[RECV] saved output/stage7_pipeline/recv/recv_frame_115_id_114.YUYV bytes=460800
+[RECV] frame=116 frame_id=115 size=640x360 format=YUYV payload=460800 crc32=0xb9e5c905
+[RECV] saved output/stage7_pipeline/recv/recv_frame_116_id_115.YUYV bytes=460800
+[RECV] frame=117 frame_id=116 size=640x360 format=YUYV payload=460800 crc32=0x912c2db6
+[RECV] saved output/stage7_pipeline/recv/recv_frame_117_id_116.YUYV bytes=460800
+[RECV] frame=118 frame_id=117 size=640x360 format=YUYV payload=460800 crc32=0x595285cc
+[RECV] saved output/stage7_pipeline/recv/recv_frame_118_id_117.YUYV bytes=460800
+[RECV] frame=119 frame_id=118 size=640x360 format=YUYV payload=460800 crc32=0x8c49c04f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_119_id_118.YUYV bytes=460800
+[RECV] frame=120 frame_id=119 size=640x360 format=YUYV payload=460800 crc32=0x90a1227d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_120_id_119.YUYV bytes=460800
+[RECV] frame=121 frame_id=120 size=640x360 format=YUYV payload=460800 crc32=0x28dfb098
+[RECV] saved output/stage7_pipeline/recv/recv_frame_121_id_120.YUYV bytes=460800
+[RECV] frame=122 frame_id=121 size=640x360 format=YUYV payload=460800 crc32=0xd056340b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_122_id_121.YUYV bytes=460800
+[RECV] frame=123 frame_id=122 size=640x360 format=YUYV payload=460800 crc32=0xbe953ff1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_123_id_122.YUYV bytes=460800
+[RECV] frame=124 frame_id=123 size=640x360 format=YUYV payload=460800 crc32=0xc6b229de
+[RECV] saved output/stage7_pipeline/recv/recv_frame_124_id_123.YUYV bytes=460800
+[RECV] frame=125 frame_id=124 size=640x360 format=YUYV payload=460800 crc32=0xd5d144ed
+[RECV] saved output/stage7_pipeline/recv/recv_frame_125_id_124.YUYV bytes=460800
+[RECV] frame=126 frame_id=125 size=640x360 format=YUYV payload=460800 crc32=0xe21644a3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_126_id_125.YUYV bytes=460800
+[RECV] frame=127 frame_id=126 size=640x360 format=YUYV payload=460800 crc32=0x8fe71579
+[RECV] saved output/stage7_pipeline/recv/recv_frame_127_id_126.YUYV bytes=460800
+[RECV] frame=128 frame_id=127 size=640x360 format=YUYV payload=460800 crc32=0x58fe2340
+[RECV] saved output/stage7_pipeline/recv/recv_frame_128_id_127.YUYV bytes=460800
+[RECV] frame=129 frame_id=128 size=640x360 format=YUYV payload=460800 crc32=0xa3c29d22
+[RECV] saved output/stage7_pipeline/recv/recv_frame_129_id_128.YUYV bytes=460800
+[RECV] frame=130 frame_id=129 size=640x360 format=YUYV payload=460800 crc32=0xc25cf8d5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_130_id_129.YUYV bytes=460800
+[RECV] frame=131 frame_id=130 size=640x360 format=YUYV payload=460800 crc32=0xfb97a830
+[RECV] saved output/stage7_pipeline/recv/recv_frame_131_id_130.YUYV bytes=460800
+[RECV] frame=132 frame_id=131 size=640x360 format=YUYV payload=460800 crc32=0x9da91f70
+[RECV] saved output/stage7_pipeline/recv/recv_frame_132_id_131.YUYV bytes=460800
+[RECV] frame=133 frame_id=132 size=640x360 format=YUYV payload=460800 crc32=0xf4854a92
+[RECV] saved output/stage7_pipeline/recv/recv_frame_133_id_132.YUYV bytes=460800
+[RECV] frame=134 frame_id=133 size=640x360 format=YUYV payload=460800 crc32=0x88a3d710
+[RECV] saved output/stage7_pipeline/recv/recv_frame_134_id_133.YUYV bytes=460800
+[RECV] frame=135 frame_id=134 size=640x360 format=YUYV payload=460800 crc32=0x76a83d3b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_135_id_134.YUYV bytes=460800
+[RECV] frame=136 frame_id=135 size=640x360 format=YUYV payload=460800 crc32=0xfb9bf7a5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_136_id_135.YUYV bytes=460800
+[RECV] frame=137 frame_id=136 size=640x360 format=YUYV payload=460800 crc32=0x70b978b4
+[RECV] saved output/stage7_pipeline/recv/recv_frame_137_id_136.YUYV bytes=460800
+[RECV] frame=138 frame_id=137 size=640x360 format=YUYV payload=460800 crc32=0x32cec8ce
+[RECV] saved output/stage7_pipeline/recv/recv_frame_138_id_137.YUYV bytes=460800
+[RECV] frame=139 frame_id=138 size=640x360 format=YUYV payload=460800 crc32=0x2afe3794
+[RECV] saved output/stage7_pipeline/recv/recv_frame_139_id_138.YUYV bytes=460800
+[RECV] frame=140 frame_id=139 size=640x360 format=YUYV payload=460800 crc32=0x3f260f4f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_140_id_139.YUYV bytes=460800
+[RECV] frame=141 frame_id=140 size=640x360 format=YUYV payload=460800 crc32=0xe7ab5c9d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_141_id_140.YUYV bytes=460800
+[RECV] frame=142 frame_id=141 size=640x360 format=YUYV payload=460800 crc32=0x89fb52a8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_142_id_141.YUYV bytes=460800
+[RECV] frame=143 frame_id=142 size=640x360 format=YUYV payload=460800 crc32=0x6f127b5f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_143_id_142.YUYV bytes=460800
+[RECV] frame=144 frame_id=143 size=640x360 format=YUYV payload=460800 crc32=0x8896a4c9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_144_id_143.YUYV bytes=460800
+[RECV] frame=145 frame_id=144 size=640x360 format=YUYV payload=460800 crc32=0x49511918
+[RECV] saved output/stage7_pipeline/recv/recv_frame_145_id_144.YUYV bytes=460800
+[RECV] frame=146 frame_id=145 size=640x360 format=YUYV payload=460800 crc32=0x736edaba
+[RECV] saved output/stage7_pipeline/recv/recv_frame_146_id_145.YUYV bytes=460800
+[RECV] frame=147 frame_id=146 size=640x360 format=YUYV payload=460800 crc32=0xfb75a3c5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_147_id_146.YUYV bytes=460800
+[RECV] frame=148 frame_id=147 size=640x360 format=YUYV payload=460800 crc32=0xce8cc8b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_148_id_147.YUYV bytes=460800
+[RECV] frame=149 frame_id=148 size=640x360 format=YUYV payload=460800 crc32=0xb6e34e9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_149_id_148.YUYV bytes=460800
+[RECV] frame=150 frame_id=149 size=640x360 format=YUYV payload=460800 crc32=0xcbee3507
+[RECV] saved output/stage7_pipeline/recv/recv_frame_150_id_149.YUYV bytes=460800
+[RECV] frame=151 frame_id=150 size=640x360 format=YUYV payload=460800 crc32=0x2d002d50
+[RECV] saved output/stage7_pipeline/recv/recv_frame_151_id_150.YUYV bytes=460800
+[RECV] frame=152 frame_id=151 size=640x360 format=YUYV payload=460800 crc32=0x905c3d0d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_152_id_151.YUYV bytes=460800
+[RECV] frame=153 frame_id=152 size=640x360 format=YUYV payload=460800 crc32=0x45902e5d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_153_id_152.YUYV bytes=460800
+[RECV] frame=154 frame_id=153 size=640x360 format=YUYV payload=460800 crc32=0x18e62761
+[RECV] saved output/stage7_pipeline/recv/recv_frame_154_id_153.YUYV bytes=460800
+[RECV] frame=155 frame_id=154 size=640x360 format=YUYV payload=460800 crc32=0x7cfac7e3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_155_id_154.YUYV bytes=460800
+[RECV] frame=156 frame_id=155 size=640x360 format=YUYV payload=460800 crc32=0x5ff09436
+[RECV] saved output/stage7_pipeline/recv/recv_frame_156_id_155.YUYV bytes=460800
+[RECV] frame=157 frame_id=156 size=640x360 format=YUYV payload=460800 crc32=0xd333f35f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_157_id_156.YUYV bytes=460800
+[RECV] frame=158 frame_id=157 size=640x360 format=YUYV payload=460800 crc32=0x3f9a3267
+[RECV] saved output/stage7_pipeline/recv/recv_frame_158_id_157.YUYV bytes=460800
+[RECV] frame=159 frame_id=158 size=640x360 format=YUYV payload=460800 crc32=0xd00d32a4
+[RECV] saved output/stage7_pipeline/recv/recv_frame_159_id_158.YUYV bytes=460800
+[RECV] frame=160 frame_id=159 size=640x360 format=YUYV payload=460800 crc32=0x478fb46d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_160_id_159.YUYV bytes=460800
+[RECV] frame=161 frame_id=160 size=640x360 format=YUYV payload=460800 crc32=0x8a3dfe16
+[RECV] saved output/stage7_pipeline/recv/recv_frame_161_id_160.YUYV bytes=460800
+[RECV] frame=162 frame_id=161 size=640x360 format=YUYV payload=460800 crc32=0xc6e6c384
+[RECV] saved output/stage7_pipeline/recv/recv_frame_162_id_161.YUYV bytes=460800
+[RECV] frame=163 frame_id=162 size=640x360 format=YUYV payload=460800 crc32=0x8c05c4f9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_163_id_162.YUYV bytes=460800
+[RECV] frame=164 frame_id=163 size=640x360 format=YUYV payload=460800 crc32=0x72d18a68
+[RECV] saved output/stage7_pipeline/recv/recv_frame_164_id_163.YUYV bytes=460800
+[RECV] frame=165 frame_id=164 size=640x360 format=YUYV payload=460800 crc32=0x160985d2
+[RECV] saved output/stage7_pipeline/recv/recv_frame_165_id_164.YUYV bytes=460800
+[RECV] frame=166 frame_id=165 size=640x360 format=YUYV payload=460800 crc32=0x448b91bd
+[RECV] saved output/stage7_pipeline/recv/recv_frame_166_id_165.YUYV bytes=460800
+[RECV] frame=167 frame_id=166 size=640x360 format=YUYV payload=460800 crc32=0x2d3ec87d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_167_id_166.YUYV bytes=460800
+[RECV] frame=168 frame_id=167 size=640x360 format=YUYV payload=460800 crc32=0x8ecc18c9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_168_id_167.YUYV bytes=460800
+[RECV] frame=169 frame_id=168 size=640x360 format=YUYV payload=460800 crc32=0xc8f4eb2a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_169_id_168.YUYV bytes=460800
+[RECV] frame=170 frame_id=169 size=640x360 format=YUYV payload=460800 crc32=0xd2d7c283
+[RECV] saved output/stage7_pipeline/recv/recv_frame_170_id_169.YUYV bytes=460800
+[RECV] frame=171 frame_id=170 size=640x360 format=YUYV payload=460800 crc32=0x3420547c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_171_id_170.YUYV bytes=460800
+[RECV] frame=172 frame_id=171 size=640x360 format=YUYV payload=460800 crc32=0xdda9b470
+[RECV] saved output/stage7_pipeline/recv/recv_frame_172_id_171.YUYV bytes=460800
+[RECV] frame=173 frame_id=172 size=640x360 format=YUYV payload=460800 crc32=0x9aef3bde
+[RECV] saved output/stage7_pipeline/recv/recv_frame_173_id_172.YUYV bytes=460800
+[RECV] frame=174 frame_id=173 size=640x360 format=YUYV payload=460800 crc32=0x635e52a3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_174_id_173.YUYV bytes=460800
+[RECV] frame=175 frame_id=174 size=640x360 format=YUYV payload=460800 crc32=0xa5b2a715
+[RECV] saved output/stage7_pipeline/recv/recv_frame_175_id_174.YUYV bytes=460800
+[RECV] frame=176 frame_id=175 size=640x360 format=YUYV payload=460800 crc32=0xca2f2efc
+[RECV] saved output/stage7_pipeline/recv/recv_frame_176_id_175.YUYV bytes=460800
+[RECV] frame=177 frame_id=176 size=640x360 format=YUYV payload=460800 crc32=0x36d66c04
+[RECV] saved output/stage7_pipeline/recv/recv_frame_177_id_176.YUYV bytes=460800
+[RECV] frame=178 frame_id=177 size=640x360 format=YUYV payload=460800 crc32=0xdd8fb22
+[RECV] saved output/stage7_pipeline/recv/recv_frame_178_id_177.YUYV bytes=460800
+[RECV] frame=179 frame_id=178 size=640x360 format=YUYV payload=460800 crc32=0x28c0ff55
+[RECV] saved output/stage7_pipeline/recv/recv_frame_179_id_178.YUYV bytes=460800
+[RECV] frame=180 frame_id=179 size=640x360 format=YUYV payload=460800 crc32=0x96b813d2
+[RECV] saved output/stage7_pipeline/recv/recv_frame_180_id_179.YUYV bytes=460800
+[RECV] frame=181 frame_id=180 size=640x360 format=YUYV payload=460800 crc32=0xd9356a88
+[RECV] saved output/stage7_pipeline/recv/recv_frame_181_id_180.YUYV bytes=460800
+[RECV] frame=182 frame_id=181 size=640x360 format=YUYV payload=460800 crc32=0x123d14e3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_182_id_181.YUYV bytes=460800
+[RECV] frame=183 frame_id=182 size=640x360 format=YUYV payload=460800 crc32=0xbeb47526
+[RECV] saved output/stage7_pipeline/recv/recv_frame_183_id_182.YUYV bytes=460800
+[RECV] frame=184 frame_id=183 size=640x360 format=YUYV payload=460800 crc32=0x7a0016a8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_184_id_183.YUYV bytes=460800
+[RECV] frame=185 frame_id=184 size=640x360 format=YUYV payload=460800 crc32=0x968b1346
+[RECV] saved output/stage7_pipeline/recv/recv_frame_185_id_184.YUYV bytes=460800
+[RECV] frame=186 frame_id=185 size=640x360 format=YUYV payload=460800 crc32=0xd922cc83
+[RECV] saved output/stage7_pipeline/recv/recv_frame_186_id_185.YUYV bytes=460800
+[RECV] frame=187 frame_id=186 size=640x360 format=YUYV payload=460800 crc32=0xc77b213c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_187_id_186.YUYV bytes=460800
+[RECV] frame=188 frame_id=187 size=640x360 format=YUYV payload=460800 crc32=0x82991cda
+[RECV] saved output/stage7_pipeline/recv/recv_frame_188_id_187.YUYV bytes=460800
+[RECV] frame=189 frame_id=188 size=640x360 format=YUYV payload=460800 crc32=0x45d9566
+[RECV] saved output/stage7_pipeline/recv/recv_frame_189_id_188.YUYV bytes=460800
+[RECV] frame=190 frame_id=189 size=640x360 format=YUYV payload=460800 crc32=0x680e6c1b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_190_id_189.YUYV bytes=460800
+[RECV] frame=191 frame_id=190 size=640x360 format=YUYV payload=460800 crc32=0x23a85d5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_191_id_190.YUYV bytes=460800
+[RECV] frame=192 frame_id=191 size=640x360 format=YUYV payload=460800 crc32=0xbfeae5cf
+[RECV] saved output/stage7_pipeline/recv/recv_frame_192_id_191.YUYV bytes=460800
+[RECV] frame=193 frame_id=192 size=640x360 format=YUYV payload=460800 crc32=0xa94a6080
+[RECV] saved output/stage7_pipeline/recv/recv_frame_193_id_192.YUYV bytes=460800
+[RECV] frame=194 frame_id=193 size=640x360 format=YUYV payload=460800 crc32=0xa2bc52b4
+[RECV] saved output/stage7_pipeline/recv/recv_frame_194_id_193.YUYV bytes=460800
+[RECV] frame=195 frame_id=194 size=640x360 format=YUYV payload=460800 crc32=0xe027a2e4
+[RECV] saved output/stage7_pipeline/recv/recv_frame_195_id_194.YUYV bytes=460800
+[RECV] frame=196 frame_id=195 size=640x360 format=YUYV payload=460800 crc32=0x15a8c657
+[RECV] saved output/stage7_pipeline/recv/recv_frame_196_id_195.YUYV bytes=460800
+[RECV] frame=197 frame_id=196 size=640x360 format=YUYV payload=460800 crc32=0x7517dfb1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_197_id_196.YUYV bytes=460800
+[RECV] frame=198 frame_id=197 size=640x360 format=YUYV payload=460800 crc32=0xd3726c50
+[RECV] saved output/stage7_pipeline/recv/recv_frame_198_id_197.YUYV bytes=460800
+[RECV] frame=199 frame_id=198 size=640x360 format=YUYV payload=460800 crc32=0x81f12f93
+[RECV] saved output/stage7_pipeline/recv/recv_frame_199_id_198.YUYV bytes=460800
+[RECV] frame=200 frame_id=199 size=640x360 format=YUYV payload=460800 crc32=0x36839f31
+[RECV] saved output/stage7_pipeline/recv/recv_frame_200_id_199.YUYV bytes=460800
+[RECV] frame=201 frame_id=200 size=640x360 format=YUYV payload=460800 crc32=0x8534c152
+[RECV] saved output/stage7_pipeline/recv/recv_frame_201_id_200.YUYV bytes=460800
+[RECV] frame=202 frame_id=201 size=640x360 format=YUYV payload=460800 crc32=0x35a9e53c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_202_id_201.YUYV bytes=460800
+[RECV] frame=203 frame_id=202 size=640x360 format=YUYV payload=460800 crc32=0x8df55c4c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_203_id_202.YUYV bytes=460800
+[RECV] frame=204 frame_id=203 size=640x360 format=YUYV payload=460800 crc32=0x8bab481e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_204_id_203.YUYV bytes=460800
+[RECV] frame=205 frame_id=204 size=640x360 format=YUYV payload=460800 crc32=0xcee38c70
+[RECV] saved output/stage7_pipeline/recv/recv_frame_205_id_204.YUYV bytes=460800
+[RECV] frame=206 frame_id=205 size=640x360 format=YUYV payload=460800 crc32=0x87d9ecab
+[RECV] saved output/stage7_pipeline/recv/recv_frame_206_id_205.YUYV bytes=460800
+[RECV] frame=207 frame_id=206 size=640x360 format=YUYV payload=460800 crc32=0x70e45a83
+[RECV] saved output/stage7_pipeline/recv/recv_frame_207_id_206.YUYV bytes=460800
+[RECV] frame=208 frame_id=207 size=640x360 format=YUYV payload=460800 crc32=0x36022867
+[RECV] saved output/stage7_pipeline/recv/recv_frame_208_id_207.YUYV bytes=460800
+[RECV] frame=209 frame_id=208 size=640x360 format=YUYV payload=460800 crc32=0x1511a90c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_209_id_208.YUYV bytes=460800
+[RECV] frame=210 frame_id=209 size=640x360 format=YUYV payload=460800 crc32=0xa8f1e974
+[RECV] saved output/stage7_pipeline/recv/recv_frame_210_id_209.YUYV bytes=460800
+[RECV] frame=211 frame_id=210 size=640x360 format=YUYV payload=460800 crc32=0xa1627f5e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_211_id_210.YUYV bytes=460800
+[RECV] frame=212 frame_id=211 size=640x360 format=YUYV payload=460800 crc32=0x651bf295
+[RECV] saved output/stage7_pipeline/recv/recv_frame_212_id_211.YUYV bytes=460800
+[RECV] frame=213 frame_id=212 size=640x360 format=YUYV payload=460800 crc32=0x867742f1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_213_id_212.YUYV bytes=460800
+[RECV] frame=214 frame_id=213 size=640x360 format=YUYV payload=460800 crc32=0xc1215d9a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_214_id_213.YUYV bytes=460800
+[RECV] frame=215 frame_id=214 size=640x360 format=YUYV payload=460800 crc32=0xe9f4445f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_215_id_214.YUYV bytes=460800
+[RECV] frame=216 frame_id=216 size=640x360 format=YUYV payload=460800 crc32=0xd11834f5
+[RECV] saved output/stage7_pipeline/recv/recv_frame_216_id_216.YUYV bytes=460800
+[RECV] frame=217 frame_id=217 size=640x360 format=YUYV payload=460800 crc32=0x51239dc4
+[RECV] saved output/stage7_pipeline/recv/recv_frame_217_id_217.YUYV bytes=460800
+[RECV] frame=218 frame_id=218 size=640x360 format=YUYV payload=460800 crc32=0xd8d7b5af
+[RECV] saved output/stage7_pipeline/recv/recv_frame_218_id_218.YUYV bytes=460800
+[RECV] frame=219 frame_id=219 size=640x360 format=YUYV payload=460800 crc32=0x914c2cfc
+[RECV] saved output/stage7_pipeline/recv/recv_frame_219_id_219.YUYV bytes=460800
+[RECV] frame=220 frame_id=220 size=640x360 format=YUYV payload=460800 crc32=0xa03df4ed
+[RECV] saved output/stage7_pipeline/recv/recv_frame_220_id_220.YUYV bytes=460800
+[RECV] frame=221 frame_id=221 size=640x360 format=YUYV payload=460800 crc32=0xf677f52e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_221_id_221.YUYV bytes=460800
+[RECV] frame=222 frame_id=222 size=640x360 format=YUYV payload=460800 crc32=0xcf6d5c72
+[RECV] saved output/stage7_pipeline/recv/recv_frame_222_id_222.YUYV bytes=460800
+[RECV] frame=223 frame_id=223 size=640x360 format=YUYV payload=460800 crc32=0xd213a32e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_223_id_223.YUYV bytes=460800
+[RECV] frame=224 frame_id=224 size=640x360 format=YUYV payload=460800 crc32=0x9736461d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_224_id_224.YUYV bytes=460800
+[RECV] frame=225 frame_id=225 size=640x360 format=YUYV payload=460800 crc32=0xca02034b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_225_id_225.YUYV bytes=460800
+[RECV] frame=226 frame_id=226 size=640x360 format=YUYV payload=460800 crc32=0x7735eae8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_226_id_226.YUYV bytes=460800
+[RECV] frame=227 frame_id=227 size=640x360 format=YUYV payload=460800 crc32=0xb8293923
+[RECV] saved output/stage7_pipeline/recv/recv_frame_227_id_227.YUYV bytes=460800
+[RECV] frame=228 frame_id=228 size=640x360 format=YUYV payload=460800 crc32=0xa37c5c0c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_228_id_228.YUYV bytes=460800
+[RECV] frame=229 frame_id=229 size=640x360 format=YUYV payload=460800 crc32=0xfd9848de
+[RECV] saved output/stage7_pipeline/recv/recv_frame_229_id_229.YUYV bytes=460800
+[RECV] frame=230 frame_id=230 size=640x360 format=YUYV payload=460800 crc32=0x34b3195d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_230_id_230.YUYV bytes=460800
+[RECV] frame=231 frame_id=231 size=640x360 format=YUYV payload=460800 crc32=0xa6b49c69
+[RECV] saved output/stage7_pipeline/recv/recv_frame_231_id_231.YUYV bytes=460800
+[RECV] frame=232 frame_id=232 size=640x360 format=YUYV payload=460800 crc32=0xbd1c0125
+[RECV] saved output/stage7_pipeline/recv/recv_frame_232_id_232.YUYV bytes=460800
+[RECV] frame=233 frame_id=233 size=640x360 format=YUYV payload=460800 crc32=0xdefb22b7
+[RECV] saved output/stage7_pipeline/recv/recv_frame_233_id_233.YUYV bytes=460800
+[RECV] frame=234 frame_id=234 size=640x360 format=YUYV payload=460800 crc32=0x7a2c4922
+[RECV] saved output/stage7_pipeline/recv/recv_frame_234_id_234.YUYV bytes=460800
+[RECV] frame=235 frame_id=235 size=640x360 format=YUYV payload=460800 crc32=0xcad38ee0
+[RECV] saved output/stage7_pipeline/recv/recv_frame_235_id_235.YUYV bytes=460800
+[RECV] frame=236 frame_id=236 size=640x360 format=YUYV payload=460800 crc32=0x97b9d54a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_236_id_236.YUYV bytes=460800
+[RECV] frame=237 frame_id=237 size=640x360 format=YUYV payload=460800 crc32=0xfaef43ac
+[RECV] saved output/stage7_pipeline/recv/recv_frame_237_id_237.YUYV bytes=460800
+[RECV] frame=238 frame_id=238 size=640x360 format=YUYV payload=460800 crc32=0x2a39687d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_238_id_238.YUYV bytes=460800
+[RECV] frame=239 frame_id=239 size=640x360 format=YUYV payload=460800 crc32=0xf48a9c4c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_239_id_239.YUYV bytes=460800
+[RECV] frame=240 frame_id=240 size=640x360 format=YUYV payload=460800 crc32=0x41a60b19
+[RECV] saved output/stage7_pipeline/recv/recv_frame_240_id_240.YUYV bytes=460800
+[RECV] frame=241 frame_id=241 size=640x360 format=YUYV payload=460800 crc32=0x4f974a10
+[RECV] saved output/stage7_pipeline/recv/recv_frame_241_id_241.YUYV bytes=460800
+[RECV] frame=242 frame_id=242 size=640x360 format=YUYV payload=460800 crc32=0x5d0460ca
+[RECV] saved output/stage7_pipeline/recv/recv_frame_242_id_242.YUYV bytes=460800
+[RECV] frame=243 frame_id=243 size=640x360 format=YUYV payload=460800 crc32=0x928cc528
+[RECV] saved output/stage7_pipeline/recv/recv_frame_243_id_243.YUYV bytes=460800
+[RECV] frame=244 frame_id=244 size=640x360 format=YUYV payload=460800 crc32=0xf9d1c999
+[RECV] saved output/stage7_pipeline/recv/recv_frame_244_id_244.YUYV bytes=460800
+[RECV] frame=245 frame_id=245 size=640x360 format=YUYV payload=460800 crc32=0x7bfe41ec
+[RECV] saved output/stage7_pipeline/recv/recv_frame_245_id_245.YUYV bytes=460800
+[RECV] frame=246 frame_id=246 size=640x360 format=YUYV payload=460800 crc32=0xc20dd587
+[RECV] saved output/stage7_pipeline/recv/recv_frame_246_id_246.YUYV bytes=460800
+[RECV] frame=247 frame_id=247 size=640x360 format=YUYV payload=460800 crc32=0xd4ff6e9
+[RECV] saved output/stage7_pipeline/recv/recv_frame_247_id_247.YUYV bytes=460800
+[RECV] frame=248 frame_id=248 size=640x360 format=YUYV payload=460800 crc32=0xb2e02d35
+[RECV] saved output/stage7_pipeline/recv/recv_frame_248_id_248.YUYV bytes=460800
+[RECV] frame=249 frame_id=249 size=640x360 format=YUYV payload=460800 crc32=0x4d3745d7
+[RECV] saved output/stage7_pipeline/recv/recv_frame_249_id_249.YUYV bytes=460800
+[RECV] frame=250 frame_id=250 size=640x360 format=YUYV payload=460800 crc32=0x83a77d71
+[RECV] saved output/stage7_pipeline/recv/recv_frame_250_id_250.YUYV bytes=460800
+[RECV] frame=251 frame_id=251 size=640x360 format=YUYV payload=460800 crc32=0xbf095fcf
+[RECV] saved output/stage7_pipeline/recv/recv_frame_251_id_251.YUYV bytes=460800
+[RECV] frame=252 frame_id=252 size=640x360 format=YUYV payload=460800 crc32=0x1dfb479f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_252_id_252.YUYV bytes=460800
+[RECV] frame=253 frame_id=253 size=640x360 format=YUYV payload=460800 crc32=0xf7ee1c11
+[RECV] saved output/stage7_pipeline/recv/recv_frame_253_id_253.YUYV bytes=460800
+[RECV] frame=254 frame_id=254 size=640x360 format=YUYV payload=460800 crc32=0x98f75827
+[RECV] saved output/stage7_pipeline/recv/recv_frame_254_id_254.YUYV bytes=460800
+[RECV] frame=255 frame_id=255 size=640x360 format=YUYV payload=460800 crc32=0x1f6de295
+[RECV] saved output/stage7_pipeline/recv/recv_frame_255_id_255.YUYV bytes=460800
+[RECV] frame=256 frame_id=256 size=640x360 format=YUYV payload=460800 crc32=0xdda5cc7f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_256_id_256.YUYV bytes=460800
+[RECV] frame=257 frame_id=257 size=640x360 format=YUYV payload=460800 crc32=0x38018601
+[RECV] saved output/stage7_pipeline/recv/recv_frame_257_id_257.YUYV bytes=460800
+[RECV] frame=258 frame_id=258 size=640x360 format=YUYV payload=460800 crc32=0x6a01b959
+[RECV] saved output/stage7_pipeline/recv/recv_frame_258_id_258.YUYV bytes=460800
+[RECV] frame=259 frame_id=259 size=640x360 format=YUYV payload=460800 crc32=0x891a565d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_259_id_259.YUYV bytes=460800
+[RECV] frame=260 frame_id=260 size=640x360 format=YUYV payload=460800 crc32=0xddffc4b0
+[RECV] saved output/stage7_pipeline/recv/recv_frame_260_id_260.YUYV bytes=460800
+[RECV] frame=261 frame_id=261 size=640x360 format=YUYV payload=460800 crc32=0x2dec4c14
+[RECV] saved output/stage7_pipeline/recv/recv_frame_261_id_261.YUYV bytes=460800
+[RECV] frame=262 frame_id=262 size=640x360 format=YUYV payload=460800 crc32=0xe3cb43c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_262_id_262.YUYV bytes=460800
+[RECV] frame=263 frame_id=263 size=640x360 format=YUYV payload=460800 crc32=0x24d1229b
+[RECV] saved output/stage7_pipeline/recv/recv_frame_263_id_263.YUYV bytes=460800
+[RECV] frame=264 frame_id=264 size=640x360 format=YUYV payload=460800 crc32=0x48691bb3
+[RECV] saved output/stage7_pipeline/recv/recv_frame_264_id_264.YUYV bytes=460800
+[RECV] frame=265 frame_id=265 size=640x360 format=YUYV payload=460800 crc32=0xba519284
+[RECV] saved output/stage7_pipeline/recv/recv_frame_265_id_265.YUYV bytes=460800
+[RECV] frame=266 frame_id=266 size=640x360 format=YUYV payload=460800 crc32=0xa4877158
+[RECV] saved output/stage7_pipeline/recv/recv_frame_266_id_266.YUYV bytes=460800
+[RECV] frame=267 frame_id=267 size=640x360 format=YUYV payload=460800 crc32=0x4e8aeeb1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_267_id_267.YUYV bytes=460800
+[RECV] frame=268 frame_id=268 size=640x360 format=YUYV payload=460800 crc32=0xb55b74d8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_268_id_268.YUYV bytes=460800
+[RECV] frame=269 frame_id=269 size=640x360 format=YUYV payload=460800 crc32=0xdb21f080
+[RECV] saved output/stage7_pipeline/recv/recv_frame_269_id_269.YUYV bytes=460800
+[RECV] frame=270 frame_id=270 size=640x360 format=YUYV payload=460800 crc32=0x5a86f24d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_270_id_270.YUYV bytes=460800
+[RECV] frame=271 frame_id=271 size=640x360 format=YUYV payload=460800 crc32=0x8f493138
+[RECV] saved output/stage7_pipeline/recv/recv_frame_271_id_271.YUYV bytes=460800
+[RECV] frame=272 frame_id=272 size=640x360 format=YUYV payload=460800 crc32=0x2e248fc2
+[RECV] saved output/stage7_pipeline/recv/recv_frame_272_id_272.YUYV bytes=460800
+[RECV] frame=273 frame_id=273 size=640x360 format=YUYV payload=460800 crc32=0x53c376c7
+[RECV] saved output/stage7_pipeline/recv/recv_frame_273_id_273.YUYV bytes=460800
+[RECV] frame=274 frame_id=274 size=640x360 format=YUYV payload=460800 crc32=0xba0b5b86
+[RECV] saved output/stage7_pipeline/recv/recv_frame_274_id_274.YUYV bytes=460800
+[RECV] frame=275 frame_id=275 size=640x360 format=YUYV payload=460800 crc32=0xcbd4e3ae
+[RECV] saved output/stage7_pipeline/recv/recv_frame_275_id_275.YUYV bytes=460800
+[RECV] frame=276 frame_id=276 size=640x360 format=YUYV payload=460800 crc32=0xfae820e6
+[RECV] saved output/stage7_pipeline/recv/recv_frame_276_id_276.YUYV bytes=460800
+[RECV] frame=277 frame_id=277 size=640x360 format=YUYV payload=460800 crc32=0xbd541b5d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_277_id_277.YUYV bytes=460800
+[RECV] frame=278 frame_id=278 size=640x360 format=YUYV payload=460800 crc32=0x87a9e8bd
+[RECV] saved output/stage7_pipeline/recv/recv_frame_278_id_278.YUYV bytes=460800
+[RECV] frame=279 frame_id=279 size=640x360 format=YUYV payload=460800 crc32=0xf72e176a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_279_id_279.YUYV bytes=460800
+[RECV] frame=280 frame_id=280 size=640x360 format=YUYV payload=460800 crc32=0xc90763bc
+[RECV] saved output/stage7_pipeline/recv/recv_frame_280_id_280.YUYV bytes=460800
+[RECV] frame=281 frame_id=281 size=640x360 format=YUYV payload=460800 crc32=0xb167d06e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_281_id_281.YUYV bytes=460800
+[RECV] frame=282 frame_id=282 size=640x360 format=YUYV payload=460800 crc32=0x17e0af0e
+[RECV] saved output/stage7_pipeline/recv/recv_frame_282_id_282.YUYV bytes=460800
+[RECV] frame=283 frame_id=283 size=640x360 format=YUYV payload=460800 crc32=0x46fa0939
+[RECV] saved output/stage7_pipeline/recv/recv_frame_283_id_283.YUYV bytes=460800
+[RECV] frame=284 frame_id=284 size=640x360 format=YUYV payload=460800 crc32=0x54baed64
+[RECV] saved output/stage7_pipeline/recv/recv_frame_284_id_284.YUYV bytes=460800
+[RECV] frame=285 frame_id=285 size=640x360 format=YUYV payload=460800 crc32=0x17d3e3a1
+[RECV] saved output/stage7_pipeline/recv/recv_frame_285_id_285.YUYV bytes=460800
+[RECV] frame=286 frame_id=286 size=640x360 format=YUYV payload=460800 crc32=0x7a79b52c
+[RECV] saved output/stage7_pipeline/recv/recv_frame_286_id_286.YUYV bytes=460800
+[RECV] frame=287 frame_id=287 size=640x360 format=YUYV payload=460800 crc32=0x3bef0554
+[RECV] saved output/stage7_pipeline/recv/recv_frame_287_id_287.YUYV bytes=460800
+[RECV] frame=288 frame_id=288 size=640x360 format=YUYV payload=460800 crc32=0x7fcf8b30
+[RECV] saved output/stage7_pipeline/recv/recv_frame_288_id_288.YUYV bytes=460800
+[RECV] frame=289 frame_id=289 size=640x360 format=YUYV payload=460800 crc32=0x7d844e67
+[RECV] saved output/stage7_pipeline/recv/recv_frame_289_id_289.YUYV bytes=460800
+[RECV] frame=290 frame_id=290 size=640x360 format=YUYV payload=460800 crc32=0xe904c020
+[RECV] saved output/stage7_pipeline/recv/recv_frame_290_id_290.YUYV bytes=460800
+[RECV] frame=291 frame_id=291 size=640x360 format=YUYV payload=460800 crc32=0x96d0eb02
+[RECV] saved output/stage7_pipeline/recv/recv_frame_291_id_291.YUYV bytes=460800
+[RECV] frame=292 frame_id=292 size=640x360 format=YUYV payload=460800 crc32=0x7e800a65
+[RECV] saved output/stage7_pipeline/recv/recv_frame_292_id_292.YUYV bytes=460800
+[RECV] frame=293 frame_id=293 size=640x360 format=YUYV payload=460800 crc32=0x99856cc8
+[RECV] saved output/stage7_pipeline/recv/recv_frame_293_id_293.YUYV bytes=460800
+[RECV] frame=294 frame_id=294 size=640x360 format=YUYV payload=460800 crc32=0xb4ac941f
+[RECV] saved output/stage7_pipeline/recv/recv_frame_294_id_294.YUYV bytes=460800
+[RECV] frame=295 frame_id=295 size=640x360 format=YUYV payload=460800 crc32=0xb0c8ac64
+[RECV] saved output/stage7_pipeline/recv/recv_frame_295_id_295.YUYV bytes=460800
+[RECV] frame=296 frame_id=296 size=640x360 format=YUYV payload=460800 crc32=0x785fc23d
+[RECV] saved output/stage7_pipeline/recv/recv_frame_296_id_296.YUYV bytes=460800
+[RECV] frame=297 frame_id=297 size=640x360 format=YUYV payload=460800 crc32=0x3540611a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_297_id_297.YUYV bytes=460800
+[RECV] frame=298 frame_id=298 size=640x360 format=YUYV payload=460800 crc32=0xf073e538
+[RECV] saved output/stage7_pipeline/recv/recv_frame_298_id_298.YUYV bytes=460800
+[RECV] frame=299 frame_id=299 size=640x360 format=YUYV payload=460800 crc32=0xa1c8031a
+[RECV] saved output/stage7_pipeline/recv/recv_frame_299_id_299.YUYV bytes=460800
+[INFO] peer closed connection
+========== TCP Receiver Statistics ==========
+received frames : 299
+received bytes  : 137779200
+crc errors      : 0
+=============================================
+[INFO] wrote machine-readable stats to output/stage7_pipeline/receiver_stats.json

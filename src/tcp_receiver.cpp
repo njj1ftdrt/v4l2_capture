@@ -1,4 +1,5 @@
 #include "frame_protocol.hpp"
+#include "stats_json.hpp"
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -99,7 +100,7 @@ void save_payload(
 
 void print_usage(const char* program) {
     std::cout << "Usage:\n"
-              << "  " << program << " --port 9000 --output output/tcp_recv\n";
+              << "  " << program << " --port 9000 --output output/tcp_recv --stats-output output/stats/receiver_stats.json\n";
 }
 
 }  // namespace
@@ -109,6 +110,7 @@ int main(int argc, char** argv) {
         int port = 9000;
         std::string output_dir = "output/tcp_recv";
         int max_frames = 0;
+        std::string stats_output = "output/stats/receiver_stats.json";
 
         for (int i = 1; i < argc; ++i) {
             const std::string arg = argv[i];
@@ -122,6 +124,8 @@ int main(int argc, char** argv) {
                 output_dir = argv[++i];
             } else if (arg == "--max-frames" && i + 1 < argc) {
                 max_frames = parse_int_arg(argv[++i], arg);
+            } else if (arg == "--stats-output" && i + 1 < argc) {
+                stats_output = argv[++i];
             } else {
                 throw std::invalid_argument("Unknown or incomplete argument: " + arg);
             }
@@ -158,6 +162,7 @@ int main(int argc, char** argv) {
 
         std::cout << "[INFO] tcp_receiver listening on port " << port << "\n";
         std::cout << "[INFO] output dir: " << output_dir << "\n";
+        std::cout << "[INFO] stats output: " << stats_output << "\n";
 
         sockaddr_in client_addr{};
         socklen_t client_len = sizeof(client_addr);
@@ -235,6 +240,14 @@ int main(int argc, char** argv) {
         std::cout << "received bytes  : " << received_bytes << "\n";
         std::cout << "crc errors      : " << crc_errors << "\n";
         std::cout << "=============================================\n";
+
+        ReceiverStatsSnapshot snapshot{};
+        snapshot.received_frames = received_frames;
+        snapshot.received_bytes = received_bytes;
+        snapshot.crc_errors = crc_errors;
+        snapshot.saved_files = received_frames;
+        write_receiver_stats_json(stats_output, snapshot);
+        std::cout << "[INFO] wrote machine-readable stats to " << stats_output << "\n";
 
         close_fd(client_fd);
         close_fd(listen_fd);

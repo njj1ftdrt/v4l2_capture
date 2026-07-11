@@ -133,3 +133,22 @@ git add include/pipeline_stats.hpp \
 
 git commit -m "feat: add centralized pipeline statistics"
 ls docs/logs | grep pipeline_stats
+
+## Machine-Readable Statistics Test
+
+### Purpose
+
+This step verifies that the project can export machine-readable JSON statistics for both the V4L2 sender pipeline and the TCP receiver, and that the regression script can validate the end-to-end data path from JSON instead of parsing text logs.
+
+### Verified Items
+
+- Sender writes `pipeline_stats.json`.
+- Receiver writes `receiver_stats.json`.
+- JSON files are written atomically.
+- Regression script reads JSON metrics with Python standard library.
+- Logger format changes do not break automated regression.
+- Existing V4L2 + dual RingBuffer + TCP + CRC32 behavior remains unchanged.
+
+### Engineering Meaning
+
+This update decouples automation from human-readable logs and makes the regression test more stable and maintainable. It also prepares the project for future monitoring, dashboard integration, and ROS2 status publishing.

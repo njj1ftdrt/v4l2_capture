@@ -1,0 +1,15 @@
+[INFO] tcp_receiver listening on port 9203
+[INFO] output dir: /home/gfc/v4l2_capture/output/protocol_negative/zero-width/recv
+[INFO] stats output: /home/gfc/v4l2_capture/output/protocol_negative/zero-width/receiver_stats.json
+[INFO] max payload bytes: 16777216
+[INFO] client connected
+[ERROR] invalid frame header: zero width or height frame_id=0 payload_size=460800
+========== TCP Receiver Statistics ==========
+received frames : 0
+received bytes  : 0
+crc errors      : 0
+header errors   : 1
+rejected frames : 1
+last error      : invalid frame header: zero width or height
+=============================================
+[INFO] wrote machine-readable stats to /home/gfc/v4l2_capture/output/protocol_negative/zero-width/receiver_stats.json

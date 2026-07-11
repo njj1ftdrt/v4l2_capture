@@ -123,6 +123,8 @@ pairs = {
     'TCP_QUEUE_DROPPED': sender['tcp_queue_dropped'],
     'RECEIVER_FRAMES': receiver['received_frames'],
     'CRC_ERRORS': receiver['crc_errors'],
+    'HEADER_ERRORS': receiver['header_errors'],
+    'REJECTED_FRAMES': receiver['rejected_frames'],
     'RECEIVED_FILES': int(os.environ['FILE_COUNT']),
     'BAD_SIZE_FILES': int(os.environ['BAD_SIZE_COUNT']),
     'EXPECTED_SIZE': int(os.environ['EXPECTED_SIZE']),
@@ -146,6 +148,8 @@ echo "ring dropped frames  : ${RING_DROPPED}"
 echo "tcp queue dropped    : ${TCP_QUEUE_DROPPED}"
 echo "receiver frames      : ${RECEIVER_FRAMES}"
 echo "crc errors           : ${CRC_ERRORS}"
+echo "header errors        : ${HEADER_ERRORS}"
+echo "rejected frames      : ${REJECTED_FRAMES}"
 echo "received files       : ${RECEIVED_FILES}"
 echo "bad size files       : ${BAD_SIZE_FILES}"
 echo "expected file size   : ${EXPECTED_SIZE}"
@@ -173,6 +177,16 @@ fi
 
 if [[ "${CRC_ERRORS}" != "0" ]]; then
     echo "[FAIL] receiver detected CRC errors"
+    exit 1
+fi
+
+if [[ "${HEADER_ERRORS}" != "0" ]]; then
+    echo "[FAIL] receiver detected invalid protocol headers"
+    exit 1
+fi
+
+if [[ "${REJECTED_FRAMES}" != "0" ]]; then
+    echo "[FAIL] receiver rejected frames during normal regression"
     exit 1
 fi
 

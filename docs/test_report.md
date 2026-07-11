@@ -152,3 +152,34 @@ This step verifies that the project can export machine-readable JSON statistics 
 ### Engineering Meaning
 
 This update decouples automation from human-readable logs and makes the regression test more stable and maintainable. It also prepares the project for future monitoring, dashboard integration, and ROS2 status publishing.
+
+## Malformed TCP Header Rejection Test
+
+### Purpose
+
+Verify that untrusted protocol metadata is rejected before payload allocation and file creation.
+
+### Fault Cases
+
+- bad magic;
+- unsupported protocol version;
+- invalid header size;
+- zero width;
+- payload exceeding the configured limit;
+- YUYV payload-size mismatch.
+
+### Pass Criteria
+
+For every malformed header:
+
+```text
+receiver exit code = 3
+received_frames = 0
+received_bytes = 0
+crc_errors = 0
+header_errors = 1
+rejected_frames = 1
+saved_files = 0
+```
+
+The receiver must also produce no YUYV file and leave no temporary JSON file.

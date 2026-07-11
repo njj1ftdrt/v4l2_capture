@@ -134,3 +134,22 @@ each file size = 460800 bytes
 ```
 
 The automated regression script uses these JSON files instead of parsing Logger text output.
+
+## Defensive TCP Header Validation
+
+The TCP receiver validates protocol metadata before allocating memory for a frame payload. The default maximum accepted payload is 16 MiB:
+
+```bash
+./build/tcp_receiver \
+  --port 9000 \
+  --output output/tcp_recv \
+  --stats-output output/stats/receiver_stats.json \
+  --max-payload-bytes 16777216
+```
+
+Run protocol validation tests:
+
+```bash
+ctest --test-dir build --output-on-failure
+./scripts/tcp_protocol_negative_test.sh
+```

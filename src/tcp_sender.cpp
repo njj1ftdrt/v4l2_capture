@@ -153,13 +153,44 @@ int connect_to_server(const std::string& host, int port) {
     return fd;
 }
 
+void apply_header_fault(
+    frame_protocol::FrameHeader& header,
+    const std::string& fault
+) {
+    if (fault == "bad-magic") {
+        header.magic ^= 0x1u;
+    } else if (fault == "bad-version") {
+        ++header.version;
+    } else if (fault == "bad-header-size") {
+        header.header_size = 1;
+    } else if (fault == "zero-width") {
+        header.width = 0;
+    } else if (fault == "oversized-payload") {
+        header.payload_size = frame_protocol::kDefaultMaxPayloadBytes + 1u;
+    } else if (fault == "yuyv-size-mismatch") {
+        if (header.payload_size <= 2u) {
+            throw std::runtime_error("payload too small for yuyv-size-mismatch fault");
+        }
+        header.payload_size -= 2u;
+    } else {
+        throw std::invalid_argument(
+            "Unsupported --header-fault: " + fault +
+            ". Expected bad-magic, bad-version, bad-header-size, zero-width, "
+            "oversized-payload, or yuyv-size-mismatch"
+        );
+    }
+}
+
 void print_usage(const char* program) {
     std::cout << "Usage:\n"
               << "  " << program
               << " --host 127.0.0.1 --port 9000 --frames 3 --width 640 --height 360 --format YUYV [--corrupt-frame-id 2]\n"
+              << "  " << program
+              << " --host 127.0.0.1 --port 9000 --frames 1 --header-fault bad-magic\n"
               << "\n"
-              << "Test-only option:\n"
-              << "  --corrupt-frame-id N  Calculate the CRC first, then flip one payload byte for frame N.\n";
+              << "Test-only options:\n"
+              << "  --corrupt-frame-id N  Calculate the CRC first, then flip one payload byte for frame N.\n"
+              << "  --header-fault TYPE   Send one malformed header and no payload.\n";
 }
 
 }  // namespace
@@ -174,6 +205,7 @@ int main(int argc, char** argv) {
         std::string format_text = "YUYV";
         int interval_ms = 33;
         int corrupt_frame_id = -1;
+        std::string header_fault;
 
         for (int i = 1; i < argc; ++i) {
             const std::string arg = argv[i];
@@ -197,12 +229,18 @@ int main(int argc, char** argv) {
                 interval_ms = parse_int_arg(argv[++i], arg);
             } else if (arg == "--corrupt-frame-id" && i + 1 < argc) {
                 corrupt_frame_id = parse_int_arg(argv[++i], arg);
+            } else if (arg == "--header-fault" && i + 1 < argc) {
+                header_fault = argv[++i];
             } else {
                 throw std::invalid_argument("Unknown or incomplete argument: " + arg);
             }
         }
 
         const std::uint32_t pixel_format = parse_format(format_text);
+
+        if (!header_fault.empty() && frames != 1) {
+            throw std::invalid_argument("--header-fault requires --frames 1");
+        }
 
         std::cout << "[INFO] tcp_sender connecting to "
                   << host << ":" << port << "\n";
@@ -224,7 +262,7 @@ int main(int argc, char** argv) {
                 payload.size()
             );
 
-            const auto header = frame_protocol::make_header(
+            auto header = frame_protocol::make_header(
                 static_cast<std::uint64_t>(i),
                 now_ns(),
                 static_cast<std::uint32_t>(width),
@@ -233,6 +271,18 @@ int main(int argc, char** argv) {
                 static_cast<std::uint32_t>(payload.size()),
                 payload_crc32
             );
+
+            if (!header_fault.empty()) {
+                apply_header_fault(header, header_fault);
+                send_all(fd, &header, sizeof(header));
+                sent_bytes += sizeof(header);
+                std::cout << "[TEST] sent malformed header"
+                          << " fault=" << header_fault
+                          << " frame_id=" << i
+                          << " payload_size=" << header.payload_size
+                          << "\n";
+                break;
+            }
 
             if (i == corrupt_frame_id) {
                 if (payload.empty()) {
@@ -263,7 +313,11 @@ int main(int argc, char** argv) {
         close_fd(fd);
 
         std::cout << "========== TCP Sender Statistics ==========" << "\n";
-        std::cout << "sent frames : " << frames << "\n";
+        if (header_fault.empty()) {
+            std::cout << "sent frames : " << frames << "\n";
+        } else {
+            std::cout << "sent malformed headers : 1\n";
+        }
         std::cout << "sent bytes  : " << sent_bytes << "\n";
         std::cout << "===========================================" << "\n";
         return 0;

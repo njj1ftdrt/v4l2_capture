@@ -1,0 +1,8 @@
+[INFO] tcp_sender connecting to 127.0.0.1:9203
+[INFO] test frame: 640x360 format=YUYV frames=1
+[INFO] connected
+[TEST] sent malformed header fault=zero-width frame_id=0 payload_size=460800
+========== TCP Sender Statistics ==========
+sent malformed headers : 1
+sent bytes  : 44
+===========================================

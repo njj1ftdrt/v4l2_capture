@@ -179,6 +179,7 @@ int main(int argc, char** argv) {
 
         std::uint64_t received_frames = 0;
         std::uint64_t received_bytes = 0;
+        std::uint64_t crc_errors = 0;
 
         while (max_frames <= 0 || static_cast<int>(received_frames) < max_frames) {
             frame_protocol::FrameHeader header{};
@@ -200,6 +201,21 @@ int main(int argc, char** argv) {
                 break;
             }
 
+            const std::uint32_t actual_crc32 = frame_protocol::compute_crc32(
+                payload.data(),
+                payload.size()
+            );
+
+            if (actual_crc32 != header.payload_crc32) {
+                ++crc_errors;
+                std::cerr << "[ERROR] payload crc mismatch"
+                          << " frame_id=" << header.frame_id
+                          << " expected=0x" << std::hex << header.payload_crc32
+                          << " actual=0x" << actual_crc32 << std::dec
+                          << "\n";
+                break;
+            }
+
             ++received_frames;
             received_bytes += payload.size();
 
@@ -208,6 +224,7 @@ int main(int argc, char** argv) {
                       << " size=" << header.width << "x" << header.height
                       << " format=" << fourcc_to_string(header.pixel_format)
                       << " payload=" << header.payload_size
+                      << " crc32=0x" << std::hex << header.payload_crc32 << std::dec
                       << "\n";
 
             save_payload(header, payload, output_dir, received_frames);
@@ -216,6 +233,7 @@ int main(int argc, char** argv) {
         std::cout << "========== TCP Receiver Statistics ==========\n";
         std::cout << "received frames : " << received_frames << "\n";
         std::cout << "received bytes  : " << received_bytes << "\n";
+        std::cout << "crc errors      : " << crc_errors << "\n";
         std::cout << "=============================================\n";
 
         close_fd(client_fd);

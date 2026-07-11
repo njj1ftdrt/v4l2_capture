@@ -213,13 +213,19 @@ int main(int argc, char** argv) {
         for (int i = 0; i < frames; ++i) {
             std::vector<std::uint8_t> payload = make_test_yuyv_payload(width, height, i);
 
+            const std::uint32_t payload_crc32 = frame_protocol::compute_crc32(
+                payload.data(),
+                payload.size()
+            );
+
             const auto header = frame_protocol::make_header(
                 static_cast<std::uint64_t>(i),
                 now_ns(),
                 static_cast<std::uint32_t>(width),
                 static_cast<std::uint32_t>(height),
                 pixel_format,
-                static_cast<std::uint32_t>(payload.size())
+                static_cast<std::uint32_t>(payload.size()),
+                payload_crc32
             );
 
             send_all(fd, &header, sizeof(header));
@@ -231,6 +237,7 @@ int main(int argc, char** argv) {
                       << " size=" << width << "x" << height
                       << " format=" << fourcc_to_string(pixel_format)
                       << " payload=" << payload.size()
+                      << " crc32=0x" << std::hex << payload_crc32 << std::dec
                       << "\n";
 
             if (i + 1 < frames && interval_ms > 0) {

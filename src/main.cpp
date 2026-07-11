@@ -113,13 +113,19 @@ static std::uint64_t send_frame_over_tcp(int fd, const Frame& frame) {
         throw std::runtime_error("Frame payload is too large for FrameHeader payload_size");
     }
 
+    const std::uint32_t payload_crc32 = frame_protocol::compute_crc32(
+        frame.data.data(),
+        frame.data.size()
+    );
+
     const auto header = frame_protocol::make_header(
         static_cast<std::uint64_t>(frame.sequence),
         current_system_time_ns(),
         frame.width,
         frame.height,
         frame.pixel_format,
-        static_cast<std::uint32_t>(frame.data.size())
+        static_cast<std::uint32_t>(frame.data.size()),
+        payload_crc32
     );
 
     send_all_tcp(fd, &header, sizeof(header));

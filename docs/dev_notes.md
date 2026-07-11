@@ -102,3 +102,60 @@ git add CMakeLists.txt \
   docs/logs/logger_debug_sender_30.txt
 
 git commit -m "feat: add lightweight thread safe logger"
+
+## TCP Payload CRC32 Check
+
+The TCP frame protocol was upgraded from version 1 to version 2.
+
+FrameHeader now includes:
+
+```text
+payload_crc32
+v1 FrameHeader size: 40 bytes
+v2 FrameHeader size: 44 bytes
+
+```bash
+cat >> docs/test_report.md <<'EOF'
+
+## TCP Payload CRC32 Test
+
+### Purpose
+
+This test verifies that the TCP receiver can detect payload corruption by comparing the CRC32 value in FrameHeader with the CRC32 value recalculated from the received payload.
+
+### Verified Items
+
+- Build passed.
+- RingBuffer unit test passed.
+- tcp_sender test frames passed CRC verification.
+- V4L2 + TCP pipeline still works after protocol v2 upgrade.
+- Receiver reconstructs complete YUYV files.
+- Receiver reports `crc errors = 0`.
+
+### Protocol Update
+
+```text
+FrameHeader v1: 40 bytes
+FrameHeader v2: 44 bytes
+New field: payload_crc32
+640 * 360 * 2 = 460800 bytes
+460800 + 44 = 460844 bytes
+
+---
+
+## 第 8 步：提交
+
+```bash
+git add include/frame_protocol.hpp \
+  src/main.cpp \
+  src/tcp_sender.cpp \
+  src/tcp_receiver.cpp \
+  docs/dev_notes.md \
+  docs/test_report.md \
+  docs/logs/crc_test_ring_buffer.txt \
+  docs/logs/crc_tcp_receiver_test.txt \
+  docs/logs/crc_tcp_sender_test.txt \
+  docs/logs/crc_pipeline_receiver_300.txt \
+  docs/logs/crc_pipeline_sender_300.txt
+
+git commit -m "feat: add tcp payload crc32 verification"

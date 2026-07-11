@@ -1,3 +1,26 @@
+========== Effective AppConfig ==========
+config path        : config/v4l2_tcp_pipeline.conf
+device             : /dev/video0
+list formats       : no
+width              : 640
+height             : 360
+format             : YUYV
+mmap buffers       : 4
+capture one        : no
+save one           : no
+capture frames     : 0
+pipeline frames    : 300
+ring capacity      : 8
+tcp queue capacity : 8
+consumer delay ms  : 0
+pipeline save      : no
+save limit         : 5
+output dir         : output
+tcp host           : 127.0.0.1
+tcp port           : 9000
+timeout ms         : 2000
+log level          : INFO
+=========================================
 [INFO] Opened device: /dev/video0
 ========== V4L2 Capability ==========
 driver      : uvcvideo
@@ -26,10 +49,10 @@ sizeimage   : 460800
 ========== Init MMAP Buffers ==========
 requested buffers: 4
 driver buffers   : 4
-buffer[0] length=460800 offset=0 mapped_addr=0x7dbd138e7000
-buffer[1] length=460800 offset=32768 mapped_addr=0x7dbd1358f000
-buffer[2] length=460800 offset=65536 mapped_addr=0x7dbd1351e000
-buffer[3] length=460800 offset=98304 mapped_addr=0x7dbd134ad000
+buffer[0] length=460800 offset=0 mapped_addr=0x71649d0dd000
+buffer[1] length=460800 offset=32768 mapped_addr=0x71649cd8f000
+buffer[2] length=460800 offset=65536 mapped_addr=0x71649cd1e000
+buffer[3] length=460800 offset=98304 mapped_addr=0x71649ccad000
 queued buffer[0]
 queued buffer[1]
 queued buffer[2]
@@ -82,9 +105,9 @@ produced frames      : 300
 consumed frames      : 300
 ring dropped frames  : 0
 remaining ring size  : 0
-elapsed seconds      : 10.326
-producer FPS         : 29.052
-consumer FPS         : 29.052
+elapsed seconds      : 10.289
+producer FPS         : 29.156
+consumer FPS         : 29.156
 saved frames         : 0
 tcp queued frames    : 300
 tcp queue dropped    : 0

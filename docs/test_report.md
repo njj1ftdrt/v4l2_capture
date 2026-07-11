@@ -70,3 +70,66 @@ consumed bytes       : 13824000
 output/tcp_recv_v4l2/recv_frame_10_id_9.YUYV 460800 bytes
 output/tcp_recv_v4l2/recv_frame_11_id_10.YUYV 460800 bytes
 output/tcp_recv_v4l2/recv_frame_12_id_11.YUYV 460800 bytes
+
+## PipelineStats 300-Frame Clean Run
+
+### Purpose
+
+This test verifies that the centralized PipelineStats integration does not change the behavior of the existing V4L2 + dual RingBuffer + TCP three-thread pipeline.
+
+### Result
+
+```text
+produced frames      : 300
+consumed frames      : 300
+ring dropped frames  : 0
+remaining ring size  : 0
+tcp queued frames    : 300
+tcp queue dropped    : 0
+tcp queue remaining  : 0
+tcp sent frames      : 300
+tcp sent bytes       : 138252000
+tcp send errors      : 0
+received frames      : 0
+reconnect count      : 0
+invalid frames       : 0
+consumed bytes       : 138240000
+received YUYV files  : 300
+each file size       : 460800 bytes
+
+再追加 dev notes：
+
+```bash
+cat >> docs/dev_notes.md <<'EOF'
+
+## PipelineStats Validation Note
+
+PipelineStats was validated with a clean 300-frame V4L2 + TCP transmission test.
+
+The final clean run produced:
+
+```text
+produced=300
+consumed=300
+ring_dropped=0
+tcp_queued=300
+tcp_dropped=0
+tcp_sent=300
+tcp_send_errors=0
+invalid=0
+received_files=300
+payload_size=460800
+
+然后提交：
+
+```bash
+git add include/pipeline_stats.hpp \
+  src/main.cpp \
+  docs/dev_notes.md \
+  docs/test_report.md \
+  docs/logs/pipeline_stats_test_ring_buffer.txt \
+  docs/logs/pipeline_stats_receiver_300.txt \
+  docs/logs/pipeline_stats_sender_300.txt
+
+git commit -m "feat: add centralized pipeline statistics"
+ls docs/logs | grep pipeline_stats

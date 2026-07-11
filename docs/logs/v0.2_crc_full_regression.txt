@@ -1,3 +1,14 @@
+========== TCP V4L2 Regression Test ==========
+device             : /dev/video0
+resolution         : 640x360
+format             : YUYV
+frames             : 300
+ring capacity      : 8
+tcp queue capacity : 8
+port               : 9000
+expected size      : 460800
+output             : /home/gfc/v4l2_capture/output/tcp_regression_300
+==============================================
 [2026-07-11 10:59:41.254][INFO][MAIN] logger initialized with level=INFO
 [2026-07-11 10:59:41.254][INFO][CONFIG] ========== Effective AppConfig ==========
 [2026-07-11 10:59:41.254][INFO][CONFIG] config path        : /home/gfc/v4l2_capture/config/v4l2_tcp_pipeline.conf
@@ -108,3 +119,18 @@ MMAP buffer initialization done.
 [2026-07-11 10:59:51.684][INFO][STATS] consumed bytes       : 138240000
 [2026-07-11 10:59:51.684][INFO][STATS] =========================================
 [INFO] Streaming stopped.
+========== Verification ==========
+produced frames      : 300
+consumed frames      : 300
+tcp sent frames      : 300
+tcp send errors      : 0
+invalid frames       : 0
+ring dropped frames  : 0
+tcp queue dropped    : 0
+receiver frames      : 300
+crc errors           : 0
+received files       : 300
+bad size files       : 0
+expected file size   : 460800
+==================================
+[PASS] TCP V4L2 regression test passed.

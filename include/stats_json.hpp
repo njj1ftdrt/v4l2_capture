@@ -12,6 +12,9 @@ struct ReceiverStatsSnapshot {
     std::uint64_t header_errors = 0;
     std::uint64_t rejected_frames = 0;
     std::uint64_t saved_files = 0;
+    std::uint64_t accepted_sessions = 0;
+    std::uint64_t completed_sessions = 0;
+    std::uint64_t peer_disconnects = 0;
     std::string last_error;
 };
 

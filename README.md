@@ -153,3 +153,18 @@ Run protocol validation tests:
 ctest --test-dir build --output-on-failure
 ./scripts/tcp_protocol_negative_test.sh
 ```
+
+## Sequential Receiver Sessions
+
+`tcp_receiver` can keep its listening socket open and accept multiple clients sequentially:
+
+```bash
+./build/tcp_receiver \
+  --port 9500 \
+  --output output/multisession/recv \
+  --max-frames 5 \
+  --max-sessions 2 \
+  --stats-output output/multisession/receiver_stats.json
+```
+
+The default remains `--max-sessions 1`, preserving the original single-client behavior. Session counters are exported in receiver JSON statistics.

@@ -119,6 +119,9 @@ void write_receiver_stats_json(const std::string& path, const ReceiverStatsSnaps
     out << "  \"header_errors\": " << snapshot.header_errors << ",\n";
     out << "  \"rejected_frames\": " << snapshot.rejected_frames << ",\n";
     out << "  \"saved_files\": " << snapshot.saved_files << ",\n";
+    out << "  \"accepted_sessions\": " << snapshot.accepted_sessions << ",\n";
+    out << "  \"completed_sessions\": " << snapshot.completed_sessions << ",\n";
+    out << "  \"peer_disconnects\": " << snapshot.peer_disconnects << ",\n";
     out << "  \"last_error\": \"" << json_escape(snapshot.last_error) << "\"\n";
     out << "}\n";
 

@@ -190,3 +190,17 @@ This closes a failure mode where a malformed or hostile header could request an 
 header error: reject before payload allocation
 CRC error: payload was received, but integrity verification failed
 ```
+
+## Sequential TCP Receiver Sessions
+
+The receiver now supports a bounded accept loop through `--max-sessions`. A clean client disconnect no longer requires restarting the receiver when additional sessions are allowed.
+
+The implementation deliberately remains single-client and sequential. It does not introduce concurrent client processing or sender-side frame replay. This keeps frame ordering and resource ownership straightforward.
+
+Receiver JSON now records:
+
+- `accepted_sessions`
+- `completed_sessions`
+- `peer_disconnects`
+
+The default `max_sessions=1` preserves existing behavior.

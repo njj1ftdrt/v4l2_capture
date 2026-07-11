@@ -1,0 +1,31 @@
+[INFO] tcp_receiver listening on port 9500
+[INFO] output dir: output/stage9_part1/recv
+[INFO] stats output: output/stage9_part1/receiver_stats.json
+[INFO] max payload bytes: 16777216
+[INFO] max sessions: 2
+[INFO] client connected session=1
+[RECV] frame=1 frame_id=0 session=1 size=640x360 format=YUYV payload=460800 crc32=0x953554f0
+[RECV] saved output/stage9_part1/recv/recv_frame_1_id_0.YUYV bytes=460800
+[RECV] frame=2 frame_id=1 session=1 size=640x360 format=YUYV payload=460800 crc32=0x8b7e5db2
+[RECV] saved output/stage9_part1/recv/recv_frame_2_id_1.YUYV bytes=460800
+[INFO] peer closed connection session=1 session_frames=2
+[INFO] session closed session=1 session_frames=2 total_frames=2
+[INFO] client connected session=2
+[RECV] frame=3 frame_id=0 session=2 size=640x360 format=YUYV payload=460800 crc32=0x953554f0
+[RECV] saved output/stage9_part1/recv/recv_frame_3_id_0.YUYV bytes=460800
+[RECV] frame=4 frame_id=1 session=2 size=640x360 format=YUYV payload=460800 crc32=0x8b7e5db2
+[RECV] saved output/stage9_part1/recv/recv_frame_4_id_1.YUYV bytes=460800
+[RECV] frame=5 frame_id=2 session=2 size=640x360 format=YUYV payload=460800 crc32=0x9cc7044e
+[RECV] saved output/stage9_part1/recv/recv_frame_5_id_2.YUYV bytes=460800
+[INFO] session closed session=2 session_frames=3 total_frames=5
+========== TCP Receiver Statistics ==========
+received frames    : 5
+received bytes     : 2304000
+crc errors         : 0
+header errors      : 0
+rejected frames    : 0
+accepted sessions  : 2
+completed sessions : 2
+peer disconnects   : 1
+=============================================
+[INFO] wrote machine-readable stats to output/stage9_part1/receiver_stats.json

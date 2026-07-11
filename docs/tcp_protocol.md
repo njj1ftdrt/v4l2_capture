@@ -73,3 +73,11 @@ The default payload limit is 16 MiB and can be changed with:
 ```
 
 Invalid headers are rejected before `std::vector` payload allocation. The receiver reports `header_errors`, `rejected_frames`, and `last_error` in `receiver_stats.json`.
+
+## Session Model
+
+The protocol remains a frame stream inside one TCP connection. The receiver may accept multiple TCP connections sequentially when started with `--max-sessions N`.
+
+Statistics and saved-file indices are cumulative across sessions. Test senders may restart their `frame_id` sequence in a new session; the receiver's global file index prevents filename collisions.
+
+A protocol-header or CRC failure remains fatal for the receiver process. Multi-session recovery currently applies to clean connection closure, not to corrupted streams.

@@ -38,6 +38,21 @@ enable_testing()
 add_test(NAME test_ring_buffer COMMAND test_ring_buffer)
 
 
+
+add_executable(test_frame_protocol
+    tests/test_frame_protocol.cpp
+)
+
+target_include_directories(test_frame_protocol PRIVATE include)
+
+target_compile_options(test_frame_protocol PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
+add_test(NAME test_frame_protocol COMMAND test_frame_protocol)
+
 add_executable(tcp_receiver
     src/tcp_receiver.cpp
     src/stats_json.cpp

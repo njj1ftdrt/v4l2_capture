@@ -179,3 +179,14 @@ output/stats/receiver_stats.json
 Both files are written by first creating a temporary `.tmp` file and then atomically renaming it to the final path. This avoids partially written JSON files being read by automation.
 
 The automated regression script now reads JSON statistics with Python's standard `json` module instead of parsing text logs. This removes coupling between the regression test and Logger output format.
+
+## Defensive Protocol Boundary
+
+`tcp_receiver` no longer trusts `payload_size` directly from the network. It validates magic, version, header size, dimensions, format metadata, configured payload limit, and YUYV size consistency before constructing the payload vector.
+
+This closes a failure mode where a malformed or hostile header could request an unexpectedly large allocation. Header validation errors are separated from CRC errors because they occur at different stages:
+
+```text
+header error: reject before payload allocation
+CRC error: payload was received, but integrity verification failed
+```

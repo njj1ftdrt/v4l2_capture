@@ -116,7 +116,10 @@ void write_receiver_stats_json(const std::string& path, const ReceiverStatsSnaps
     out << "  \"received_frames\": " << snapshot.received_frames << ",\n";
     out << "  \"received_bytes\": " << snapshot.received_bytes << ",\n";
     out << "  \"crc_errors\": " << snapshot.crc_errors << ",\n";
-    out << "  \"saved_files\": " << snapshot.saved_files << "\n";
+    out << "  \"header_errors\": " << snapshot.header_errors << ",\n";
+    out << "  \"rejected_frames\": " << snapshot.rejected_frames << ",\n";
+    out << "  \"saved_files\": " << snapshot.saved_files << ",\n";
+    out << "  \"last_error\": \"" << json_escape(snapshot.last_error) << "\"\n";
     out << "}\n";
 
     write_atomic_text_file(path, out.str());

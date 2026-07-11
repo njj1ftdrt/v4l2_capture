@@ -1,12 +1,18 @@
 #pragma once
 
+#include <linux/videodev2.h>
+
 #include <cstddef>
 #include <cstdint>
+#include <limits>
+#include <string>
 
 namespace frame_protocol {
 
 constexpr std::uint32_t kMagic = 0x56345450;  // 'V4TP'
 constexpr std::uint16_t kVersion = 2;
+constexpr std::uint32_t kDefaultMaxPayloadBytes = 16u * 1024u * 1024u;
+constexpr std::uint32_t kMaxDimension = 16384u;
 
 #pragma pack(push, 1)
 struct FrameHeader {
@@ -63,14 +69,91 @@ inline FrameHeader make_header(
     return header;
 }
 
+inline bool validate_header(
+    const FrameHeader& header,
+    std::uint32_t max_payload_bytes,
+    std::string& reason
+) {
+    if (max_payload_bytes == 0) {
+        reason = "receiver max payload must be positive";
+        return false;
+    }
+
+    if (header.magic != kMagic) {
+        reason = "invalid magic";
+        return false;
+    }
+
+    if (header.header_size != sizeof(FrameHeader)) {
+        reason = "unsupported header size: " + std::to_string(header.header_size);
+        return false;
+    }
+
+    if (header.version != kVersion) {
+        reason = "unsupported protocol version: " + std::to_string(header.version);
+        return false;
+    }
+
+    if (header.width == 0 || header.height == 0) {
+        reason = "zero width or height";
+        return false;
+    }
+
+    if (header.width > kMaxDimension || header.height > kMaxDimension) {
+        reason = "frame dimension exceeds limit";
+        return false;
+    }
+
+    if (header.pixel_format == 0) {
+        reason = "missing pixel format";
+        return false;
+    }
+
+    if (header.payload_size == 0) {
+        reason = "zero payload size";
+        return false;
+    }
+
+    if (header.payload_size > max_payload_bytes) {
+        reason = "payload size " + std::to_string(header.payload_size) +
+                 " exceeds receiver limit " + std::to_string(max_payload_bytes);
+        return false;
+    }
+
+    if (header.pixel_format == V4L2_PIX_FMT_YUYV) {
+        if ((header.width % 2u) != 0u) {
+            reason = "YUYV width must be even";
+            return false;
+        }
+
+        const std::uint64_t expected =
+            static_cast<std::uint64_t>(header.width) *
+            static_cast<std::uint64_t>(header.height) * 2u;
+
+        if (expected > std::numeric_limits<std::uint32_t>::max()) {
+            reason = "YUYV payload size overflows protocol field";
+            return false;
+        }
+
+        if (header.payload_size != static_cast<std::uint32_t>(expected)) {
+            reason = "YUYV payload size mismatch: got=" +
+                     std::to_string(header.payload_size) +
+                     ", expected=" + std::to_string(expected);
+            return false;
+        }
+    }
+
+    reason.clear();
+    return true;
+}
+
 inline bool is_valid_header(const FrameHeader& header) {
-    return header.magic == kMagic &&
-           header.header_size == sizeof(FrameHeader) &&
-           header.version == kVersion &&
-           header.width > 0 &&
-           header.height > 0 &&
-           header.pixel_format != 0 &&
-           header.payload_size > 0;
+    std::string ignored;
+    return validate_header(
+        header,
+        std::numeric_limits<std::uint32_t>::max(),
+        ignored
+    );
 }
 
 }  // namespace frame_protocol

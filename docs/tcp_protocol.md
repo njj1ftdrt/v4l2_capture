@@ -46,3 +46,30 @@ FrameHeader includes:
 2. add tcp_receiver.cpp
 3. add tcp_sender.cpp with fake test frame
 4. connect tcp sender into V4L2 pipeline
+
+## Defensive Header Validation
+
+The receiver validates a complete `FrameHeader` before allocating the payload buffer.
+
+Validation includes:
+
+- protocol magic;
+- fixed header size;
+- protocol version;
+- nonzero and bounded width/height;
+- nonzero pixel format;
+- nonzero payload size;
+- configurable maximum payload size;
+- even width for YUYV;
+- exact `width * height * 2` payload size for YUYV.
+
+The default payload limit is 16 MiB and can be changed with:
+
+```bash
+./build/tcp_receiver \
+  --port 9000 \
+  --output output/tcp_recv \
+  --max-payload-bytes 16777216
+```
+
+Invalid headers are rejected before `std::vector` payload allocation. The receiver reports `header_errors`, `rejected_frames`, and `last_error` in `receiver_stats.json`.

@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
 
         close_fd(client_fd);
         close_fd(listen_fd);
-        return 0;
+        return crc_errors == 0 ? 0 : 2;
     } catch (const std::exception& e) {
         std::cerr << "[ERROR] " << e.what() << "\n";
         return 1;

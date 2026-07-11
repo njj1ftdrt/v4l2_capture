@@ -1,0 +1,14 @@
+[INFO] tcp_receiver listening on port 9000
+[INFO] output dir: output/crc_normal_test
+[INFO] client connected
+[RECV] frame=1 frame_id=0 size=640x360 format=YUYV payload=460800 crc32=0x953554f0
+[RECV] saved output/crc_normal_test/recv_frame_1_id_0.YUYV bytes=460800
+[RECV] frame=2 frame_id=1 size=640x360 format=YUYV payload=460800 crc32=0x8b7e5db2
+[RECV] saved output/crc_normal_test/recv_frame_2_id_1.YUYV bytes=460800
+[RECV] frame=3 frame_id=2 size=640x360 format=YUYV payload=460800 crc32=0x9cc7044e
+[RECV] saved output/crc_normal_test/recv_frame_3_id_2.YUYV bytes=460800
+========== TCP Receiver Statistics ==========
+received frames : 3
+received bytes  : 1382400
+crc errors      : 0
+=============================================

@@ -1,27 +1,27 @@
-[2026-07-11 09:24:22.738][INFO][MAIN] logger initialized with level=INFO
-[2026-07-11 09:24:22.738][INFO][CONFIG] ========== Effective AppConfig ==========
-[2026-07-11 09:24:22.738][INFO][CONFIG] config path        : config/v4l2_tcp_pipeline.conf
-[2026-07-11 09:24:22.738][INFO][CONFIG] device             : /dev/video0
-[2026-07-11 09:24:22.738][INFO][CONFIG] list formats       : no
-[2026-07-11 09:24:22.738][INFO][CONFIG] width              : 640
-[2026-07-11 09:24:22.738][INFO][CONFIG] height             : 360
-[2026-07-11 09:24:22.738][INFO][CONFIG] format             : YUYV
-[2026-07-11 09:24:22.738][INFO][CONFIG] mmap buffers       : 4
-[2026-07-11 09:24:22.738][INFO][CONFIG] capture one        : no
-[2026-07-11 09:24:22.738][INFO][CONFIG] save one           : no
-[2026-07-11 09:24:22.738][INFO][CONFIG] capture frames     : 0
-[2026-07-11 09:24:22.738][INFO][CONFIG] pipeline frames    : 300
-[2026-07-11 09:24:22.738][INFO][CONFIG] ring capacity      : 8
-[2026-07-11 09:24:22.738][INFO][CONFIG] tcp queue capacity : 8
-[2026-07-11 09:24:22.738][INFO][CONFIG] consumer delay ms  : 0
-[2026-07-11 09:24:22.738][INFO][CONFIG] pipeline save      : no
-[2026-07-11 09:24:22.738][INFO][CONFIG] save limit         : 5
-[2026-07-11 09:24:22.738][INFO][CONFIG] output dir         : output
-[2026-07-11 09:24:22.738][INFO][CONFIG] tcp host           : 127.0.0.1
-[2026-07-11 09:24:22.738][INFO][CONFIG] tcp port           : 9000
-[2026-07-11 09:24:22.738][INFO][CONFIG] timeout ms         : 2000
-[2026-07-11 09:24:22.738][INFO][CONFIG] log level          : INFO
-[2026-07-11 09:24:22.738][INFO][CONFIG] =========================================
+[2026-07-11 09:42:06.091][INFO][MAIN] logger initialized with level=INFO
+[2026-07-11 09:42:06.091][INFO][CONFIG] ========== Effective AppConfig ==========
+[2026-07-11 09:42:06.091][INFO][CONFIG] config path        : config/v4l2_tcp_pipeline.conf
+[2026-07-11 09:42:06.091][INFO][CONFIG] device             : /dev/video0
+[2026-07-11 09:42:06.091][INFO][CONFIG] list formats       : no
+[2026-07-11 09:42:06.091][INFO][CONFIG] width              : 640
+[2026-07-11 09:42:06.091][INFO][CONFIG] height             : 360
+[2026-07-11 09:42:06.091][INFO][CONFIG] format             : YUYV
+[2026-07-11 09:42:06.091][INFO][CONFIG] mmap buffers       : 4
+[2026-07-11 09:42:06.091][INFO][CONFIG] capture one        : no
+[2026-07-11 09:42:06.091][INFO][CONFIG] save one           : no
+[2026-07-11 09:42:06.091][INFO][CONFIG] capture frames     : 0
+[2026-07-11 09:42:06.091][INFO][CONFIG] pipeline frames    : 300
+[2026-07-11 09:42:06.091][INFO][CONFIG] ring capacity      : 8
+[2026-07-11 09:42:06.091][INFO][CONFIG] tcp queue capacity : 8
+[2026-07-11 09:42:06.091][INFO][CONFIG] consumer delay ms  : 0
+[2026-07-11 09:42:06.091][INFO][CONFIG] pipeline save      : no
+[2026-07-11 09:42:06.091][INFO][CONFIG] save limit         : 5
+[2026-07-11 09:42:06.091][INFO][CONFIG] output dir         : output
+[2026-07-11 09:42:06.091][INFO][CONFIG] tcp host           : 127.0.0.1
+[2026-07-11 09:42:06.091][INFO][CONFIG] tcp port           : 9000
+[2026-07-11 09:42:06.091][INFO][CONFIG] timeout ms         : 2000
+[2026-07-11 09:42:06.091][INFO][CONFIG] log level          : INFO
+[2026-07-11 09:42:06.091][INFO][CONFIG] =========================================
 [INFO] Opened device: /dev/video0
 ========== V4L2 Capability ==========
 driver      : uvcvideo
@@ -50,10 +50,10 @@ sizeimage   : 460800
 ========== Init MMAP Buffers ==========
 requested buffers: 4
 driver buffers   : 4
-buffer[0] length=460800 offset=0 mapped_addr=0x730359f8f000
-buffer[1] length=460800 offset=32768 mapped_addr=0x730359f1e000
-buffer[2] length=460800 offset=65536 mapped_addr=0x730359ead000
-buffer[3] length=460800 offset=98304 mapped_addr=0x730359e3c000
+buffer[0] length=460800 offset=0 mapped_addr=0x7a581aea6000
+buffer[1] length=460800 offset=32768 mapped_addr=0x7a581ae35000
+buffer[2] length=460800 offset=65536 mapped_addr=0x7a581ab8f000
+buffer[3] length=460800 offset=98304 mapped_addr=0x7a581ab1e000
 queued buffer[0]
 queued buffer[1]
 queued buffer[2]
@@ -61,50 +61,50 @@ queued buffer[3]
 MMAP buffer initialization done.
 =======================================
 [INFO] Streaming started.
-[2026-07-11 09:24:22.856][INFO][PIPELINE] ========== Pipeline Capture ==========
-[2026-07-11 09:24:22.856][INFO][PIPELINE] target frames      : 300
-[2026-07-11 09:24:22.856][INFO][PIPELINE] ring capacity      : 8
-[2026-07-11 09:24:22.856][INFO][PIPELINE] poll timeout       : 2000 ms
-[2026-07-11 09:24:22.856][INFO][PIPELINE] consumer delay     : 0 ms
-[2026-07-11 09:24:22.856][INFO][PIPELINE] pipeline save      : no
-[2026-07-11 09:24:22.856][INFO][PIPELINE] save limit         : 5
-[2026-07-11 09:24:22.856][INFO][PIPELINE] output dir         : output
-[2026-07-11 09:24:22.856][INFO][PIPELINE] tcp send           : yes
-[2026-07-11 09:24:22.856][INFO][PIPELINE] tcp target         : 127.0.0.1:9000
-[2026-07-11 09:24:22.856][INFO][PIPELINE] tcp queue capacity : 8
-[2026-07-11 09:24:22.857][INFO][TCP] connected to 127.0.0.1:9000
-[2026-07-11 09:24:23.410][INFO][TCP_QUEUE] enqueued 1 queue_size=1 queue_dropped=0
-[2026-07-11 09:24:23.429][INFO][TCP] sent 1 frame_id=0 bytes=460844
-[2026-07-11 09:24:25.581][INFO][TCP_QUEUE] enqueued 50 queue_size=1 queue_dropped=0
-[2026-07-11 09:24:25.602][INFO][TCP] sent 50 frame_id=49 bytes=460844
-[2026-07-11 09:24:27.252][INFO][TCP_QUEUE] enqueued 100 queue_size=1 queue_dropped=0
-[2026-07-11 09:24:27.271][INFO][TCP] sent 100 frame_id=99 bytes=460844
-[2026-07-11 09:24:28.929][INFO][TCP_QUEUE] enqueued 150 queue_size=1 queue_dropped=0
-[2026-07-11 09:24:28.948][INFO][TCP] sent 150 frame_id=149 bytes=460844
-[2026-07-11 09:24:30.601][INFO][TCP_QUEUE] enqueued 200 queue_size=1 queue_dropped=0
-[2026-07-11 09:24:30.620][INFO][TCP] sent 200 frame_id=199 bytes=460844
-[2026-07-11 09:24:32.273][INFO][TCP_QUEUE] enqueued 250 queue_size=1 queue_dropped=0
-[2026-07-11 09:24:32.293][INFO][TCP] sent 250 frame_id=249 bytes=460844
-[2026-07-11 09:24:33.981][INFO][TCP_QUEUE] enqueued 300 queue_size=1 queue_dropped=0
-[2026-07-11 09:24:34.002][INFO][TCP] sent 300 frame_id=299 bytes=460844
-[2026-07-11 09:24:34.002][INFO][STATS] ========== Pipeline Statistics ==========
-[2026-07-11 09:24:34.002][INFO][STATS] produced frames      : 300
-[2026-07-11 09:24:34.002][INFO][STATS] consumed frames      : 300
-[2026-07-11 09:24:34.002][INFO][STATS] ring dropped frames  : 0
-[2026-07-11 09:24:34.002][INFO][STATS] remaining ring size  : 0
-[2026-07-11 09:24:34.002][INFO][STATS] elapsed seconds      : 11.146
-[2026-07-11 09:24:34.002][INFO][STATS] producer FPS         : 26.916
-[2026-07-11 09:24:34.002][INFO][STATS] consumer FPS         : 26.916
-[2026-07-11 09:24:34.002][INFO][STATS] saved frames         : 0
-[2026-07-11 09:24:34.002][INFO][STATS] tcp queued frames    : 300
-[2026-07-11 09:24:34.002][INFO][STATS] tcp queue dropped    : 0
-[2026-07-11 09:24:34.002][INFO][STATS] tcp queue remaining  : 0
-[2026-07-11 09:24:34.002][INFO][STATS] tcp sent frames      : 300
-[2026-07-11 09:24:34.002][INFO][STATS] tcp sent bytes       : 138253200
-[2026-07-11 09:24:34.002][INFO][STATS] tcp send errors      : 0
-[2026-07-11 09:24:34.002][INFO][STATS] received frames      : 0
-[2026-07-11 09:24:34.002][INFO][STATS] reconnect count      : 0
-[2026-07-11 09:24:34.002][INFO][STATS] invalid frames       : 0
-[2026-07-11 09:24:34.002][INFO][STATS] consumed bytes       : 138240000
-[2026-07-11 09:24:34.002][INFO][STATS] =========================================
+[2026-07-11 09:42:06.209][INFO][PIPELINE] ========== Pipeline Capture ==========
+[2026-07-11 09:42:06.209][INFO][PIPELINE] target frames      : 300
+[2026-07-11 09:42:06.209][INFO][PIPELINE] ring capacity      : 8
+[2026-07-11 09:42:06.209][INFO][PIPELINE] poll timeout       : 2000 ms
+[2026-07-11 09:42:06.209][INFO][PIPELINE] consumer delay     : 0 ms
+[2026-07-11 09:42:06.209][INFO][PIPELINE] pipeline save      : no
+[2026-07-11 09:42:06.209][INFO][PIPELINE] save limit         : 5
+[2026-07-11 09:42:06.209][INFO][PIPELINE] output dir         : output
+[2026-07-11 09:42:06.209][INFO][PIPELINE] tcp send           : yes
+[2026-07-11 09:42:06.209][INFO][PIPELINE] tcp target         : 127.0.0.1:9000
+[2026-07-11 09:42:06.209][INFO][PIPELINE] tcp queue capacity : 8
+[2026-07-11 09:42:06.209][INFO][TCP] connected to 127.0.0.1:9000
+[2026-07-11 09:42:06.495][INFO][TCP_QUEUE] enqueued 1 queue_size=1 queue_dropped=0
+[2026-07-11 09:42:06.515][INFO][TCP] sent 1 frame_id=0 bytes=460844
+[2026-07-11 09:42:08.134][INFO][TCP_QUEUE] enqueued 50 queue_size=1 queue_dropped=0
+[2026-07-11 09:42:08.153][INFO][TCP] sent 50 frame_id=49 bytes=460844
+[2026-07-11 09:42:09.807][INFO][TCP_QUEUE] enqueued 100 queue_size=1 queue_dropped=0
+[2026-07-11 09:42:09.826][INFO][TCP] sent 100 frame_id=99 bytes=460844
+[2026-07-11 09:42:11.478][INFO][TCP_QUEUE] enqueued 150 queue_size=1 queue_dropped=0
+[2026-07-11 09:42:11.498][INFO][TCP] sent 150 frame_id=149 bytes=460844
+[2026-07-11 09:42:13.154][INFO][TCP_QUEUE] enqueued 200 queue_size=1 queue_dropped=0
+[2026-07-11 09:42:13.174][INFO][TCP] sent 200 frame_id=199 bytes=460844
+[2026-07-11 09:42:14.826][INFO][TCP_QUEUE] enqueued 250 queue_size=1 queue_dropped=0
+[2026-07-11 09:42:14.846][INFO][TCP] sent 250 frame_id=249 bytes=460844
+[2026-07-11 09:42:16.567][INFO][TCP_QUEUE] enqueued 300 queue_size=1 queue_dropped=0
+[2026-07-11 09:42:16.586][INFO][TCP] sent 300 frame_id=299 bytes=460844
+[2026-07-11 09:42:16.586][INFO][STATS] ========== Pipeline Statistics ==========
+[2026-07-11 09:42:16.586][INFO][STATS] produced frames      : 300
+[2026-07-11 09:42:16.586][INFO][STATS] consumed frames      : 300
+[2026-07-11 09:42:16.586][INFO][STATS] ring dropped frames  : 0
+[2026-07-11 09:42:16.586][INFO][STATS] remaining ring size  : 0
+[2026-07-11 09:42:16.586][INFO][STATS] elapsed seconds      : 10.377
+[2026-07-11 09:42:16.586][INFO][STATS] producer FPS         : 28.910
+[2026-07-11 09:42:16.586][INFO][STATS] consumer FPS         : 28.910
+[2026-07-11 09:42:16.586][INFO][STATS] saved frames         : 0
+[2026-07-11 09:42:16.586][INFO][STATS] tcp queued frames    : 300
+[2026-07-11 09:42:16.586][INFO][STATS] tcp queue dropped    : 0
+[2026-07-11 09:42:16.586][INFO][STATS] tcp queue remaining  : 0
+[2026-07-11 09:42:16.586][INFO][STATS] tcp sent frames      : 300
+[2026-07-11 09:42:16.586][INFO][STATS] tcp sent bytes       : 138253200
+[2026-07-11 09:42:16.586][INFO][STATS] tcp send errors      : 0
+[2026-07-11 09:42:16.586][INFO][STATS] received frames      : 0
+[2026-07-11 09:42:16.586][INFO][STATS] reconnect count      : 0
+[2026-07-11 09:42:16.586][INFO][STATS] invalid frames       : 0
+[2026-07-11 09:42:16.586][INFO][STATS] consumed bytes       : 138240000
+[2026-07-11 09:42:16.586][INFO][STATS] =========================================
 [INFO] Streaming stopped.

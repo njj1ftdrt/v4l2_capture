@@ -156,7 +156,10 @@ int connect_to_server(const std::string& host, int port) {
 void print_usage(const char* program) {
     std::cout << "Usage:\n"
               << "  " << program
-              << " --host 127.0.0.1 --port 9000 --frames 1 --width 640 --height 360 --format YUYV\n";
+              << " --host 127.0.0.1 --port 9000 --frames 3 --width 640 --height 360 --format YUYV [--corrupt-frame-id 2]\n"
+              << "\n"
+              << "Test-only option:\n"
+              << "  --corrupt-frame-id N  Calculate the CRC first, then flip one payload byte for frame N.\n";
 }
 
 }  // namespace
@@ -170,6 +173,7 @@ int main(int argc, char** argv) {
         int height = 360;
         std::string format_text = "YUYV";
         int interval_ms = 33;
+        int corrupt_frame_id = -1;
 
         for (int i = 1; i < argc; ++i) {
             const std::string arg = argv[i];
@@ -191,6 +195,8 @@ int main(int argc, char** argv) {
                 format_text = argv[++i];
             } else if (arg == "--interval-ms" && i + 1 < argc) {
                 interval_ms = parse_int_arg(argv[++i], arg);
+            } else if (arg == "--corrupt-frame-id" && i + 1 < argc) {
+                corrupt_frame_id = parse_int_arg(argv[++i], arg);
             } else {
                 throw std::invalid_argument("Unknown or incomplete argument: " + arg);
             }
@@ -227,6 +233,15 @@ int main(int argc, char** argv) {
                 static_cast<std::uint32_t>(payload.size()),
                 payload_crc32
             );
+
+            if (i == corrupt_frame_id) {
+                if (payload.empty()) {
+                    throw std::runtime_error("cannot corrupt an empty payload");
+                }
+                payload[payload.size() / 2] ^= 0x01u;
+                std::cout << "[TEST] intentionally corrupted frame_id=" << i
+                          << " after CRC calculation\n";
+            }
 
             send_all(fd, &header, sizeof(header));
             send_all(fd, payload.data(), payload.size());

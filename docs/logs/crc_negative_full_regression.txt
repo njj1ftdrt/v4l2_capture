@@ -1,0 +1,737 @@
+========== TCP V4L2 Regression Test ==========
+device             : /dev/video0
+resolution         : 640x360
+format             : YUYV
+frames             : 300
+ring capacity      : 8
+tcp queue capacity : 8
+port               : 9000
+expected size      : 460800
+output             : /home/gfc/v4l2_capture/output/tcp_regression_300
+==============================================
+[INFO] tcp_receiver listening on port 9000
+[INFO] output dir: /home/gfc/v4l2_capture/output/tcp_regression_300
+[INFO] client connected
+[RECV] frame=1 frame_id=0 size=640x360 format=YUYV payload=460800 crc32=0xf89e4387
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_1_id_0.YUYV bytes=460800
+[RECV] frame=2 frame_id=1 size=640x360 format=YUYV payload=460800 crc32=0xaef7124d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_2_id_1.YUYV bytes=460800
+[RECV] frame=3 frame_id=2 size=640x360 format=YUYV payload=460800 crc32=0x9e55719
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_3_id_2.YUYV bytes=460800
+[RECV] frame=4 frame_id=3 size=640x360 format=YUYV payload=460800 crc32=0xe5700a7f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_4_id_3.YUYV bytes=460800
+[RECV] frame=5 frame_id=4 size=640x360 format=YUYV payload=460800 crc32=0x4e02953b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_5_id_4.YUYV bytes=460800
+[RECV] frame=6 frame_id=5 size=640x360 format=YUYV payload=460800 crc32=0x8e6bd0a4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_6_id_5.YUYV bytes=460800
+[RECV] frame=7 frame_id=6 size=640x360 format=YUYV payload=460800 crc32=0x95535a9a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_7_id_6.YUYV bytes=460800
+[RECV] frame=8 frame_id=7 size=640x360 format=YUYV payload=460800 crc32=0xbb0c0e1e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_8_id_7.YUYV bytes=460800
+[RECV] frame=9 frame_id=8 size=640x360 format=YUYV payload=460800 crc32=0x4d323682
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_9_id_8.YUYV bytes=460800
+[RECV] frame=10 frame_id=9 size=640x360 format=YUYV payload=460800 crc32=0xb60286d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_10_id_9.YUYV bytes=460800
+[RECV] frame=11 frame_id=10 size=640x360 format=YUYV payload=460800 crc32=0x8f9f2b6e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_11_id_10.YUYV bytes=460800
+[RECV] frame=12 frame_id=11 size=640x360 format=YUYV payload=460800 crc32=0x1b21bc93
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_12_id_11.YUYV bytes=460800
+[RECV] frame=13 frame_id=12 size=640x360 format=YUYV payload=460800 crc32=0x85b514ba
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_13_id_12.YUYV bytes=460800
+[RECV] frame=14 frame_id=13 size=640x360 format=YUYV payload=460800 crc32=0x9fab8509
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_14_id_13.YUYV bytes=460800
+[RECV] frame=15 frame_id=14 size=640x360 format=YUYV payload=460800 crc32=0x97cb0e71
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_15_id_14.YUYV bytes=460800
+[RECV] frame=16 frame_id=15 size=640x360 format=YUYV payload=460800 crc32=0x2d4b272e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_16_id_15.YUYV bytes=460800
+[RECV] frame=17 frame_id=16 size=640x360 format=YUYV payload=460800 crc32=0x7de3a1e1
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_17_id_16.YUYV bytes=460800
+[RECV] frame=18 frame_id=17 size=640x360 format=YUYV payload=460800 crc32=0x16a23f9a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_18_id_17.YUYV bytes=460800
+[RECV] frame=19 frame_id=18 size=640x360 format=YUYV payload=460800 crc32=0x932a4c48
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_19_id_18.YUYV bytes=460800
+[RECV] frame=20 frame_id=19 size=640x360 format=YUYV payload=460800 crc32=0x6704ea57
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_20_id_19.YUYV bytes=460800
+[RECV] frame=21 frame_id=20 size=640x360 format=YUYV payload=460800 crc32=0x585a4c5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_21_id_20.YUYV bytes=460800
+[RECV] frame=22 frame_id=21 size=640x360 format=YUYV payload=460800 crc32=0xef6f1eef
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_22_id_21.YUYV bytes=460800
+[RECV] frame=23 frame_id=22 size=640x360 format=YUYV payload=460800 crc32=0x3c58c6b1
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_23_id_22.YUYV bytes=460800
+[RECV] frame=24 frame_id=23 size=640x360 format=YUYV payload=460800 crc32=0xde678d5a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_24_id_23.YUYV bytes=460800
+[RECV] frame=25 frame_id=24 size=640x360 format=YUYV payload=460800 crc32=0xcc44d97
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_25_id_24.YUYV bytes=460800
+[RECV] frame=26 frame_id=25 size=640x360 format=YUYV payload=460800 crc32=0xa299620c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_26_id_25.YUYV bytes=460800
+[RECV] frame=27 frame_id=26 size=640x360 format=YUYV payload=460800 crc32=0x5976438b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_27_id_26.YUYV bytes=460800
+[RECV] frame=28 frame_id=27 size=640x360 format=YUYV payload=460800 crc32=0xf654da7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_28_id_27.YUYV bytes=460800
+[RECV] frame=29 frame_id=28 size=640x360 format=YUYV payload=460800 crc32=0x85655c24
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_29_id_28.YUYV bytes=460800
+[RECV] frame=30 frame_id=29 size=640x360 format=YUYV payload=460800 crc32=0x4d2639b9
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_30_id_29.YUYV bytes=460800
+[RECV] frame=31 frame_id=30 size=640x360 format=YUYV payload=460800 crc32=0x1bb31a01
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_31_id_30.YUYV bytes=460800
+[RECV] frame=32 frame_id=31 size=640x360 format=YUYV payload=460800 crc32=0x674e78f8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_32_id_31.YUYV bytes=460800
+[RECV] frame=33 frame_id=32 size=640x360 format=YUYV payload=460800 crc32=0x14647a70
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_33_id_32.YUYV bytes=460800
+[RECV] frame=34 frame_id=33 size=640x360 format=YUYV payload=460800 crc32=0xa4d63701
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_34_id_33.YUYV bytes=460800
+[RECV] frame=35 frame_id=34 size=640x360 format=YUYV payload=460800 crc32=0xa12926c4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_35_id_34.YUYV bytes=460800
+[RECV] frame=36 frame_id=35 size=640x360 format=YUYV payload=460800 crc32=0x6b07b48e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_36_id_35.YUYV bytes=460800
+[RECV] frame=37 frame_id=36 size=640x360 format=YUYV payload=460800 crc32=0x251a8a53
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_37_id_36.YUYV bytes=460800
+[RECV] frame=38 frame_id=37 size=640x360 format=YUYV payload=460800 crc32=0x25ce6d56
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_38_id_37.YUYV bytes=460800
+[RECV] frame=39 frame_id=38 size=640x360 format=YUYV payload=460800 crc32=0x68f7b550
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_39_id_38.YUYV bytes=460800
+[RECV] frame=40 frame_id=39 size=640x360 format=YUYV payload=460800 crc32=0xaccf0876
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_40_id_39.YUYV bytes=460800
+[RECV] frame=41 frame_id=40 size=640x360 format=YUYV payload=460800 crc32=0xc827d342
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_41_id_40.YUYV bytes=460800
+[RECV] frame=42 frame_id=41 size=640x360 format=YUYV payload=460800 crc32=0xc9a5668e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_42_id_41.YUYV bytes=460800
+[RECV] frame=43 frame_id=42 size=640x360 format=YUYV payload=460800 crc32=0xb9a61065
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_43_id_42.YUYV bytes=460800
+[RECV] frame=44 frame_id=43 size=640x360 format=YUYV payload=460800 crc32=0x3e2cc155
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_44_id_43.YUYV bytes=460800
+[RECV] frame=45 frame_id=44 size=640x360 format=YUYV payload=460800 crc32=0xac24ae68
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_45_id_44.YUYV bytes=460800
+[RECV] frame=46 frame_id=45 size=640x360 format=YUYV payload=460800 crc32=0x635646ec
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_46_id_45.YUYV bytes=460800
+[RECV] frame=47 frame_id=46 size=640x360 format=YUYV payload=460800 crc32=0x5d17246a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_47_id_46.YUYV bytes=460800
+[RECV] frame=48 frame_id=47 size=640x360 format=YUYV payload=460800 crc32=0xc2d988d1
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_48_id_47.YUYV bytes=460800
+[RECV] frame=49 frame_id=48 size=640x360 format=YUYV payload=460800 crc32=0x29e17e0b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_49_id_48.YUYV bytes=460800
+[RECV] frame=50 frame_id=49 size=640x360 format=YUYV payload=460800 crc32=0x430f1304
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_50_id_49.YUYV bytes=460800
+[RECV] frame=51 frame_id=50 size=640x360 format=YUYV payload=460800 crc32=0x4f568751
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_51_id_50.YUYV bytes=460800
+[RECV] frame=52 frame_id=51 size=640x360 format=YUYV payload=460800 crc32=0x36e2eee2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_52_id_51.YUYV bytes=460800
+[RECV] frame=53 frame_id=52 size=640x360 format=YUYV payload=460800 crc32=0x8da17b11
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_53_id_52.YUYV bytes=460800
+[RECV] frame=54 frame_id=53 size=640x360 format=YUYV payload=460800 crc32=0x234b20ea
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_54_id_53.YUYV bytes=460800
+[RECV] frame=55 frame_id=54 size=640x360 format=YUYV payload=460800 crc32=0xfa3c5007
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_55_id_54.YUYV bytes=460800
+[RECV] frame=56 frame_id=55 size=640x360 format=YUYV payload=460800 crc32=0xf41cbdb7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_56_id_55.YUYV bytes=460800
+[RECV] frame=57 frame_id=56 size=640x360 format=YUYV payload=460800 crc32=0x76ef69ac
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_57_id_56.YUYV bytes=460800
+[RECV] frame=58 frame_id=57 size=640x360 format=YUYV payload=460800 crc32=0xffc515f5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_58_id_57.YUYV bytes=460800
+[RECV] frame=59 frame_id=58 size=640x360 format=YUYV payload=460800 crc32=0xfc3db111
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_59_id_58.YUYV bytes=460800
+[RECV] frame=60 frame_id=59 size=640x360 format=YUYV payload=460800 crc32=0x3684c8f5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_60_id_59.YUYV bytes=460800
+[RECV] frame=61 frame_id=60 size=640x360 format=YUYV payload=460800 crc32=0x2470195b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_61_id_60.YUYV bytes=460800
+[RECV] frame=62 frame_id=61 size=640x360 format=YUYV payload=460800 crc32=0x1dae1f21
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_62_id_61.YUYV bytes=460800
+[RECV] frame=63 frame_id=62 size=640x360 format=YUYV payload=460800 crc32=0xc7e281ec
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_63_id_62.YUYV bytes=460800
+[RECV] frame=64 frame_id=63 size=640x360 format=YUYV payload=460800 crc32=0x8f534f59
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_64_id_63.YUYV bytes=460800
+[RECV] frame=65 frame_id=64 size=640x360 format=YUYV payload=460800 crc32=0x9e48aaaf
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_65_id_64.YUYV bytes=460800
+[RECV] frame=66 frame_id=65 size=640x360 format=YUYV payload=460800 crc32=0xf4fde4db
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_66_id_65.YUYV bytes=460800
+[RECV] frame=67 frame_id=66 size=640x360 format=YUYV payload=460800 crc32=0x847b6c13
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_67_id_66.YUYV bytes=460800
+[RECV] frame=68 frame_id=67 size=640x360 format=YUYV payload=460800 crc32=0xed2b1984
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_68_id_67.YUYV bytes=460800
+[RECV] frame=69 frame_id=68 size=640x360 format=YUYV payload=460800 crc32=0x541617a3
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_69_id_68.YUYV bytes=460800
+[RECV] frame=70 frame_id=69 size=640x360 format=YUYV payload=460800 crc32=0xf358030
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_70_id_69.YUYV bytes=460800
+[RECV] frame=71 frame_id=70 size=640x360 format=YUYV payload=460800 crc32=0xc764f69f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_71_id_70.YUYV bytes=460800
+[RECV] frame=72 frame_id=71 size=640x360 format=YUYV payload=460800 crc32=0xb10cd86c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_72_id_71.YUYV bytes=460800
+[RECV] frame=73 frame_id=72 size=640x360 format=YUYV payload=460800 crc32=0xfff48259
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_73_id_72.YUYV bytes=460800
+[RECV] frame=74 frame_id=73 size=640x360 format=YUYV payload=460800 crc32=0x30d8dfb7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_74_id_73.YUYV bytes=460800
+[RECV] frame=75 frame_id=74 size=640x360 format=YUYV payload=460800 crc32=0x32bf8411
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_75_id_74.YUYV bytes=460800
+[RECV] frame=76 frame_id=75 size=640x360 format=YUYV payload=460800 crc32=0xfb6d7628
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_76_id_75.YUYV bytes=460800
+[RECV] frame=77 frame_id=76 size=640x360 format=YUYV payload=460800 crc32=0x95ad6c49
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_77_id_76.YUYV bytes=460800
+[RECV] frame=78 frame_id=77 size=640x360 format=YUYV payload=460800 crc32=0x60662ec5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_78_id_77.YUYV bytes=460800
+[RECV] frame=79 frame_id=78 size=640x360 format=YUYV payload=460800 crc32=0xb574390f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_79_id_78.YUYV bytes=460800
+[RECV] frame=80 frame_id=79 size=640x360 format=YUYV payload=460800 crc32=0xb43286d0
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_80_id_79.YUYV bytes=460800
+[RECV] frame=81 frame_id=80 size=640x360 format=YUYV payload=460800 crc32=0x4e64a8e9
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_81_id_80.YUYV bytes=460800
+[RECV] frame=82 frame_id=81 size=640x360 format=YUYV payload=460800 crc32=0x8acdf19e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_82_id_81.YUYV bytes=460800
+[RECV] frame=83 frame_id=82 size=640x360 format=YUYV payload=460800 crc32=0x96584516
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_83_id_82.YUYV bytes=460800
+[RECV] frame=84 frame_id=83 size=640x360 format=YUYV payload=460800 crc32=0xd436a517
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_84_id_83.YUYV bytes=460800
+[RECV] frame=85 frame_id=84 size=640x360 format=YUYV payload=460800 crc32=0xcc4bace9
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_85_id_84.YUYV bytes=460800
+[RECV] frame=86 frame_id=85 size=640x360 format=YUYV payload=460800 crc32=0x25eae252
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_86_id_85.YUYV bytes=460800
+[RECV] frame=87 frame_id=86 size=640x360 format=YUYV payload=460800 crc32=0x4d928ca3
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_87_id_86.YUYV bytes=460800
+[RECV] frame=88 frame_id=87 size=640x360 format=YUYV payload=460800 crc32=0x271bee04
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_88_id_87.YUYV bytes=460800
+[RECV] frame=[2026-07-11 09:40:41.993][INFO][MAIN] logger initialized with level=INFO
+[2026-07-11 09:40:41.993][INFO][CONFIG] ========== Effective AppConfig ==========
+[2026-07-11 09:40:41.993][INFO][CONFIG] config path        : config/v4l2_tcp_pipeline.conf
+[2026-07-11 09:40:41.993][INFO][CONFIG] device             : /dev/video0
+[2026-07-11 09:40:41.993][INFO][CONFIG] list formats       : no
+[2026-07-11 09:40:41.993][INFO][CONFIG] width              : 640
+[2026-07-11 09:40:41.993][INFO][CONFIG] height             : 360
+[2026-07-11 09:40:41.993][INFO][CONFIG] format             : YUYV
+[2026-07-11 09:40:41.993][INFO][CONFIG] mmap buffers       : 4
+[2026-07-11 09:40:41.993][INFO][CONFIG] capture one        : no
+[2026-07-11 09:40:41.993][INFO][CONFIG] save one           : no
+[2026-07-11 09:40:41.993][INFO][CONFIG] capture frames     : 0
+[2026-07-11 09:40:41.993][INFO][CONFIG] pipeline frames    : 300
+[2026-07-11 09:40:41.993][INFO][CONFIG] ring capacity      : 8
+[2026-07-11 09:40:41.993][INFO][CONFIG] tcp queue capacity : 8
+[2026-07-11 09:40:41.993][INFO][CONFIG] consumer delay ms  : 0
+[2026-07-11 09:40:41.993][INFO][CONFIG] pipeline save      : no
+[2026-07-11 09:40:41.993][INFO][CONFIG] save limit         : 5
+[2026-07-11 09:40:41.993][INFO][CONFIG] output dir         : output
+[2026-07-11 09:40:41.993][INFO][CONFIG] tcp host           : 127.0.0.1
+[2026-07-11 09:40:41.993][INFO][CONFIG] tcp port           : 9000
+[2026-07-11 09:40:41.993][INFO][CONFIG] timeout ms         : 2000
+[2026-07-11 09:40:41.993][INFO][CONFIG] log level          : INFO
+[2026-07-11 09:40:41.993][INFO][CONFIG] =========================================
+[INFO] Opened device: /dev/video0
+========== V4L2 Capability ==========
+driver      : uvcvideo
+card        : HP Wide Vision HD Camera: HP Wi
+bus_info    : usb-0000:03:00.0-2
+version     : 6.17.13
+capabilities: 0x84a00001
+device_caps : 0x4200001
+---------- Effective Capabilities ----------
+  V4L2_CAP_VIDEO_CAPTURE: yes
+  V4L2_CAP_VIDEO_OUTPUT: no
+  V4L2_CAP_READWRITE: no
+  V4L2_CAP_STREAMING: yes
+=====================================
+========== Set Format ==========
+requested   : 640x360 YUYV
+accepted    : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+colorspace  : 8
+---------- Current Format ----------
+current     : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+================================
+========== Init MMAP Buffers ==========
+requested buffers: 4
+driver buffers   : 4
+buffer[0] length=460800 offset=0 mapped_addr=0x7fbc4a2a6000
+buffer[1] length=460800 offset=32768 mapped_addr=0x7fbc4a235000
+buffer[2] length=460800 offset=65536 mapped_addr=0x7fbc49f8f000
+buffer[3] length=460800 offset=98304 mapped_addr=0x7fbc49f1e000
+queued buffer[0]
+queued buffer[1]
+queued buffer[2]
+queued buffer[3]
+MMAP buffer initialization done.
+=======================================
+[INFO] Streaming started.
+[2026-07-11 09:40:42.110][INFO][PIPELINE] ========== Pipeline Capture ==========
+[2026-07-11 09:40:42.110][INFO][PIPELINE] target frames      : 300
+[2026-07-11 09:40:42.110][INFO][PIPELINE] ring capacity      : 8
+[2026-07-11 09:40:42.110][INFO][PIPELINE] poll timeout       : 2000 ms
+[2026-07-11 09:40:42.110][INFO][PIPELINE] consumer delay     : 0 ms
+[2026-07-11 09:40:42.110][INFO][PIPELINE] pipeline save      : no
+[2026-07-11 09:40:42.110][INFO][PIPELINE] save limit         : 5
+[2026-07-11 09:40:42.110][INFO][PIPELINE] output dir         : output
+[2026-07-11 09:40:42.110][INFO][PIPELINE] tcp send           : yes
+[2026-07-11 09:40:42.110][INFO][PIPELINE] tcp target         : 127.0.0.1:9000
+[2026-07-11 09:40:42.110][INFO][PIPELINE] tcp queue capacity : 8
+[2026-07-11 09:40:42.110][INFO][TCP] connected to 127.0.0.1:9000
+[2026-07-11 09:40:42.394][INFO][TCP_QUEUE] enqueued 1 queue_size=1 queue_dropped=0
+[2026-07-11 09:40:42.415][INFO][TCP] sent 1 frame_id=0 bytes=460844
+[2026-07-11 09:40:44.070][INFO][TCP_QUEUE] enqueued 50 queue_size=1 queue_dropped=0
+[2026-07-11 09:40:44.089][INFO][TCP] sent 50 frame_id=49 bytes=460844
+[2026-07-11 09:40:45.743][INFO][TCP_QUEUE] enqueued 100 queue_size=1 queue_dropped=0
+[2026-07-11 09:40:45.762][I89 frame_id=88 size=640x360 format=YUYV payload=460800 crc32=0x2025dfa2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_89_id_88.YUYV bytes=460800
+[RECV] frame=90 frame_id=89 size=640x360 format=YUYV payload=460800 crc32=0x94f3be55
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_90_id_89.YUYV bytes=460800
+[RECV] frame=91 frame_id=90 size=640x360 format=YUYV payload=460800 crc32=0x751a2cc8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_91_id_90.YUYV bytes=460800
+[RECV] frame=92 frame_id=91 size=640x360 format=YUYV payload=460800 crc32=0xe2852ae7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_92_id_91.YUYV bytes=460800
+[RECV] frame=93 frame_id=92 size=640x360 format=YUYV payload=460800 crc32=0x5f645ec7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_93_id_92.YUYV bytes=460800
+[RECV] frame=94 frame_id=93 size=640x360 format=YUYV payload=460800 crc32=0x51735db7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_94_id_93.YUYV bytes=460800
+[RECV] frame=95 frame_id=94 size=640x360 format=YUYV payload=460800 crc32=0x80f11f38
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_95_id_94.YUYV bytes=460800
+[RECV] frame=96 frame_id=95 size=640x360 format=YUYV payload=460800 crc32=0xce968bbb
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_96_id_95.YUYV bytes=460800
+[RECV] frame=97 frame_id=96 size=640x360 format=YUYV payload=460800 crc32=0xc7c9102d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_97_id_96.YUYV bytes=460800
+[RECV] frame=98 frame_id=97 size=640x360 format=YUYV payload=460800 crc32=0xb0c4e4d8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_98_id_97.YUYV bytes=460800
+[RECV] frame=99 frame_id=98 size=640x360 format=YUYV payload=460800 crc32=0x3f35f3c5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_99_id_98.YUYV bytes=460800
+[RECV] frame=100 frame_id=99 size=640x360 format=YUYV payload=460800 crc32=0xd707d4e5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_100_id_99.YUYV bytes=460800
+[RECV] frame=101 frame_id=100 size=640x360 format=YUYV payload=460800 crc32=0xe6a9ec82
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_101_id_100.YUYV bytes=460800
+[RECV] frame=102 frame_id=101 size=640x360 format=YUYV payload=460800 crc32=0x748b0bab
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_102_id_101.YUYV bytes=460800
+[RECV] frame=103 frame_id=102 size=640x360 format=YUYV payload=460800 crc32=0x29f94a45
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_103_id_102.YUYV bytes=460800
+[RECV] frame=104 frame_id=103 size=640x360 format=YUYV payload=460800 crc32=0xded7c441
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_104_id_103.YUYV bytes=460800
+[RECV] frame=105 frame_id=104 size=640x360 format=YUYV payload=460800 crc32=0xbf631c3b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_105_id_104.YUYV bytes=460800
+[RECV] frame=106 frame_id=105 size=640x360 format=YUYV payload=460800 crc32=0x45032e92
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_106_id_105.YUYV bytes=460800
+[RECV] frame=107 frame_id=106 size=640x360 format=YUYV payload=460800 crc32=0xa4f2323d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_107_id_106.YUYV bytes=460800
+[RECV] frame=108 frame_id=107 size=640x360 format=YUYV payload=460800 crc32=0x782e71bb
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_108_id_107.YUYV bytes=460800
+[RECV] frame=109 frame_id=108 size=640x360 format=YUYV payload=460800 crc32=0x736835d4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_109_id_108.YUYV bytes=460800
+[RECV] frame=110 frame_id=109 size=640x360 format=YUYV payload=460800 crc32=0x9844e3fc
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_110_id_109.YUYV bytes=460800
+[RECV] frame=111 frame_id=110 size=640x360 format=YUYV payload=460800 crc32=0xe047f831
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_111_id_110.YUYV bytes=460800
+[RECV] frame=112 frame_id=111 size=640x360 format=YUYV payload=460800 crc32=0x44663633
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_112_id_111.YUYV bytes=460800
+[RECV] frame=113 frame_id=112 size=640x360 format=YUYV payload=460800 crc32=0xdda0513d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_113_id_112.YUYV bytes=460800
+[RECV] frame=114 frame_id=113 size=640x360 format=YUYV payload=460800 crc32=0x8b1c4b03
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_114_id_113.YUYV bytes=460800
+[RECV] frame=115 frame_id=114 size=640x360 format=YUYV payload=460800 crc32=0x77382169
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_115_id_114.YUYV bytes=460800
+[RECV] frame=116 frame_id=115 size=640x360 format=YUYV payload=460800 crc32=0x73407fe5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_116_id_115.YUYV bytes=460800
+[RECV] frame=117 frame_id=116 size=640x360 format=YUYV payload=460800 crc32=0x66529b14
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_117_id_116.YUYV bytes=460800
+[RECV] frame=118 frame_id=117 size=640x360 format=YUYV payload=460800 crc32=0x5fd27b4c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_118_id_117.YUYV bytes=460800
+[RECV] frame=119 frame_id=118 size=640x360 format=YUYV payload=460800 crc32=0xd448be9c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_119_id_118.YUYV bytes=460800
+[RECV] frame=120 frame_id=119 size=640x360 format=YUYV payload=460800 crc32=0x5fe1e1b4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_120_id_119.YUYV bytes=460800
+[RECV] frame=121 frame_id=120 size=640x360 format=YUYV payload=460800 crc32=0xd98c7c8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_121_id_120.YUYV bytes=460800
+[RECV] frame=122 frame_id=121 size=640x360 format=YUYV payload=460800 crc32=0x2c2eabda
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_122_id_121.YUYV bytes=460800
+[RECV] frame=123 frame_id=122 size=640x360 format=YUYV payload=460800 crc32=0xc299f2f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_123_id_122.YUYV bytes=460800
+[RECV] frame=124 frame_id=123 size=640x360 format=YUYV payload=460800 crc32=0x1bf4987d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_124_id_123.YUYV bytes=460800
+[RECV] frame=125 frame_id=124 size=640x360 format=YUYV payload=460800 crc32=0x23d8409f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_125_id_124.YUYV bytes=460800
+[RECV] frame=126 frame_id=125 size=640x360 format=YUYV payload=460800 crc32=0x1feef330
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_126_id_125.YUYV bytes=460800
+[RECV] frame=127 frame_id=126 size=640x360 format=YUYV payload=460800 crc32=0xf715533a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_127_id_126.YUYV bytes=460800
+[RECV] frame=128 frame_id=127 size=640x360 format=YUYV payload=460800 crc32=0x9f31c180
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_128_id_127.YUYV bytes=460800
+[RECV] frame=129 frame_id=128 size=640x360 format=YUYV payload=460800 crc32=0xe7ccf543
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_129_id_128.YUYV bytes=460800
+[RECV] frame=130 frame_id=129 size=640x360 format=YUYV payload=460800 crc32=0x2a14fde2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_130_id_129.YUYV bytes=460800
+[RECV] frame=131 frame_id=130 size=640x360 format=YUYV payload=460800 crc32=0x8e4fb644
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_131_id_130.YUYV bytes=460800
+[RECV] frame=132 frame_id=131 size=640x360 format=YUYV payload=460800 crc32=0xca65b3b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_132_id_131.YUYV bytes=460800
+[RECV] frame=133 frame_id=132 size=640x360 format=YUYV payload=460800 crc32=0x28410249
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_133_id_132.YUYV bytes=460800
+[RECV] frame=134 frame_id=133 size=640x360 format=YUYV payload=460800 crc32=0x1443e77a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_134_id_133.YUYV bytes=460800
+[RECV] frame=135 frame_id=134 size=640x360 format=YUYV payload=460800 crc32=0xbaf930eb
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_135_id_134.YUYV bytes=460800
+[RECV] frame=136 frame_id=135 size=640x360 format=YUYV payload=460800 crc32=0x93c61df1
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_136_id_135.YUYV bytes=460800
+[RECV] frame=137 frame_id=136 size=640x360 format=YUYV payload=460800 crc32=0xbcd95452
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_137_id_136.YUYV bytes=460800
+[RECV] frame=138 frame_id=137 size=640x360 format=YUYV payload=460800 crc32=0x977283db
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_138_id_137.YUYV bytes=460800
+[RECV] frame=139 frame_id=138 size=640x360 format=YUYV payload=460800 crc32=0x110e9fa0
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_139_id_138.YUYV bytes=460800
+[RECV] frame=140 frame_id=139 size=640x360 format=YUYV payload=460800 crc32=0x6325d910
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_140_id_139.YUYV bytes=460800
+[RECV] frame=141 frame_id=140 size=640x360 format=YUYV payload=460800 crc32=0x541bb3ef
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_141_id_140.YUYV bytes=460800
+[RECV] frame=142 frame_id=141 size=640x360 format=YUYV payload=460800 crc32=0x4fc7d6cf
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_142_id_141.YUYV bytes=460800
+[RECV] frame=143 frame_id=142 size=640x360 format=YUYV payload=460800 crc32=0x170f5078
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_143_id_142.YUYV bytes=460800
+[RECV] frame=144 frame_id=143 size=640x360 format=YUYV payload=460800 crc32=0x5b9e7bf4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_144_id_143.YUYV bytes=460800
+[RECV] frame=145 frame_id=144 size=640x360 format=YUYV payload=460800 crc32=0xeaaf13e7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_145_id_144.YUYV bytes=460800
+[RECV] frame=146 frame_id=145 size=640x360 format=YUYV payload=460800 crc32=0xc1b16f5d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_146_id_145.YUYV bytes=460800
+[RECV] frame=147 frame_id=146 size=640x360 format=YUYV payload=460800 crc32=0x309c1fc7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_147_id_146.YUYV bytes=460800
+[RECV] frame=148 frame_id=147 size=640x360 format=YUYV payload=460800 crc32=0xeedb3349
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_148_id_147.YUYV bytes=460800
+[RECV] frame=149 frame_id=148 size=640x360 format=YUYV payload=460800 crc32=0xe74ed7a0
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_149_id_148.YUYV bytes=460800
+[RECV] frame=150 frame_id=149 size=640x360 format=YUYV payload=460800 crc32=0xd8f5dfe7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_150_id_149.YUYV bytes=460800
+[RECV] frame=151 frame_id=150 size=640x360 format=YUYV payload=460800 crc32=0xd50db195
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_151_id_150.YUYV bytes=460800
+[RECV] frame=152 frame_id=151 size=640x360 format=YUYV payload=460800 crc32=0x25e593f4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_152_id_151.YUYV bytes=460800
+[RECV] frame=153 frame_id=152 size=640x360 format=YUYV payload=460800 crc32=0x64812951
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_153_id_152.YUYV bytes=460800
+[RECV] frame=154 frame_id=153 size=640x360 format=YUYV payload=460800 crc32=0x139ef74a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_154_id_153.YUYV bytes=460800
+[RECV] frame=155 frame_id=154 size=640x360 format=YUYV payload=460800 crc32=0x2c939b44
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_155_id_154.YUYV bytes=460800
+[RECV] frame=156 frame_id=155 size=640x360 format=YUYV payload=460800 crc32=0x8927607f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_156_id_155.YUYV bytes=460800
+[RECV] frame=157 frame_id=156 size=640x360 format=YUYV payload=460800 crc32=0xf430dfad
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_157_id_156.YUYV bytes=460800
+[RECV] frame=158 frame_id=157 size=640x360 format=YUYV payload=460800 crc32=0x9b6de376
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_158_id_157.YUYV bytes=460800
+[RECV] frame=159 frame_id=158 size=640x360 format=YUYV payload=460800 crc32=0x545e3968
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_159_id_158.YUYV bytes=460800
+[RECV] frame=160 frame_id=159 size=640x360 format=YUYV payload=460800 crc32=0xc158e49c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_160_id_159.YUYV bytes=460800
+[RECV] frame=161 frame_id=160 size=640x360 format=YUYV payload=460800 crc32=0xc0ba66ab
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_161_id_160.YUYV bytes=460800
+[RECV] frame=162 frame_id=161 size=640x360 format=YUYV payload=460800 crc32=0x2ba92d20
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_162_id_161.YUYV bytes=460800
+[RECV] frame=163 frame_id=162 size=640x360 format=YUYV payload=460800 crc32=0x782a6ace
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_163_id_162.YUYV bytes=460800
+[RECV] frame=164 frame_id=163 size=640x360 format=YUYV payload=460800 crc32=0x989bcdb8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_164_id_163.YUYV bytes=460800
+[RECV] frame=165 frame_id=164 size=640x360 format=YUYV payload=460800 crc32=0x5b4457d2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_165_id_164.YUYV bytes=460800
+[RECV] frame=166 frame_id=165 size=640x360 format=YUYV payload=460800 crc32=0x77f0ee91
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_166_id_165.YUYV bytes=460800
+[RECV] frame=167 frame_id=166 size=640x360 format=YUYV payload=460800 crc32=0x9777142f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_167_id_166.YUYV bytes=460800
+[RECV] frame=168 frame_id=167 size=640x360 format=YUYV payload=460800 crc32=0x8f272387
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_168_id_167.YUYV bytes=460800
+[RECV] frame=169 frame_id=168 size=640x360 format=YUYV payload=460800 crc32=0x386fcaca
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_169_id_168.YUYV bytes=460800
+[RECV] frame=170 frame_id=169 size=640x360 format=YUYV payload=460800 crc32=0x5c7868da
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_170_id_169.YUYV bytes=460800
+[RECV] frame=171 frame_id=170 size=640x360 format=YUYV payload=460800 crc32=0xad9cd64e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_171_id_170.YUYV bytes=460800
+[RECV] frame=172 frame_id=171 size=640x360 format=YUYV payload=460800 crc32=0x34a4e36d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_172_id_171.YUYV bytes=460800
+[RECV] frame=173 frame_id=172 size=640x360 format=YUYV payload=460800 crc32=0x7e97a483
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_173_id_172.YUYV bytes=460800
+[RECV] frame=174 frame_id=173 size=640x360 format=YUYV payload=460800 crc32=0x64d89ee9
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_174_id_173.YUYV bytes=460800
+[RECV] frame=175 frame_id=174 size=640x360 format=YUYV payload=460800 crc32=0x2e0bce0b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_175_id_174.YUYV bytes=460800
+[RECV] frame=176 frame_id=175 size=640x360 format=YUYV payload=460800 crc32=0x8861604
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_176_id_175.YUYV bytes=460800
+[RECV] frame=177 frame_id=176 size=640x360 format=YUYV payload=460800 crc32=0x408b8484
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_177_id_176.YUYV bytes=460800
+[RECV] frame=178 frame_id=177 size=640x360 format=YUYV payload=460800 crc32=0xe4e3fae7
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_178_id_177.YUYV bytes=460800
+[RECV] frame=179 frame_id=178 size=640x360 format=YUYV payload=460800 crc32=0x6ff2d567
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_179_id_178.YUYV bytes=460800
+[RECV] frame=180 frame_id=179 size=640x360 format=YUYV payload=460800 crc32=0xd5539fb2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_180_id_179.YUYV bytes=460800
+[RECV] frame=181 frame_id=180 size=640x360 format=YUYV payload=460800 crc32=0x880ae70
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_181_id_180.YUYV bytes=460800
+[RECV] frame=182 frame_id=181 size=640x360 format=YUYV payload=460800 crc32=0x16e8f366
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_182_id_181.YUYV bytes=460800
+[RECV] frame=183 frame_id=182 size=640x360 format=YUYV payload=460800 crc32=0x201f0897
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_183_id_182.YUYV bytes=460800
+[RECV] frame=184 frame_id=183 size=640x360 format=YUYV payload=460800 crc32=0xe313613
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_184_id_183.YUYV bytes=460800
+[RECV] frame=185 frame_id=184 size=640x360 format=YUYV payload=460800 crc32=0x55ee5fc2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_185_id_184.YUYV bytes=460800
+[RECV] frame=186 frame_id=185 size=640x360 format=YUYV payload=460800 crc32=0xa2cfc364
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_186_id_185.YUYV bytes=460800
+[RECV] frame=187 frame_id=186 size=640x360 format=YUYV payload=460800 crc32=0x884882b0
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_187_id_186.YUYV bytes=460800
+[RECV] frame=188 frame_id=187 size=640x360 format=YUYV payload=460800 crc32=0xd4727cb0
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_188_id_187.YUYV bytes=460800
+[RECV] frame=189 frame_id=188 size=640x360 format=YUYV payload=460800 crc32=0xb2f70a0a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_189_id_188.YUYV bytes=460800
+[RECV] frame=190 frame_id=189 size=640x360 format=YUYV payload=460800 crc32=0x1d41f6a0
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_190_id_189.YUYV bytes=460800
+[RECV] frame=191 frame_id=190 size=640x360 format=YUYV payload=460800 crc32=0x35cbfd8b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_191_id_190.YUYV bytes=460800
+[RECV] frame=192 frame_id=191 size=640x360 format=YUYV payload=460800 crc32=0x8bdd4018
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_192_id_191.YUYV bytes=460800
+[RECV] frame=193 frame_id=192 size=640x360 format=YUYV payload=460800 crc32=0xf69c22fc
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_193_id_192.YUYV bytes=460800
+[RECV] frame=194 frame_id=193 size=640x360 format=YUYV payload=460800 crc32=0x795353d4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_194_id_193.YUYV bytes=460800
+[RECV] frame=195 frame_id=194 size=640x360 format=YUYV payload=460800 crc32=0x6009bb5a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_195_id_194.YUYV bytes=460800
+[RECV] frame=196 frame_id=195 size=640x360 format=YUYV payload=460800 crc32=0xa31dc99e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_196_id_195.YUYV bytes=460800
+[RECV] frame=197 frame_id=196 size=640x360 format=YUYV payload=460800 crc32=0x508550d5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_197_id_196.YUYV bytes=460800
+[RECV] frame=198 frame_id=197 size=640x360 format=YUYV payload=460800 crc32=0x909482d1
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_198_id_197.YUYV bytes=460800
+[RECV] frame=199 frame_id=198 size=640x360 format=YUYV payload=460800 crc32=0x62562802
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_199_id_198.YUYV bytes=460800
+[RECV] frame=200 frame_id=199 size=640x360 format=YUYV payload=460800 crc32=0xee1938b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_200_id_199.YUYV bytes=460800
+[RECV] frame=201 frame_id=200 size=640x360 format=YUYV payload=460800 crc32=0x7c7d0832
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_201_id_200.YUYV bytes=460800
+[RECV] frame=202 frame_id=201 size=640x360 format=YUYV payload=460800 crc32=0xd95e523d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_202_id_201.YUYV bytes=460800
+[RECV] frame=203 frame_id=202 size=640x360 format=YUYV payload=460800 crc32=0xd3b3bc8c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_203_id_202.YUYV bytes=460800
+[RECV] frame=204 frame_id=203 size=640x360 format=YUYV payload=460800 crc32=0x47624e61
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_204_id_203.YUYV bytes=460800
+[RECV] frame=205 frame_id=204 size=640x360 format=YUYV payload=460800 crc32=0xe2a74b5d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_205_id_204.YUYV bytes=460800
+[RECV] frame=206 frame_id=205 size=640x360 format=YUYV payload=460800 crc32=0xd26f39fe
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_206_id_205.YUYV bytes=460800
+[RECV] frame=207 frame_id=206 size=640x360 format=YUYV payload=460800 crc32=0x5c0e1b98
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_207_id_206.YUYV bytes=460800
+[RECV] frame=208 frame_id=207 size=640x360 format=YUYV payload=460800 crc32=0x96013edf
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_208_id_207.YUYV bytes=460800
+[RECV] frame=209 frame_id=208 size=640x360 format=YUYV payload=460800 crc32=0x9c4f5027
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_209_id_208.YUYV bytes=460800
+[RECV] frame=210 frame_id=209 size=640x360 format=YUYV payload=460800 crc32=0xa80b9418
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_210_id_209.YUYV bytes=460800
+[RECV] frame=211 frame_id=210 size=640x360 format=YUYV payload=460800 crc32=0x43f9ed81
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_211_id_210.YUYV bytes=460800
+[RECV] frame=212 frame_id=211 size=640x360 format=YUYV payload=460800 crc32=0x83f8e3e5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_212_id_211.YUYV bytes=460800
+[RECV] frame=213 frame_id=212 size=640x360 format=YUYV payload=460800 crc32=0x6494bd59
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_213_id_212.YUYV bytes=460800
+[RECV] frame=214 frame_id=213 size=640x360 format=YUYV payload=460800 crc32=0xa11e5b34
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_214_id_213.YUYV bytes=460800
+[RECV] frame=215 frame_id=214 size=640x360 format=YUYV payload=460800 crc32=0x34328bbf
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_215_id_214.YUYV bytes=460800
+[RECV] frame=216 frame_id=215 size=640x360 format=YUYV payload=460800 crc32=0xd5160151
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_216_id_215.YUYV bytes=460800
+[RECV] frame=217 frame_id=216 size=640x360 format=YUYV payload=460800 crc32=0xa7b63553
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_217_id_216.YUYV bytes=460800
+[RECV] frame=218 frame_id=217 size=640x360 format=YUYV payload=460800 crc32=0x8d74280e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_218_id_217.YUYV bytes=460800
+[RECV] frame=219 frame_id=218 size=640x360 format=YUYV payload=460800 crc32=0x18563e32
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_219_id_218.YUYV bytes=460800
+[RECV] frame=220 frame_id=219 size=640x360 format=YUYV payload=460800 crc32=0xf3a6aaa4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_220_id_219.YUYV bytes=460800
+[RECV] frame=221 frame_id=220 size=640x360 format=YUYV payload=460800 crc32=0xf5d595d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_221_id_220.YUYV bytes=460800
+[RECV] frame=222 frame_id=221 size=640x360 format=YUYV payload=460800 crc32=0xddb717a9
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_222_id_221.YUYV bytes=460800
+[RECV] frame=223 frame_id=222 size=640x360 format=YUYV payload=460800 crc32=0x38012b06
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_223_id_222.YUYV bytes=460800
+[RECV] frame=224 frame_id=223 size=640x360 format=YUYV payload=460800 crc32=0x75be4d16
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_224_id_223.YUYV bytes=460800
+[RECV] frame=225 frame_id=224 size=640x360 format=YUYV payload=460800 crc32=0xe4d2a16a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_225_id_224.YUYV bytes=460800
+[RECV] frame=226 frame_id=225 size=640x360 format=YUYV payload=460800 crc32=0x7a1ff83
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_226_id_225.YUYV bytes=460800
+[RECV] frame=227 frame_id=226 size=640x360 format=YUYV payload=460800 crc32=0xbb336409
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_227_id_226.YUYV bytes=460800
+[RECV] frame=228 frame_id=227 size=640x360 format=YUYV payload=460800 crc32=0xde35c150
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_228_id_227.YUYV bytes=460800
+[RECV] frame=229 frame_id=228 size=640x360 format=YUYV payload=460800 crc32=0x8a4dcda
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_229_id_228.YUYV bytes=460800
+[RECV] frame=230 frame_id=229 size=640x360 format=YUYV payload=460800 crc32=0x1ef7e899
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_230_id_229.YUYV bytes=460800
+[RECV] frame=231 frame_id=230 size=640x360 format=YUYV payload=460800 crc32=0x81d693d3
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_231_id_230.YUYV bytes=460800
+[RECV] frame=232 frame_id=231 size=640x360 format=YUYV payload=460800 crc32=0xb2cfd73e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_232_id_231.YUYV bytes=460800
+[RECV] frame=233 frame_id=232 size=640x360 format=YUYV payload=460800 crc32=0xf6f843db
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_233_id_232.YUYV bytes=460800
+[RECV] frame=234 frame_id=233 size=640x360 format=YUYV payload=460800 crc32=0x5d9ea189
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_234_id_233.YUYV bytes=460800
+[RECV] frame=235 frame_id=234 size=640x360 format=YUYV payload=460800 crc32=0x43210180
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_235_id_234.YUYV bytes=460800
+[RECV] frame=236 frame_id=235 size=640x360 format=YUYV payload=460800 crc32=0x892fbf9a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_236_id_235.YUYV bytes=460800
+[RECV] frame=237 frame_id=236 size=640x360 format=YUYV payload=460800 crc32=0xdf22364c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_237_id_236.YUYV bytes=460800
+[RECV] frame=238 frame_id=237 size=640x360 format=YUYV payload=460800 crc32=0x557c94f8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_238_id_237.YUYV bytes=460800
+[RECV] frame=239 frame_id=238 size=640x360 format=YUYV payload=460800 crc32=0xf4afb451
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_239_id_238.YUYV bytes=460800
+[RECV] frame=240 frame_id=239 size=640x360 format=YUYV payload=460800 crc32=0xd59c2237
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_240_id_239.YUYV bytes=460800
+[RECV] frame=241 frame_id=240 size=640x360 format=YUYV payload=460800 crc32=0x2451b7df
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_241_id_240.YUYV bytes=460800
+[RECV] frame=242 frame_id=241 size=640x360 format=YUYV payload=460800 crc32=0xd97bac58
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_242_id_241.YUYV bytes=460800
+[RECV] frame=243 frame_id=242 size=640x360 format=YUYV payload=460800 crc32=0xb0536195
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_243_id_242.YUYV bytes=460800
+[RECV] frame=244 frame_id=243 size=640x360 format=YUYV payload=460800 crc32=0x7c3a9aff
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_244_id_243.YUYV bytes=460800
+[RECV] frame=245 frame_id=244 size=640x360 format=YUYV payload=460800 crc32=0x797706c5
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_245_id_244.YUYV bytes=460800
+[RECV] frame=246 frame_id=245 size=640x360 format=YUYV payload=460800 crc32=0x77dd48de
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_246_id_245.YUYV bytes=460800
+[RECV] frame=247 frame_id=246 size=640x360 format=YUYV payload=460800 crc32=0x39376925
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_247_id_246.YUYV bytes=460800
+[RECV] frame=248 frame_id=247 size=640x360 format=YUYV payload=460800 crc32=0x117d4f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_248_id_247.YUYV bytes=460800
+[RECV] frame=249 frame_id=248 size=640x360 format=YUYV payload=460800 crc32=0xf7e9f1bd
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_249_id_248.YUYV bytes=460800
+[RECV] frame=250 frame_id=249 size=640x360 format=YUYV payload=460800 crc32=0x51db58d2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_250_id_249.YUYV bytes=460800
+[RECV] frame=251 frame_id=250 size=640x360 format=YUYV payload=460800 crc32=0x3025eb49
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_251_id_250.YUYV bytes=460800
+[RECV] frame=252 frame_id=251 size=640x360 format=YUYV payload=460800 crc32=0xf3ade3d8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_252_id_251.YUYV bytes=460800
+[RECV] frame=253 frame_id=252 size=640x360 format=YUYV payload=460800 crc32=0x84bb978a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_253_id_252.YUYV bytes=460800
+[RECV] frame=254 frame_id=253 size=640x360 format=YUYV payload=460800 crc32=0xe232c06e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_254_id_253.YUYV bytes=460800
+[RECV] frame=255 frame_id=254 size=640x360 format=YUYV payload=460800 crc32=0xb0366c25
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_255_id_254.YUYV bytes=460800
+[RECV] frame=256 frame_id=255 size=640x360 format=YUYV payload=460800 crc32=0x7878bb9f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_256_id_255.YUYV bytes=460800
+[RECV] frame=257 frame_id=256 size=640x360 format=YUYV payload=460800 crc32=0x1bbc63f8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_257_id_256.YUYV bytes=460800
+[RECV] frame=258 frame_id=257 size=640x360 format=YUYV payload=460800 crc32=0x21a2e578
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_258_id_257.YUYV bytes=460800
+[RECV] frame=259 frame_id=258 size=640x360 format=YUYV payload=460800 crc32=0x5f069a4a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_259_id_258.YUYV bytes=460800
+[RECV] frame=260 frame_id=259 size=640x360 format=YUYV payload=460800 crc32=0xc74863d3
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_260_id_259.YUYV bytes=460800
+[RECV] frame=261 frame_id=260 size=640x360 format=YUYV payload=460800 crc32=0x8cc77004
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_261_id_260.YUYV bytes=460800
+[RECV] frame=262 frame_id=261 size=640x360 format=YUYV payload=460800 crc32=0x460f171a
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regressiNFO][TCP] sent 100 frame_id=99 bytes=460844
+[2026-07-11 09:40:47.414][INFO][TCP_QUEUE] enqueued 150 queue_size=1 queue_dropped=0
+[2026-07-11 09:40:47.433][INFO][TCP] sent 150 frame_id=149 bytes=460844
+[2026-07-11 09:40:49.085][INFO][TCP_QUEUE] enqueued 200 queue_size=1 queue_dropped=0
+[2026-07-11 09:40:49.105][INFO][TCP] sent 200 frame_id=199 bytes=460844
+[2026-07-11 09:40:50.761][INFO][TCP_QUEUE] enqueued 250 queue_size=1 queue_dropped=0
+[2026-07-11 09:40:50.783][INFO][TCP] sent 250 frame_id=249 bytes=460844
+[2026-07-11 09:40:51.253][WARN][PIPELINE] skip invalid frame sequence=264 bytesused=392192 data_size=392192 reason=incomplete YUYV frame: got=392192, expected=460800
+on_300/recv_frame_262_id_261.YUYV bytes=460800
+[RECV] frame=263 frame_id=262 size=640x360 format=YUYV payload=460800 crc32=0x5267cb53
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_263_id_262.YUYV bytes=460800
+[RECV] frame=264 frame_id=263 size=640x360 format=YUYV payload=460800 crc32=0x2bf7c05c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_264_id_263.YUYV bytes=460800
+[RECV] frame=265 frame_id=265 size=640x360 format=YUYV payload=460800 crc32=0xbd03664d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_265_id_265.YUYV bytes=460800
+[RECV] frame=266 frame_id=266 size=640x360 format=YUYV payload=460800 crc32=0x329fe3b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_266_id_266.YUYV bytes=460800
+[RECV] frame=267 frame_id=267 size=640x360 format=YUYV payload=460800 crc32=0xcf16e6f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_267_id_267.YUYV bytes=460800
+[RECV] frame=268 frame_id=268 size=640x360 format=YUYV payload=460800 crc32=0x2240ddfa
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_268_id_268.YUYV bytes=460800
+[RECV] frame=269 frame_id=269 size=640x360 format=YUYV payload=460800 crc32=0xef3a34b4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_269_id_269.YUYV bytes=460800
+[RECV] frame=270 frame_id=270 size=640x360 format=YUYV payload=460800 crc32=0x3bad5c07
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_270_id_270.YUYV bytes=460800
+[RECV] frame=271 frame_id=271 size=640x360 format=YUYV payload=460800 crc32=0x2fb6d702
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_271_id_271.YUYV bytes=460800
+[RECV] frame=272 frame_id=272 size=640x360 format=YUYV payload=460800 crc32=0xb0e1a23f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_272_id_272.YUYV bytes=460800
+[RECV] frame=273 frame_id=273 size=640x360 format=YUYV payload=460800 crc32=0x23ca0937
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_273_id_273.YUYV bytes=460800
+[RECV] frame=274 frame_id=274 size=640x360 format=YUYV payload=460800 crc32=0x68a6d839
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_274_id_274.YUYV bytes=460800
+[RECV] frame=275 frame_id=275 size=640x360 format=YUYV payload=460800 crc32=0xfa3118
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_275_id_275.YUYV bytes=460800
+[RECV] frame=276 frame_id=276 size=640x360 format=YUYV payload=460800 crc32=0xff0ee64d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_276_id_276.YUYV bytes=460800
+[RECV] frame=277 frame_id=277 size=640x360 format=YUYV payload=460800 crc32=0x793d27a3
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_277_id_277.YUYV bytes=460800
+[RECV] frame=278 frame_id=278 size=640x360 format=YUYV payload=460800 crc32=0x496aa184
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_278_id_278.YUYV bytes=460800
+[RECV] frame=279 frame_id=279 size=640x360 format=YUYV payload=460800 crc32=0x60d3df2e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_279_id_279.YUYV bytes=460800
+[RECV] frame=280 frame_id=280 size=640x360 format=YUYV payload=460800 crc32=0xe384f213
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_280_id_280.YUYV bytes=460800
+[RECV] frame=281 frame_id=281 size=640x360 format=YUYV payload=460800 crc32=0x29f55b31
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_281_id_281.YUYV bytes=460800
+[RECV] frame=282 frame_id=282 size=640x360 format=YUYV payload=460800 crc32=0x9ce644c2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_282_id_282.YUYV bytes=460800
+[RECV] frame=283 frame_id=283 size=640x360 format=YUYV payload=460800 crc32=0x97e4a00b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_283_id_283.YUYV bytes=460800
+[RECV] frame=284 frame_id=284 size=640x360 format=YUYV payload=460800 crc32=0x20ea44[2026-07-11 09:40:52.454][INFO][STATS] ========== Pipeline Statistics ==========
+[2026-07-11 09:40:52.454][INFO][STATS] produced frames      : 300
+[2026-07-11 09:40:52.454][INFO][STATS] consumed frames      : 300
+[2026-07-11 09:40:52.454][INFO][STATS] ring dropped frames  : 0
+[2026-07-11 09:40:52.454][INFO][STATS] remaining ring size  : 0
+[2026-07-11 09:40:52.454][INFO][STATS] elapsed seconds      : 10.344
+[2026-07-11 09:40:52.454][INFO][STATS] producer FPS         : 29.002
+[2026-07-11 09:40:52.454][INFO][STATS] consumer FPS         : 29.002
+[2026-07-11 09:40:52.454][INFO][STATS] saved frames         : 0
+[2026-07-11 09:40:52.454][INFO][STATS] tcp queued frames    : 299
+[2026-07-11 09:40:52.454][INFO][STATS] tcp queue dropped    : 0
+[2026-07-11 09:40:52.454][INFO][STATS] tcp queue remaining  : 0
+[2026-07-11 09:40:52.454][INFO][STATS] tcp sent frames      : 299
+[2026-07-11 09:40:52.454][INFO][STATS] tcp sent bytes       : 137792356
+[2026-07-11 09:40:52.454][INFO][STATS] tcp send errors      : 0
+[2026-07-11 09:40:52.454][INFO][STATS] received frames      : 0
+[2026-07-11 09:40:52.454][INFO][STATS] reconnect count      : 0
+[2026-07-11 09:40:52.454][INFO][STATS] invalid frames       : 1
+[2026-07-11 09:40:52.454][INFO][STATS] consumed bytes       : 138171392
+[2026-07-11 09:40:52.454][INFO][STATS] =========================================
+[INFO] Streaming stopped.
+c0
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_284_id_284.YUYV bytes=460800
+[RECV] frame=285 frame_id=285 size=640x360 format=YUYV payload=460800 crc32=0xda74df44
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_285_id_285.YUYV bytes=460800
+[RECV] frame=286 frame_id=286 size=640x360 format=YUYV payload=460800 crc32=0xcbdf96f8
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_286_id_286.YUYV bytes=460800
+[RECV] frame=287 frame_id=287 size=640x360 format=YUYV payload=460800 crc32=0x618c3883
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_287_id_287.YUYV bytes=460800
+[RECV] frame=288 frame_id=288 size=640x360 format=YUYV payload=460800 crc32=0x11c1121e
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_288_id_288.YUYV bytes=460800
+[RECV] frame=289 frame_id=289 size=640x360 format=YUYV payload=460800 crc32=0xeb4eb77f
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_289_id_289.YUYV bytes=460800
+[RECV] frame=290 frame_id=290 size=640x360 format=YUYV payload=460800 crc32=0x8e25f59b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_290_id_290.YUYV bytes=460800
+[RECV] frame=291 frame_id=291 size=640x360 format=YUYV payload=460800 crc32=0x802d1ca2
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_291_id_291.YUYV bytes=460800
+[RECV] frame=292 frame_id=292 size=640x360 format=YUYV payload=460800 crc32=0x3529a3fd
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_292_id_292.YUYV bytes=460800
+[RECV] frame=293 frame_id=293 size=640x360 format=YUYV payload=460800 crc32=0x459e37c
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_293_id_293.YUYV bytes=460800
+[RECV] frame=294 frame_id=294 size=640x360 format=YUYV payload=460800 crc32=0x9c16c33d
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_294_id_294.YUYV bytes=460800
+[RECV] frame=295 frame_id=295 size=640x360 format=YUYV payload=460800 crc32=0x5591d2a4
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_295_id_295.YUYV bytes=460800
+[RECV] frame=296 frame_id=296 size=640x360 format=YUYV payload=460800 crc32=0x1c8b0f9b
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_296_id_296.YUYV bytes=460800
+[RECV] frame=297 frame_id=297 size=640x360 format=YUYV payload=460800 crc32=0x899b63dd
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_297_id_297.YUYV bytes=460800
+[RECV] frame=298 frame_id=298 size=640x360 format=YUYV payload=460800 crc32=0x16dddaf
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_298_id_298.YUYV bytes=460800
+[RECV] frame=299 frame_id=299 size=640x360 format=YUYV payload=460800 crc32=0x4c603873
+[RECV] saved /home/gfc/v4l2_capture/output/tcp_regression_300/recv_frame_299_id_299.YUYV bytes=460800
+[INFO] peer closed connection
+========== TCP Receiver Statistics ==========
+received frames : 299
+received bytes  : 137779200
+crc errors      : 0
+=============================================
+========== Verification ==========
+tcp sent frames      : 40
+tcp send errors      : 40
+invalid frames       : 40
+ring dropped frames  : 40
+received files       : 299
+bad size files       : 0
+expected file size   : 460800
+==================================
+[FAIL] tcp send errors detected

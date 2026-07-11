@@ -183,3 +183,16 @@ saved_files = 0
 ```
 
 The receiver must also produce no YUYV file and leave no temporary JSON file.
+
+## Sequential Receiver Session Regression
+
+The receiver was started with a total target of five frames and a maximum of two sessions. The first synthetic sender transmitted two frames and disconnected. The same receiver process then accepted a second sender, received three additional frames, and exited after reaching the cumulative frame target.
+
+Acceptance criteria:
+
+- five valid frames received and saved;
+- two sessions accepted and completed;
+- one peer disconnect observed before the global frame target;
+- no CRC or header errors;
+- no rejected frames;
+- no unexpected file sizes or temporary JSON files.

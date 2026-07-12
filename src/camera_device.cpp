@@ -857,6 +857,11 @@ Frame CameraDevice::capture_frame_copy(int timeout_ms) {
     }
 
     CapturedFrameInfo info = dequeue_frame(timeout_ms);
+    const auto host_receive_time = std::chrono::steady_clock::now();
+    const auto capture_system_time = std::chrono::system_clock::now().time_since_epoch();
+    const auto capture_timestamp_ns = static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(capture_system_time).count()
+    );
 
     try {
         const auto* data = static_cast<const std::uint8_t*>(buffers_[info.index].start);
@@ -869,7 +874,8 @@ Frame CameraDevice::capture_frame_copy(int timeout_ms) {
         frame.bytesused = info.bytesused;
         frame.sequence = info.sequence;
         frame.v4l2_timestamp = info.timestamp;
-        frame.host_receive_time = std::chrono::steady_clock::now();
+        frame.capture_timestamp_ns = capture_timestamp_ns;
+        frame.host_receive_time = host_receive_time;
 
         requeue_buffer(info.index);
         return frame;

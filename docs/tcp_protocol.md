@@ -81,3 +81,19 @@ The protocol remains a frame stream inside one TCP connection. The receiver may 
 Statistics and saved-file indices are cumulative across sessions. Test senders may restart their `frame_id` sequence in a new session; the receiver's global file index prevents filename collisions.
 
 A protocol-header or CRC failure remains fatal for the receiver process. Multi-session recovery currently applies to clean connection closure, not to corrupted streams.
+
+## Protocol Version 3 Timestamp Semantics
+
+Protocol v3 keeps the packed `FrameHeader` size at 44 bytes and renames the timestamp field to `capture_timestamp_ns`.
+
+The timestamp is recorded by the V4L2 process immediately after `VIDIOC_DQBUF` returns and before the frame is copied into the application-owned buffer. The synthetic test sender records the source timestamp immediately before transmitting the generated frame.
+
+The receiver records the receive-complete time after the full payload has arrived and passed CRC verification. It then computes:
+
+```text
+e2e_latency_us = (receive_complete_ns - capture_timestamp_ns) / 1000
+```
+
+A zero capture timestamp is rejected as an invalid v3 header. If the receiver clock is earlier than the transmitted timestamp, the sample is skipped and `latency_clock_errors` is incremented.
+
+Receiver-side end-to-end latency is directly meaningful on one host. Across different devices, NTP or PTP synchronization is required.

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "latency_stats.hpp"
+
 #include <atomic>
 #include <cstdint>
 #include <mutex>
@@ -28,6 +30,8 @@ struct PipelineStatsSnapshot {
     std::uint64_t tcp_sent = 0;
     std::uint64_t tcp_sent_bytes = 0;
     std::uint64_t tcp_send_errors = 0;
+    std::uint64_t tcp_connect_attempts = 0;
+    std::uint64_t tcp_connect_retries = 0;
 
     // Reserved for tcp_receiver or future ROS2/status aggregation.
     std::uint64_t received = 0;
@@ -36,6 +40,9 @@ struct PipelineStatsSnapshot {
     double elapsed_seconds = 0.0;
     double producer_fps = 0.0;
     double consumer_fps = 0.0;
+
+    LatencySummary capture_to_consumer_latency;
+    LatencySummary capture_to_send_latency;
 
     std::string last_error;
 };
@@ -57,9 +64,14 @@ public:
     std::atomic<std::uint64_t> tcp_sent{0};
     std::atomic<std::uint64_t> tcp_sent_bytes{0};
     std::atomic<std::uint64_t> tcp_send_errors{0};
+    std::atomic<std::uint64_t> tcp_connect_attempts{0};
+    std::atomic<std::uint64_t> tcp_connect_retries{0};
 
     std::atomic<std::uint64_t> received{0};
     std::atomic<std::uint64_t> reconnect_count{0};
+
+    LatencyStats capture_to_consumer_latency;
+    LatencyStats capture_to_send_latency;
 
     void set_last_error(const std::string& message) {
         std::lock_guard<std::mutex> lock(error_mutex_);
@@ -86,6 +98,8 @@ public:
         s.tcp_sent = tcp_sent.load();
         s.tcp_sent_bytes = tcp_sent_bytes.load();
         s.tcp_send_errors = tcp_send_errors.load();
+        s.tcp_connect_attempts = tcp_connect_attempts.load();
+        s.tcp_connect_retries = tcp_connect_retries.load();
         s.received = received.load();
         s.reconnect_count = reconnect_count.load();
         s.elapsed_seconds = elapsed_seconds;
@@ -95,6 +109,8 @@ public:
         s.consumer_fps = elapsed_seconds > 0.0
             ? static_cast<double>(s.consumed) / elapsed_seconds
             : 0.0;
+        s.capture_to_consumer_latency = capture_to_consumer_latency.snapshot();
+        s.capture_to_send_latency = capture_to_send_latency.snapshot();
         s.last_error = last_error();
         return s;
     }

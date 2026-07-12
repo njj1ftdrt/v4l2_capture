@@ -76,6 +76,12 @@ int main() {
 
     {
         auto header = valid;
+        header.capture_timestamp_ns = 0;
+        expect_invalid(header, frame_protocol::kDefaultMaxPayloadBytes, "timestamp", "zero capture timestamp");
+    }
+
+    {
+        auto header = valid;
         header.header_size = 1;
         expect_invalid(header, frame_protocol::kDefaultMaxPayloadBytes, "header size", "bad header size");
     }

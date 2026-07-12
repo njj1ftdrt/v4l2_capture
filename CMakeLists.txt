@@ -53,6 +53,20 @@ target_compile_options(test_frame_protocol PRIVATE
 
 add_test(NAME test_frame_protocol COMMAND test_frame_protocol)
 
+add_executable(test_latency_stats
+    tests/test_latency_stats.cpp
+)
+
+target_include_directories(test_latency_stats PRIVATE include)
+
+target_compile_options(test_latency_stats PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
+add_test(NAME test_latency_stats COMMAND test_latency_stats)
+
 add_executable(tcp_receiver
     src/tcp_receiver.cpp
     src/stats_json.cpp

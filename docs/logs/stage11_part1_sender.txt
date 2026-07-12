@@ -1,0 +1,12 @@
+[INFO] tcp_sender connecting to 127.0.0.1:9701
+[INFO] test frame: 640x360 format=YUYV frames=3
+[INFO] connected attempt=1/1
+[SEND] frame_id=0 size=640x360 format=YUYV payload=460800 crc32=0x953554f0
+[SEND] frame_id=1 size=640x360 format=YUYV payload=460800 crc32=0x8b7e5db2
+[SEND] frame_id=2 size=640x360 format=YUYV payload=460800 crc32=0x9cc7044e
+========== TCP Sender Statistics ==========
+sent frames : 3
+sent bytes       : 1382532
+connect attempts : 1
+connect retries  : 0
+===========================================

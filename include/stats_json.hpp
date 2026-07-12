@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pipeline_stats.hpp"
+#include "latency_stats.hpp"
 
 #include <cstdint>
 #include <string>
@@ -15,6 +16,8 @@ struct ReceiverStatsSnapshot {
     std::uint64_t accepted_sessions = 0;
     std::uint64_t completed_sessions = 0;
     std::uint64_t peer_disconnects = 0;
+    std::uint64_t latency_clock_errors = 0;
+    LatencySummary e2e_latency;
     std::string last_error;
 };
 

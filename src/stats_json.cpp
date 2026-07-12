@@ -6,6 +6,28 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace {
+
+void write_latency_fields(
+    std::ostringstream& out,
+    const std::string& prefix,
+    const LatencySummary& summary,
+    bool trailing_comma
+) {
+    out << "  \"" << prefix << "_samples\": " << summary.sample_count << ",\n";
+    out << std::fixed << std::setprecision(3);
+    out << "  \"" << prefix << "_min_us\": " << summary.min_us << ",\n";
+    out << "  \"" << prefix << "_mean_us\": " << summary.mean_us << ",\n";
+    out << "  \"" << prefix << "_p50_us\": " << summary.p50_us << ",\n";
+    out << "  \"" << prefix << "_p95_us\": " << summary.p95_us << ",\n";
+    out << "  \"" << prefix << "_p99_us\": " << summary.p99_us << ",\n";
+    out << "  \"" << prefix << "_max_us\": " << summary.max_us << ",\n";
+    out << "  \"" << prefix << "_jitter_us\": " << summary.jitter_us;
+    out << (trailing_comma ? ",\n" : "\n");
+}
+
+}  // namespace
+
 std::string json_escape(const std::string& value) {
     std::ostringstream out;
 
@@ -98,12 +120,16 @@ void write_pipeline_stats_json(const std::string& path, const PipelineStatsSnaps
     out << "  \"tcp_sent_frames\": " << snapshot.tcp_sent << ",\n";
     out << "  \"tcp_sent_bytes\": " << snapshot.tcp_sent_bytes << ",\n";
     out << "  \"tcp_send_errors\": " << snapshot.tcp_send_errors << ",\n";
+    out << "  \"tcp_connect_attempts\": " << snapshot.tcp_connect_attempts << ",\n";
+    out << "  \"tcp_connect_retries\": " << snapshot.tcp_connect_retries << ",\n";
     out << "  \"received_frames\": " << snapshot.received << ",\n";
     out << "  \"reconnect_count\": " << snapshot.reconnect_count << ",\n";
     out << std::fixed << std::setprecision(3);
     out << "  \"elapsed_seconds\": " << snapshot.elapsed_seconds << ",\n";
     out << "  \"producer_fps\": " << snapshot.producer_fps << ",\n";
     out << "  \"consumer_fps\": " << snapshot.consumer_fps << ",\n";
+    write_latency_fields(out, "capture_to_consumer", snapshot.capture_to_consumer_latency, true);
+    write_latency_fields(out, "capture_to_send", snapshot.capture_to_send_latency, true);
     out << "  \"last_error\": \"" << json_escape(snapshot.last_error) << "\"\n";
     out << "}\n";
 
@@ -122,6 +148,8 @@ void write_receiver_stats_json(const std::string& path, const ReceiverStatsSnaps
     out << "  \"accepted_sessions\": " << snapshot.accepted_sessions << ",\n";
     out << "  \"completed_sessions\": " << snapshot.completed_sessions << ",\n";
     out << "  \"peer_disconnects\": " << snapshot.peer_disconnects << ",\n";
+    out << "  \"latency_clock_errors\": " << snapshot.latency_clock_errors << ",\n";
+    write_latency_fields(out, "e2e_latency", snapshot.e2e_latency, true);
     out << "  \"last_error\": \"" << json_escape(snapshot.last_error) << "\"\n";
     out << "}\n";
 

@@ -168,3 +168,36 @@ ctest --test-dir build --output-on-failure
 ```
 
 The default remains `--max-sessions 1`, preserving the original single-client behavior. Session counters are exported in receiver JSON statistics.
+
+## Bounded TCP Connection Retry
+
+The V4L2 pipeline supports bounded retry when the receiver is not yet listening:
+
+```bash
+./build/v4l2_capture \
+  --config config/v4l2_tcp_pipeline.conf \
+  --tcp-connect-max-attempts 5 \
+  --tcp-connect-retry-delay-ms 500
+```
+
+The retry policy is applied before the application producer and consumer threads begin processing frames. This prevents the TCP RingBuffer from filling while the receiver is unavailable.
+
+This policy covers initial connection establishment only. A failure after part of a frame has already been sent is reported and the pipeline stops; it does not blindly retransmit the frame because the sender cannot know how many bytes the receiver accepted.
+
+## End-to-End Latency Statistics
+
+Protocol version 3 carries a host-side capture handoff timestamp recorded immediately after `VIDIOC_DQBUF`. The sender keeps the timestamp with the `Frame`, places it in `FrameHeader`, and the receiver measures latency when the complete payload has arrived and passed CRC validation.
+
+Sender JSON reports:
+
+- `capture_to_consumer_*`: capture handoff to consumer dequeue;
+- `capture_to_send_*`: capture handoff to completion of header and payload `send_all` calls.
+
+Receiver JSON reports:
+
+- `e2e_latency_*`: capture handoff to complete payload reception and CRC validation;
+- `latency_clock_errors`: samples skipped because the receive clock was earlier than the transmitted timestamp.
+
+Each latency group contains sample count, minimum, mean, P50, P95, P99, maximum, and jitter in microseconds. Jitter is defined as the population standard deviation of latency samples.
+
+Same-host tests use the same system clock and can be interpreted directly. Cross-device measurements require synchronized clocks such as NTP or PTP; otherwise receiver-side end-to-end values must not be presented as strict physical latency.

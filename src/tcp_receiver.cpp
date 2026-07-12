@@ -1,4 +1,5 @@
 #include "frame_protocol.hpp"
+#include "latency_stats.hpp"
 #include "stats_json.hpp"
 
 #include <arpa/inet.h>
@@ -6,12 +7,15 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -22,6 +26,26 @@ void close_fd(int fd) {
     if (fd >= 0) {
         close(fd);
     }
+}
+
+std::uint64_t current_system_time_ns() {
+    const auto now = std::chrono::system_clock::now().time_since_epoch();
+    return static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(now).count()
+    );
+}
+
+void print_latency_summary(const LatencySummary& summary) {
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << "latency samples     : " << summary.sample_count << "\n";
+    std::cout << "e2e min us         : " << summary.min_us << "\n";
+    std::cout << "e2e mean us        : " << summary.mean_us << "\n";
+    std::cout << "e2e p50 us         : " << summary.p50_us << "\n";
+    std::cout << "e2e p95 us         : " << summary.p95_us << "\n";
+    std::cout << "e2e p99 us         : " << summary.p99_us << "\n";
+    std::cout << "e2e max us         : " << summary.max_us << "\n";
+    std::cout << "e2e jitter us      : " << summary.jitter_us << "\n";
+    std::cout.unsetf(std::ios::floatfield);
 }
 
 bool read_exact(int fd, void* buffer, std::size_t size) {
@@ -213,6 +237,8 @@ int main(int argc, char** argv) {
         std::uint64_t accepted_sessions = 0;
         std::uint64_t completed_sessions = 0;
         std::uint64_t peer_disconnects = 0;
+        std::uint64_t latency_clock_errors = 0;
+        LatencyStats e2e_latency;
         std::string last_error;
 
         bool fatal_protocol_error = false;
@@ -306,6 +332,20 @@ int main(int argc, char** argv) {
                     break;
                 }
 
+                const std::uint64_t receive_complete_ns = current_system_time_ns();
+                if (receive_complete_ns >= header.capture_timestamp_ns) {
+                    const double latency_us = static_cast<double>(
+                        receive_complete_ns - header.capture_timestamp_ns
+                    ) / 1000.0;
+                    e2e_latency.add_sample_us(latency_us);
+                } else {
+                    ++latency_clock_errors;
+                    std::cout << "[WARN] receive clock is earlier than capture timestamp"
+                              << " frame_id=" << header.frame_id
+                              << " session=" << session_id
+                              << "\n";
+                }
+
                 ++received_frames;
                 ++session_frames;
                 received_bytes += payload.size();
@@ -316,6 +356,7 @@ int main(int argc, char** argv) {
                           << " size=" << header.width << "x" << header.height
                           << " format=" << fourcc_to_string(header.pixel_format)
                           << " payload=" << header.payload_size
+                          << " capture_ts_ns=" << header.capture_timestamp_ns
                           << " crc32=0x" << std::hex << header.payload_crc32 << std::dec
                           << "\n";
 
@@ -348,6 +389,9 @@ int main(int argc, char** argv) {
         std::cout << "accepted sessions  : " << accepted_sessions << "\n";
         std::cout << "completed sessions : " << completed_sessions << "\n";
         std::cout << "peer disconnects   : " << peer_disconnects << "\n";
+        std::cout << "latency clock errors: " << latency_clock_errors << "\n";
+        const LatencySummary e2e_latency_summary = e2e_latency.snapshot();
+        print_latency_summary(e2e_latency_summary);
         if (!last_error.empty()) {
             std::cout << "last error         : " << last_error << "\n";
         }
@@ -363,6 +407,8 @@ int main(int argc, char** argv) {
         snapshot.accepted_sessions = accepted_sessions;
         snapshot.completed_sessions = completed_sessions;
         snapshot.peer_disconnects = peer_disconnects;
+        snapshot.latency_clock_errors = latency_clock_errors;
+        snapshot.e2e_latency = e2e_latency_summary;
         snapshot.last_error = last_error;
         write_receiver_stats_json(stats_output, snapshot);
         std::cout << "[INFO] wrote machine-readable stats to " << stats_output << "\n";

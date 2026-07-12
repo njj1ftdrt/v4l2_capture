@@ -204,3 +204,48 @@ Receiver JSON now records:
 - `peer_disconnects`
 
 The default `max_sessions=1` preserves existing behavior.
+
+## Bounded Initial TCP Connection Retry
+
+The sender now performs a bounded number of connection attempts before the frame pipeline begins:
+
+```text
+connect attempt
+→ failure
+→ fixed delay
+→ retry until success or max attempts
+```
+
+Configuration:
+
+```text
+tcp_connect_max_attempts=5
+tcp_connect_retry_delay_ms=500
+```
+
+The total-attempt setting includes the first connection attempt. For example, five maximum attempts allow up to four scheduled retries.
+
+The producer and consumer threads are started only after the TCP connection is established. This avoids filling and dropping frames in the TCP RingBuffer while the receiver is unavailable.
+
+Mid-frame send failures are not automatically retransmitted. TCP may have delivered an unknown prefix of the header or payload, so a blind retry could introduce duplicate frames or stream misalignment.
+
+## Protocol v3 Capture Timestamp and Latency
+
+`FrameHeader` keeps its 44-byte packed layout, but protocol version is raised from v2 to v3 because the timestamp field now has explicit capture-handoff semantics.
+
+```text
+DQBUF returns
+→ record system-clock capture_timestamp_ns
+→ copy frame into owned memory
+→ capture RingBuffer
+→ consumer
+→ TCP RingBuffer
+→ send_all(header + payload)
+→ receiver reads complete payload
+→ CRC passes
+→ record receive-complete timestamp
+```
+
+The sender also uses `steady_clock` locally for capture-to-consumer and capture-to-send timing. Receiver end-to-end timing uses the transmitted system-clock timestamp so that separate processes can compare timestamps. Cross-device use requires clock synchronization.
+
+Percentiles use linear interpolation over sorted samples. `jitter_us` is the population standard deviation of the latency samples.

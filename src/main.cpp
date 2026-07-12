@@ -41,11 +41,28 @@ static void close_socket_fd(int fd) {
     }
 }
 
-static std::uint64_t current_system_time_ns() {
-    const auto now = std::chrono::system_clock::now().time_since_epoch();
-    return static_cast<std::uint64_t>(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(now).count()
-    );
+static double elapsed_microseconds(
+    std::chrono::steady_clock::time_point start,
+    std::chrono::steady_clock::time_point end
+) {
+    return std::chrono::duration<double, std::micro>(end - start).count();
+}
+
+static void log_latency_summary(
+    const std::string& name,
+    const LatencySummary& summary
+) {
+    std::ostringstream text;
+    text << std::fixed << std::setprecision(3)
+         << "samples=" << summary.sample_count
+         << " min_us=" << summary.min_us
+         << " mean_us=" << summary.mean_us
+         << " p50_us=" << summary.p50_us
+         << " p95_us=" << summary.p95_us
+         << " p99_us=" << summary.p99_us
+         << " max_us=" << summary.max_us
+         << " jitter_us=" << summary.jitter_us;
+    log_info("LATENCY", name, " ", text.str());
 }
 
 static int connect_to_tcp_receiver(const std::string& host, int port) {
@@ -73,6 +90,56 @@ static int connect_to_tcp_receiver(const std::string& host, int port) {
     }
 
     return fd;
+}
+
+static int connect_to_tcp_receiver_with_retry(
+    const std::string& host,
+    int port,
+    int max_attempts,
+    int retry_delay_ms,
+    PipelineStats& stats
+) {
+    std::string last_error;
+
+    for (int attempt = 1; attempt <= max_attempts; ++attempt) {
+        stats.tcp_connect_attempts = static_cast<std::uint64_t>(attempt);
+
+        try {
+            const int fd = connect_to_tcp_receiver(host, port);
+            log_info(
+                "TCP",
+                "connected to ", host, ":", port,
+                " attempt=", attempt, "/", max_attempts
+            );
+            return fd;
+        } catch (const std::exception& e) {
+            last_error = e.what();
+
+            if (attempt >= max_attempts) {
+                break;
+            }
+
+            ++stats.tcp_connect_retries;
+            log_warn(
+                "TCP",
+                "connect attempt ", attempt, "/", max_attempts,
+                " failed: ", last_error,
+                "; retrying in ", retry_delay_ms, " ms"
+            );
+
+            if (retry_delay_ms > 0) {
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(retry_delay_ms)
+                );
+            }
+        }
+    }
+
+    throw std::runtime_error(
+        "connect to " + host + ":" + std::to_string(port) +
+        " failed after " + std::to_string(max_attempts) +
+        " attempt(s): " + last_error
+    );
 }
 
 static void send_all_tcp(int fd, const void* data, std::size_t size) {
@@ -119,9 +186,13 @@ static std::uint64_t send_frame_over_tcp(int fd, const Frame& frame) {
         frame.data.size()
     );
 
+    if (frame.capture_timestamp_ns == 0) {
+        throw std::runtime_error("Frame is missing capture_timestamp_ns");
+    }
+
     const auto header = frame_protocol::make_header(
         static_cast<std::uint64_t>(frame.sequence),
-        current_system_time_ns(),
+        frame.capture_timestamp_ns,
         frame.width,
         frame.height,
         frame.pixel_format,
@@ -352,6 +423,8 @@ static void run_pipeline(
     const std::optional<std::string>& tcp_host,
     int tcp_port,
     int tcp_queue_capacity,
+    int tcp_connect_max_attempts,
+    int tcp_connect_retry_delay_ms,
     const std::string& stats_output
 ) {
     if (frame_count <= 0) {
@@ -364,6 +437,14 @@ static void run_pipeline(
 
     if (tcp_queue_capacity <= 0) {
         throw std::runtime_error("TCP queue capacity must be positive");
+    }
+
+    if (tcp_connect_max_attempts <= 0) {
+        throw std::runtime_error("TCP connect max attempts must be positive");
+    }
+
+    if (tcp_connect_retry_delay_ms < 0) {
+        throw std::runtime_error("TCP connect retry delay must be non-negative");
     }
 
     const bool tcp_enabled = tcp_host.has_value() && tcp_port > 0;
@@ -398,6 +479,30 @@ static void run_pipeline(
     if (tcp_enabled) {
         log_info("PIPELINE", "tcp target         : ", *tcp_host, ":", tcp_port);
         log_info("PIPELINE", "tcp queue capacity : ", tcp_queue_capacity);
+        log_info("PIPELINE", "tcp connect attempts: ", tcp_connect_max_attempts);
+        log_info("PIPELINE", "tcp retry delay ms  : ", tcp_connect_retry_delay_ms);
+    }
+
+    int connected_tcp_fd = -1;
+    if (tcp_enabled) {
+        try {
+            connected_tcp_fd = connect_to_tcp_receiver_with_retry(
+                *tcp_host,
+                tcp_port,
+                tcp_connect_max_attempts,
+                tcp_connect_retry_delay_ms,
+                stats
+            );
+        } catch (const std::exception& e) {
+            ++stats.tcp_send_errors;
+            stats.set_last_error(e.what());
+            log_error("TCP", stats.last_error());
+
+            const PipelineStatsSnapshot failure_snapshot = stats.snapshot(0.0);
+            write_pipeline_stats_json(stats_output, failure_snapshot);
+            log_info("STATS", "wrote connection-failure stats to ", stats_output);
+            throw;
+        }
     }
 
     const auto start_time = std::chrono::steady_clock::now();
@@ -405,29 +510,21 @@ static void run_pipeline(
     std::thread tcp_sender_thread;
     if (tcp_enabled) {
         tcp_sender_thread = std::thread([&]() {
-            int tcp_fd = -1;
+            int tcp_fd = connected_tcp_fd;
 
             try {
-                try {
-                    tcp_fd = connect_to_tcp_receiver(*tcp_host, tcp_port);
-                    log_info("TCP", "connected to ", *tcp_host, ":", tcp_port);
-                } catch (const std::exception& e) {
-                    ++stats.tcp_send_errors;
-                    stats.set_last_error(std::string("connect to ") + *tcp_host + ":" +
-                                         std::to_string(tcp_port) + " failed: " + e.what());
-                    log_error("TCP", stats.last_error());
-                    stop_requested = true;
-                    cv.notify_all();
-                    tcp_cv.notify_all();
-                    return;
-                }
-
                 while (!consumer_done.load() || !tcp_ring.empty()) {
                     Frame frame;
 
                     if (tcp_ring.try_pop_oldest(frame)) {
                         try {
                             const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
+                            stats.capture_to_send_latency.add_sample_us(
+                                elapsed_microseconds(
+                                    frame.host_receive_time,
+                                    std::chrono::steady_clock::now()
+                                )
+                            );
                             stats.tcp_sent_bytes += bytes;
                             const int tcp_count = static_cast<int>(++stats.tcp_sent);
 
@@ -474,6 +571,12 @@ static void run_pipeline(
                 Frame frame;
 
                 if (ring.try_pop_oldest(frame)) {
+                    stats.capture_to_consumer_latency.add_sample_us(
+                        elapsed_microseconds(
+                            frame.host_receive_time,
+                            std::chrono::steady_clock::now()
+                        )
+                    );
                     ++stats.consumed;
                     stats.consumed_bytes += frame.bytesused;
 
@@ -605,6 +708,8 @@ static void run_pipeline(
     log_info("STATS", "tcp sent frames      : ", snapshot.tcp_sent);
     log_info("STATS", "tcp sent bytes       : ", snapshot.tcp_sent_bytes);
     log_info("STATS", "tcp send errors      : ", snapshot.tcp_send_errors);
+    log_info("STATS", "tcp connect attempts : ", snapshot.tcp_connect_attempts);
+    log_info("STATS", "tcp connect retries  : ", snapshot.tcp_connect_retries);
     log_info("STATS", "received frames      : ", snapshot.received);
     log_info("STATS", "reconnect count      : ", snapshot.reconnect_count);
     if (!snapshot.last_error.empty()) {
@@ -612,6 +717,8 @@ static void run_pipeline(
     }
     log_info("STATS", "invalid frames       : ", snapshot.invalid);
     log_info("STATS", "consumed bytes       : ", snapshot.consumed_bytes);
+    log_latency_summary("capture_to_consumer", snapshot.capture_to_consumer_latency);
+    log_latency_summary("capture_to_send", snapshot.capture_to_send_latency);
     log_info("STATS", "=========================================");
 
     write_pipeline_stats_json(stats_output, snapshot);
@@ -648,7 +755,7 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 2 --consumer-delay-ms 50 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --pipeline-save --save-limit 5 --output output/pipeline --timeout-ms 2000\n"
-              << "  " << program << " --device /dev/video0 --width 640 --height 360 --format YUYV --mmap-buffers 4 --pipeline-frames 30 --ring-capacity 8 --tcp-host 127.0.0.1 --tcp-port 9000 --tcp-queue-capacity 8 --timeout-ms 2000\n"
+              << "  " << program << " --device /dev/video0 --width 640 --height 360 --format YUYV --mmap-buffers 4 --pipeline-frames 30 --ring-capacity 8 --tcp-host 127.0.0.1 --tcp-port 9000 --tcp-queue-capacity 8 --tcp-connect-max-attempts 5 --tcp-connect-retry-delay-ms 500 --timeout-ms 2000\n"
               << "  " << program << " --config config/v4l2_tcp_pipeline.conf --pipeline-frames 300\n";
 }
 
@@ -715,6 +822,8 @@ int main(int argc, char* argv[]) {
                     config.tcp_host,
                     config.tcp_port,
                     config.tcp_queue_capacity,
+                    config.tcp_connect_max_attempts,
+                    config.tcp_connect_retry_delay_ms,
                     config.stats_output
                 );
             }

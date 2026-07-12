@@ -17,5 +17,8 @@ struct Frame {
     __u32 sequence{0};
     timeval v4l2_timestamp{};
 
+    // Host-side capture handoff timestamps recorded immediately after DQBUF.
+    // system_clock is propagated through the wire protocol for cross-process latency.
+    std::uint64_t capture_timestamp_ns{0};
     std::chrono::steady_clock::time_point host_receive_time{};
 };

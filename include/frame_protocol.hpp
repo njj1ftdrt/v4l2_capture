@@ -10,7 +10,7 @@
 namespace frame_protocol {
 
 constexpr std::uint32_t kMagic = 0x56345450;  // 'V4TP'
-constexpr std::uint16_t kVersion = 2;
+constexpr std::uint16_t kVersion = 3;
 constexpr std::uint32_t kDefaultMaxPayloadBytes = 16u * 1024u * 1024u;
 constexpr std::uint32_t kMaxDimension = 16384u;
 
@@ -20,7 +20,7 @@ struct FrameHeader {
     std::uint16_t header_size{0};
     std::uint16_t version{0};
     std::uint64_t frame_id{0};
-    std::uint64_t timestamp_ns{0};
+    std::uint64_t capture_timestamp_ns{0};
     std::uint32_t width{0};
     std::uint32_t height{0};
     std::uint32_t pixel_format{0};
@@ -48,7 +48,7 @@ inline std::uint32_t compute_crc32(const void* data, std::size_t size) {
 
 inline FrameHeader make_header(
     std::uint64_t frame_id,
-    std::uint64_t timestamp_ns,
+    std::uint64_t capture_timestamp_ns,
     std::uint32_t width,
     std::uint32_t height,
     std::uint32_t pixel_format,
@@ -60,7 +60,7 @@ inline FrameHeader make_header(
     header.header_size = static_cast<std::uint16_t>(sizeof(FrameHeader));
     header.version = kVersion;
     header.frame_id = frame_id;
-    header.timestamp_ns = timestamp_ns;
+    header.capture_timestamp_ns = capture_timestamp_ns;
     header.width = width;
     header.height = height;
     header.pixel_format = pixel_format;
@@ -91,6 +91,11 @@ inline bool validate_header(
 
     if (header.version != kVersion) {
         reason = "unsupported protocol version: " + std::to_string(header.version);
+        return false;
+    }
+
+    if (header.capture_timestamp_ns == 0) {
+        reason = "zero capture timestamp";
         return false;
     }
 

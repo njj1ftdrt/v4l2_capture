@@ -14,3 +14,15 @@ Before any frame is sent, retrying `connect()` is unambiguous: either a connecti
 ## Why connect before starting producer and consumer threads?
 
 If capture continues while the receiver is unavailable, the TCP RingBuffer can fill and discard frames before a connection is established. The pipeline now completes bounded connection establishment first, then starts the application threads, so startup recovery does not create queue loss.
+
+## How is end-to-end latency measured?
+
+The camera wrapper records a host-side timestamp immediately after `VIDIOC_DQBUF` returns. That timestamp travels with the frame through both RingBuffers and is serialized in protocol v3. The receiver records time only after the entire payload has been read and CRC32 has passed, so the measured value includes application queueing, CRC calculation, socket transmission, TCP receive, and receiver CRC verification, but excludes file-save time.
+
+## Why use two clock types?
+
+`steady_clock` is used for sender-local stage latency because it cannot jump when wall time changes. Receiver end-to-end measurement needs a timestamp comparable across processes, so the protocol carries a `system_clock` timestamp. On different devices, that value is valid only when clocks are synchronized with NTP or PTP.
+
+## What does jitter mean in this project?
+
+The reported jitter is the population standard deviation of the measured latency samples. The definition is documented explicitly so the metric is reproducible and is not confused with an undocumented networking-jitter formula.

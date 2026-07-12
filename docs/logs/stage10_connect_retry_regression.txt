@@ -1,0 +1,11 @@
+[PASS] delayed receiver recovered on connection attempt 5
+[PASS] exhausted connection attempts returned a non-zero status
+========== TCP Connect Retry Verification ==========
+delayed-start sender status : 0
+delayed-start receiver status: 0
+successful attempt          : 5
+scheduled retries           : 4
+received files              : 3
+bad-size files              : 0
+exhaustion sender status    : 1
+====================================================

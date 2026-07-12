@@ -1,0 +1,8 @@
+[PASS] receiver accepted two sequential sessions and accumulated five valid frames
+========== Multi-session Verification ==========
+receiver exit code : 0
+received files     : 5
+bad size files     : 0
+temporary files    : 0
+stats json         : /home/gfc/v4l2_capture/output/stage9_multisession/receiver_stats.json
+================================================

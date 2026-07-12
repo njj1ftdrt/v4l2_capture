@@ -196,3 +196,25 @@ Acceptance criteria:
 - no CRC or header errors;
 - no rejected frames;
 - no unexpected file sizes or temporary JSON files.
+
+## Bounded TCP Connection Retry Test
+
+### Delayed Receiver
+
+The sender starts before the receiver. The receiver is launched after a controlled delay. The sender must recover within the configured maximum attempts and deliver three valid YUYV frames.
+
+Verified conditions:
+
+- connection succeeds after more than one attempt;
+- scheduled retry count equals successful attempt minus one;
+- three frames are received and saved;
+- CRC and header error counts remain zero;
+- every saved YUYV file has the expected size.
+
+### Retry Exhaustion
+
+No receiver is started. The sender is configured for three total attempts and must terminate with a non-zero status after exactly three failed attempts.
+
+### Real V4L2 Delayed Receiver
+
+The real camera pipeline starts before the receiver. The producer and consumer threads begin only after connection recovery, preventing TCP queue overflow during receiver startup delay.

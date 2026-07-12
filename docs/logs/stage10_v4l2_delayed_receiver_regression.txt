@@ -1,0 +1,10 @@
+[PASS] V4L2 pipeline recovered after 4 scheduled connection retries
+========== V4L2 Delayed Receiver Verification ==========
+sender exit code     : 0
+receiver exit code   : 0
+received files       : 30
+bad-size files       : 0
+temporary files      : 0
+sender stats json    : /home/gfc/v4l2_capture/output/stage10_v4l2_delayed_receiver/pipeline_stats.json
+receiver stats json  : /home/gfc/v4l2_capture/output/stage10_v4l2_delayed_receiver/receiver_stats.json
+========================================================

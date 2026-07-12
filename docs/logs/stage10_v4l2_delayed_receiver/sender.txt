@@ -1,0 +1,113 @@
+[2026-07-12 08:52:07.465][INFO][MAIN] logger initialized with level=INFO
+[2026-07-12 08:52:07.465][INFO][CONFIG] ========== Effective AppConfig ==========
+[2026-07-12 08:52:07.465][INFO][CONFIG] config path        : /home/gfc/v4l2_capture/config/v4l2_tcp_pipeline.conf
+[2026-07-12 08:52:07.465][INFO][CONFIG] device             : /dev/video0
+[2026-07-12 08:52:07.465][INFO][CONFIG] list formats       : no
+[2026-07-12 08:52:07.465][INFO][CONFIG] width              : 640
+[2026-07-12 08:52:07.465][INFO][CONFIG] height             : 360
+[2026-07-12 08:52:07.465][INFO][CONFIG] format             : YUYV
+[2026-07-12 08:52:07.465][INFO][CONFIG] mmap buffers       : 4
+[2026-07-12 08:52:07.465][INFO][CONFIG] capture one        : no
+[2026-07-12 08:52:07.465][INFO][CONFIG] save one           : no
+[2026-07-12 08:52:07.465][INFO][CONFIG] capture frames     : 0
+[2026-07-12 08:52:07.465][INFO][CONFIG] pipeline frames    : 30
+[2026-07-12 08:52:07.465][INFO][CONFIG] ring capacity      : 8
+[2026-07-12 08:52:07.465][INFO][CONFIG] tcp queue capacity : 8
+[2026-07-12 08:52:07.465][INFO][CONFIG] tcp connect attempts: 10
+[2026-07-12 08:52:07.465][INFO][CONFIG] tcp retry delay ms  : 200
+[2026-07-12 08:52:07.465][INFO][CONFIG] consumer delay ms  : 0
+[2026-07-12 08:52:07.465][INFO][CONFIG] pipeline save      : no
+[2026-07-12 08:52:07.465][INFO][CONFIG] save limit         : 5
+[2026-07-12 08:52:07.465][INFO][CONFIG] output dir         : output
+[2026-07-12 08:52:07.465][INFO][CONFIG] stats output       : /home/gfc/v4l2_capture/output/stage10_v4l2_delayed_receiver/pipeline_stats.json
+[2026-07-12 08:52:07.465][INFO][CONFIG] tcp host           : 127.0.0.1
+[2026-07-12 08:52:07.465][INFO][CONFIG] tcp port           : 9602
+[2026-07-12 08:52:07.465][INFO][CONFIG] timeout ms         : 2000
+[2026-07-12 08:52:07.465][INFO][CONFIG] log level          : INFO
+[2026-07-12 08:52:07.465][INFO][CONFIG] =========================================
+[INFO] Opened device: /dev/video0
+========== V4L2 Capability ==========
+driver      : uvcvideo
+card        : HP Wide Vision HD Camera: HP Wi
+bus_info    : usb-0000:03:00.0-2
+version     : 6.17.13
+capabilities: 0x84a00001
+device_caps : 0x4200001
+---------- Effective Capabilities ----------
+  V4L2_CAP_VIDEO_CAPTURE: yes
+  V4L2_CAP_VIDEO_OUTPUT: no
+  V4L2_CAP_READWRITE: no
+  V4L2_CAP_STREAMING: yes
+=====================================
+========== Set Format ==========
+requested   : 640x360 YUYV
+accepted    : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+colorspace  : 8
+---------- Current Format ----------
+current     : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+================================
+========== Init MMAP Buffers ==========
+requested buffers: 4
+driver buffers   : 4
+buffer[0] length=460800 offset=0 mapped_addr=0x770177f8f000
+buffer[1] length=460800 offset=32768 mapped_addr=0x770177f1e000
+buffer[2] length=460800 offset=65536 mapped_addr=0x770177ead000
+buffer[3] length=460800 offset=98304 mapped_addr=0x770177e3c000
+queued buffer[0]
+queued buffer[1]
+queued buffer[2]
+queued buffer[3]
+MMAP buffer initialization done.
+=======================================
+[INFO] Streaming started.
+[2026-07-12 08:52:07.584][INFO][PIPELINE] ========== Pipeline Capture ==========
+[2026-07-12 08:52:07.584][INFO][PIPELINE] target frames      : 30
+[2026-07-12 08:52:07.584][INFO][PIPELINE] ring capacity      : 8
+[2026-07-12 08:52:07.584][INFO][PIPELINE] poll timeout       : 2000 ms
+[2026-07-12 08:52:07.584][INFO][PIPELINE] consumer delay     : 0 ms
+[2026-07-12 08:52:07.584][INFO][PIPELINE] pipeline save      : no
+[2026-07-12 08:52:07.584][INFO][PIPELINE] save limit         : 5
+[2026-07-12 08:52:07.584][INFO][PIPELINE] output dir         : output
+[2026-07-12 08:52:07.584][INFO][PIPELINE] stats output       : /home/gfc/v4l2_capture/output/stage10_v4l2_delayed_receiver/pipeline_stats.json
+[2026-07-12 08:52:07.584][INFO][PIPELINE] tcp send           : yes
+[2026-07-12 08:52:07.584][INFO][PIPELINE] tcp target         : 127.0.0.1:9602
+[2026-07-12 08:52:07.584][INFO][PIPELINE] tcp queue capacity : 8
+[2026-07-12 08:52:07.584][INFO][PIPELINE] tcp connect attempts: 10
+[2026-07-12 08:52:07.585][INFO][PIPELINE] tcp retry delay ms  : 200
+[2026-07-12 08:52:07.585][WARN][TCP] connect attempt 1/10 failed: connect failed: Connection refused; retrying in 200 ms
+[2026-07-12 08:52:07.786][WARN][TCP] connect attempt 2/10 failed: connect failed: Connection refused; retrying in 200 ms
+[2026-07-12 08:52:07.987][WARN][TCP] connect attempt 3/10 failed: connect failed: Connection refused; retrying in 200 ms
+[2026-07-12 08:52:08.188][WARN][TCP] connect attempt 4/10 failed: connect failed: Connection refused; retrying in 200 ms
+[2026-07-12 08:52:08.389][INFO][TCP] connected to 127.0.0.1:9602 attempt=5/10
+[2026-07-12 08:52:08.389][INFO][TCP_QUEUE] enqueued 1 queue_size=1 queue_dropped=0
+[2026-07-12 08:52:08.408][INFO][TCP] sent 1 frame_id=0 bytes=460844
+[2026-07-12 08:52:09.841][INFO][TCP_QUEUE] enqueued 30 queue_size=1 queue_dropped=0
+[2026-07-12 08:52:09.861][INFO][TCP] sent 30 frame_id=29 bytes=460844
+[2026-07-12 08:52:09.861][INFO][STATS] ========== Pipeline Statistics ==========
+[2026-07-12 08:52:09.861][INFO][STATS] produced frames      : 30
+[2026-07-12 08:52:09.861][INFO][STATS] consumed frames      : 30
+[2026-07-12 08:52:09.861][INFO][STATS] ring dropped frames  : 0
+[2026-07-12 08:52:09.861][INFO][STATS] remaining ring size  : 0
+[2026-07-12 08:52:09.861][INFO][STATS] elapsed seconds      : 1.472
+[2026-07-12 08:52:09.861][INFO][STATS] producer FPS         : 20.377
+[2026-07-12 08:52:09.861][INFO][STATS] consumer FPS         : 20.377
+[2026-07-12 08:52:09.861][INFO][STATS] saved frames         : 0
+[2026-07-12 08:52:09.861][INFO][STATS] tcp queued frames    : 30
+[2026-07-12 08:52:09.861][INFO][STATS] tcp queue dropped    : 0
+[2026-07-12 08:52:09.861][INFO][STATS] tcp queue remaining  : 0
+[2026-07-12 08:52:09.861][INFO][STATS] tcp sent frames      : 30
+[2026-07-12 08:52:09.861][INFO][STATS] tcp sent bytes       : 13825320
+[2026-07-12 08:52:09.861][INFO][STATS] tcp send errors      : 0
+[2026-07-12 08:52:09.861][INFO][STATS] tcp connect attempts : 5
+[2026-07-12 08:52:09.861][INFO][STATS] tcp connect retries  : 4
+[2026-07-12 08:52:09.861][INFO][STATS] received frames      : 0
+[2026-07-12 08:52:09.861][INFO][STATS] reconnect count      : 0
+[2026-07-12 08:52:09.861][INFO][STATS] invalid frames       : 0
+[2026-07-12 08:52:09.861][INFO][STATS] consumed bytes       : 13824000
+[2026-07-12 08:52:09.861][INFO][STATS] =========================================
+[2026-07-12 08:52:09.861][INFO][STATS] wrote machine-readable stats to /home/gfc/v4l2_capture/output/stage10_v4l2_delayed_receiver/pipeline_stats.json
+[INFO] Streaming stopped.

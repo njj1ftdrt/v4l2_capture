@@ -1,0 +1,13 @@
+[TEST] fault=bad-magic port=9200
+[PASS] bad-magic rejected before payload allocation
+[TEST] fault=bad-version port=9201
+[PASS] bad-version rejected before payload allocation
+[TEST] fault=bad-header-size port=9202
+[PASS] bad-header-size rejected before payload allocation
+[TEST] fault=zero-width port=9203
+[PASS] zero-width rejected before payload allocation
+[TEST] fault=oversized-payload port=9204
+[PASS] oversized-payload rejected before payload allocation
+[TEST] fault=yuyv-size-mismatch port=9205
+[PASS] yuyv-size-mismatch rejected before payload allocation
+[PASS] all malformed-header tests passed.

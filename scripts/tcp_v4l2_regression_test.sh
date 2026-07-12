@@ -10,6 +10,8 @@ RING_CAPACITY="${RING_CAPACITY:-8}"
 TCP_QUEUE_CAPACITY="${TCP_QUEUE_CAPACITY:-8}"
 PORT="${PORT:-9000}"
 TIMEOUT_MS="${TIMEOUT_MS:-2000}"
+TCP_CONNECT_MAX_ATTEMPTS="${TCP_CONNECT_MAX_ATTEMPTS:-5}"
+TCP_CONNECT_RETRY_DELAY_MS="${TCP_CONNECT_RETRY_DELAY_MS:-500}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/build"
@@ -44,6 +46,8 @@ echo "frames             : ${FRAMES}"
 echo "ring capacity      : ${RING_CAPACITY}"
 echo "tcp queue capacity : ${TCP_QUEUE_CAPACITY}"
 echo "port               : ${PORT}"
+echo "connect attempts   : ${TCP_CONNECT_MAX_ATTEMPTS}"
+echo "retry delay ms     : ${TCP_CONNECT_RETRY_DELAY_MS}"
 echo "expected size      : ${EXPECTED_SIZE}"
 echo "output             : ${OUTPUT_DIR}"
 echo "sender stats json  : ${SENDER_STATS_JSON}"
@@ -73,6 +77,8 @@ set +e
   --tcp-host 127.0.0.1 \
   --tcp-port "${PORT}" \
   --tcp-queue-capacity "${TCP_QUEUE_CAPACITY}" \
+  --tcp-connect-max-attempts "${TCP_CONNECT_MAX_ATTEMPTS}" \
+  --tcp-connect-retry-delay-ms "${TCP_CONNECT_RETRY_DELAY_MS}" \
   --timeout-ms "${TIMEOUT_MS}" \
   --stats-output "${SENDER_STATS_JSON}" \
   2>&1 | tee "${SENDER_LOG}"
@@ -118,6 +124,8 @@ pairs = {
     'CONSUMED_FRAMES': sender['consumed_frames'],
     'TCP_SENT_FRAMES': sender['tcp_sent_frames'],
     'TCP_SEND_ERRORS': sender['tcp_send_errors'],
+    'TCP_CONNECT_ATTEMPTS': sender['tcp_connect_attempts'],
+    'TCP_CONNECT_RETRIES': sender['tcp_connect_retries'],
     'INVALID_FRAMES': sender['invalid_frames'],
     'RING_DROPPED': sender['ring_dropped_frames'],
     'TCP_QUEUE_DROPPED': sender['tcp_queue_dropped'],
@@ -143,6 +151,8 @@ echo "produced frames      : ${PRODUCED_FRAMES}"
 echo "consumed frames      : ${CONSUMED_FRAMES}"
 echo "tcp sent frames      : ${TCP_SENT_FRAMES}"
 echo "tcp send errors      : ${TCP_SEND_ERRORS}"
+echo "tcp connect attempts : ${TCP_CONNECT_ATTEMPTS}"
+echo "tcp connect retries  : ${TCP_CONNECT_RETRIES}"
 echo "invalid frames       : ${INVALID_FRAMES}"
 echo "ring dropped frames  : ${RING_DROPPED}"
 echo "tcp queue dropped    : ${TCP_QUEUE_DROPPED}"
@@ -162,6 +172,16 @@ fi
 
 if [[ "${TCP_SEND_ERRORS}" != "0" ]]; then
     echo "[FAIL] tcp send errors detected"
+    exit 1
+fi
+
+if [[ "${TCP_CONNECT_ATTEMPTS}" != "1" ]]; then
+    echo "[FAIL] receiver was already listening, so the sender should connect on the first attempt"
+    exit 1
+fi
+
+if [[ "${TCP_CONNECT_RETRIES}" != "0" ]]; then
+    echo "[FAIL] unexpected TCP connection retries in normal regression"
     exit 1
 fi
 

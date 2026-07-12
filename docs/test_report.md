@@ -218,3 +218,30 @@ No receiver is started. The sender is configured for three total attempts and mu
 ### Real V4L2 Delayed Receiver
 
 The real camera pipeline starts before the receiver. The producer and consumer threads begin only after connection recovery, preventing TCP queue overflow during receiver startup delay.
+
+## Protocol v3 Latency Regression
+
+### Synthetic End-to-End Test
+
+`tcp_latency_regression_test.sh` sends 30 generated YUYV frames through the real TCP protocol path and verifies:
+
+- protocol v3 headers are accepted;
+- one end-to-end latency sample exists for every received frame;
+- `latency_clock_errors=0` on the same host;
+- minimum, P50, P95, P99, and maximum are monotonically ordered;
+- mean lies within minimum and maximum;
+- jitter is finite and non-negative;
+- all received files have the expected YUYV size;
+- no temporary statistics file remains.
+
+The test deliberately does not enforce a fixed latency threshold because CI machines and developer hosts have different CPU, scheduler, storage, and socket performance.
+
+### Real V4L2 Regression
+
+The 300-frame camera regression now additionally requires:
+
+- capture-to-consumer samples equal consumed frames;
+- capture-to-send samples equal TCP-sent frames;
+- receiver end-to-end samples equal received frames;
+- no clock-order errors;
+- valid percentile ordering for all latency groups.

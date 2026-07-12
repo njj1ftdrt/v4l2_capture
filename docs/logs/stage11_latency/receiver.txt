@@ -1,0 +1,87 @@
+[INFO] tcp_receiver listening on port 9700
+[INFO] output dir: /home/gfc/v4l2_capture/output/stage11_latency/recv
+[INFO] stats output: /home/gfc/v4l2_capture/output/stage11_latency/receiver_stats.json
+[INFO] max payload bytes: 16777216
+[INFO] max sessions: 1
+[INFO] client connected session=1
+[RECV] frame=1 frame_id=0 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632110379123 crc32=0x953554f0
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_1_id_0.YUYV bytes=460800
+[RECV] frame=2 frame_id=1 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632141763675 crc32=0x8b7e5db2
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_2_id_1.YUYV bytes=460800
+[RECV] frame=3 frame_id=2 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632173005105 crc32=0x9cc7044e
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_3_id_2.YUYV bytes=460800
+[RECV] frame=4 frame_id=3 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632204991960 crc32=0xeab48266
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_4_id_3.YUYV bytes=460800
+[RECV] frame=5 frame_id=4 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632236837497 crc32=0xf2b3f27e
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_5_id_4.YUYV bytes=460800
+[RECV] frame=6 frame_id=5 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632268120596 crc32=0xa401e71a
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_6_id_5.YUYV bytes=460800
+[RECV] frame=7 frame_id=6 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632299198847 crc32=0xc4442941
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_7_id_6.YUYV bytes=460800
+[RECV] frame=8 frame_id=7 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632331250425 crc32=0x1cc5c04c
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_8_id_7.YUYV bytes=460800
+[RECV] frame=9 frame_id=8 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632362936940 crc32=0x91efd78
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_9_id_8.YUYV bytes=460800
+[RECV] frame=10 frame_id=9 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632393738615 crc32=0x57bdce5
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_10_id_9.YUYV bytes=460800
+[RECV] frame=11 frame_id=10 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632425062833 crc32=0xe98f91ec
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_11_id_10.YUYV bytes=460800
+[RECV] frame=12 frame_id=11 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632455297111 crc32=0x773f656d
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_12_id_11.YUYV bytes=460800
+[RECV] frame=13 frame_id=12 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632486591502 crc32=0x9c06a5ca
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_13_id_12.YUYV bytes=460800
+[RECV] frame=14 frame_id=13 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632517899448 crc32=0x982d9c66
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_14_id_13.YUYV bytes=460800
+[RECV] frame=15 frame_id=14 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632548847702 crc32=0x350f35f
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_15_id_14.YUYV bytes=460800
+[RECV] frame=16 frame_id=15 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632580515782 crc32=0x56474722
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_16_id_15.YUYV bytes=460800
+[RECV] frame=17 frame_id=16 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632611796045 crc32=0xa6dc45a1
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_17_id_16.YUYV bytes=460800
+[RECV] frame=18 frame_id=17 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632644892778 crc32=0xedd59136
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_18_id_17.YUYV bytes=460800
+[RECV] frame=19 frame_id=18 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632676219660 crc32=0x41f8213f
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_19_id_18.YUYV bytes=460800
+[RECV] frame=20 frame_id=19 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632708547458 crc32=0x9a3d7bb1
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_20_id_19.YUYV bytes=460800
+[RECV] frame=21 frame_id=20 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632740394793 crc32=0xc5ae2884
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_21_id_20.YUYV bytes=460800
+[RECV] frame=22 frame_id=21 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632772825892 crc32=0xc054c26c
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_22_id_21.YUYV bytes=460800
+[RECV] frame=23 frame_id=22 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632804201887 crc32=0x6728987a
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_23_id_22.YUYV bytes=460800
+[RECV] frame=24 frame_id=23 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632835744730 crc32=0x83c3b8c7
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_24_id_23.YUYV bytes=460800
+[RECV] frame=25 frame_id=24 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632866985739 crc32=0x840f9da7
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_25_id_24.YUYV bytes=460800
+[RECV] frame=26 frame_id=25 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632898356545 crc32=0x63062fc4
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_26_id_25.YUYV bytes=460800
+[RECV] frame=27 frame_id=26 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632929015279 crc32=0x7a693bf3
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_27_id_26.YUYV bytes=460800
+[RECV] frame=28 frame_id=27 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632959164816 crc32=0x2cab1de2
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_28_id_27.YUYV bytes=460800
+[RECV] frame=29 frame_id=28 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819632990181079 crc32=0x7f3d9079
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_29_id_28.YUYV bytes=460800
+[RECV] frame=30 frame_id=29 session=1 size=640x360 format=YUYV payload=460800 capture_ts_ns=1783819633021693874 crc32=0x8fab529a
+[RECV] saved /home/gfc/v4l2_capture/output/stage11_latency/recv/recv_frame_30_id_29.YUYV bytes=460800
+[INFO] session closed session=1 session_frames=30 total_frames=30
+========== TCP Receiver Statistics ==========
+received frames    : 30
+received bytes     : 13824000
+crc errors         : 0
+header errors      : 0
+rejected frames    : 0
+accepted sessions  : 1
+completed sessions : 1
+peer disconnects   : 0
+latency clock errors: 0
+latency samples     : 30
+e2e min us         : 18814.869
+e2e mean us        : 19894.814
+e2e p50 us         : 19673.760
+e2e p95 us         : 21325.323
+e2e p99 us         : 22514.133
+e2e max us         : 22923.930
+e2e jitter us      : 832.172
+=============================================
+[INFO] wrote machine-readable stats to /home/gfc/v4l2_capture/output/stage11_latency/receiver_stats.json

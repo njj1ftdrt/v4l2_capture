@@ -129,7 +129,21 @@ pairs = {
     'INVALID_FRAMES': sender['invalid_frames'],
     'RING_DROPPED': sender['ring_dropped_frames'],
     'TCP_QUEUE_DROPPED': sender['tcp_queue_dropped'],
+    'CAPTURE_CONSUMER_SAMPLES': sender['capture_to_consumer_samples'],
+    'CAPTURE_CONSUMER_P95_US': sender['capture_to_consumer_p95_us'],
+    'CAPTURE_SEND_SAMPLES': sender['capture_to_send_samples'],
+    'CAPTURE_SEND_P95_US': sender['capture_to_send_p95_us'],
+    'CAPTURE_SEND_P99_US': sender['capture_to_send_p99_us'],
+    'CAPTURE_SEND_JITTER_US': sender['capture_to_send_jitter_us'],
     'RECEIVER_FRAMES': receiver['received_frames'],
+    'LATENCY_CLOCK_ERRORS': receiver['latency_clock_errors'],
+    'E2E_LATENCY_SAMPLES': receiver['e2e_latency_samples'],
+    'E2E_LATENCY_MEAN_US': receiver['e2e_latency_mean_us'],
+    'E2E_LATENCY_P50_US': receiver['e2e_latency_p50_us'],
+    'E2E_LATENCY_P95_US': receiver['e2e_latency_p95_us'],
+    'E2E_LATENCY_P99_US': receiver['e2e_latency_p99_us'],
+    'E2E_LATENCY_MAX_US': receiver['e2e_latency_max_us'],
+    'E2E_LATENCY_JITTER_US': receiver['e2e_latency_jitter_us'],
     'CRC_ERRORS': receiver['crc_errors'],
     'HEADER_ERRORS': receiver['header_errors'],
     'REJECTED_FRAMES': receiver['rejected_frames'],
@@ -137,6 +151,30 @@ pairs = {
     'BAD_SIZE_FILES': int(os.environ['BAD_SIZE_COUNT']),
     'EXPECTED_SIZE': int(os.environ['EXPECTED_SIZE']),
 }
+
+def validate_latency(stats, prefix, expected_samples):
+    keys = [
+        f'{prefix}_min_us',
+        f'{prefix}_p50_us',
+        f'{prefix}_p95_us',
+        f'{prefix}_p99_us',
+        f'{prefix}_max_us',
+    ]
+    values = [float(stats[key]) for key in keys]
+    if int(stats[f'{prefix}_samples']) != int(expected_samples):
+        raise SystemExit(
+            f"[FAIL] {prefix}_samples={stats[f'{prefix}_samples']} expected={expected_samples}"
+        )
+    if values != sorted(values):
+        raise SystemExit(f'[FAIL] invalid percentile ordering for {prefix}: {values}')
+    if not (values[0] <= float(stats[f'{prefix}_mean_us']) <= values[-1]):
+        raise SystemExit(f'[FAIL] mean outside min/max for {prefix}')
+    if float(stats[f'{prefix}_jitter_us']) < 0:
+        raise SystemExit(f'[FAIL] negative jitter for {prefix}')
+
+validate_latency(sender, 'capture_to_consumer', sender['consumed_frames'])
+validate_latency(sender, 'capture_to_send', sender['tcp_sent_frames'])
+validate_latency(receiver, 'e2e_latency', receiver['received_frames'])
 
 for key, value in pairs.items():
     print(f'{key}={value}')
@@ -156,7 +194,21 @@ echo "tcp connect retries  : ${TCP_CONNECT_RETRIES}"
 echo "invalid frames       : ${INVALID_FRAMES}"
 echo "ring dropped frames  : ${RING_DROPPED}"
 echo "tcp queue dropped    : ${TCP_QUEUE_DROPPED}"
+echo "capture->consumer n  : ${CAPTURE_CONSUMER_SAMPLES}"
+echo "capture->consumer p95: ${CAPTURE_CONSUMER_P95_US} us"
+echo "capture->send n      : ${CAPTURE_SEND_SAMPLES}"
+echo "capture->send p95    : ${CAPTURE_SEND_P95_US} us"
+echo "capture->send p99    : ${CAPTURE_SEND_P99_US} us"
+echo "capture->send jitter : ${CAPTURE_SEND_JITTER_US} us"
 echo "receiver frames      : ${RECEIVER_FRAMES}"
+echo "latency clock errors : ${LATENCY_CLOCK_ERRORS}"
+echo "e2e latency samples  : ${E2E_LATENCY_SAMPLES}"
+echo "e2e mean             : ${E2E_LATENCY_MEAN_US} us"
+echo "e2e p50              : ${E2E_LATENCY_P50_US} us"
+echo "e2e p95              : ${E2E_LATENCY_P95_US} us"
+echo "e2e p99              : ${E2E_LATENCY_P99_US} us"
+echo "e2e max              : ${E2E_LATENCY_MAX_US} us"
+echo "e2e jitter           : ${E2E_LATENCY_JITTER_US} us"
 echo "crc errors           : ${CRC_ERRORS}"
 echo "header errors        : ${HEADER_ERRORS}"
 echo "rejected frames      : ${REJECTED_FRAMES}"
@@ -192,6 +244,26 @@ fi
 
 if [[ "${TCP_QUEUE_DROPPED}" != "0" ]]; then
     echo "[FAIL] TCP RingBuffer dropped frames"
+    exit 1
+fi
+
+if [[ "${CAPTURE_CONSUMER_SAMPLES}" != "${CONSUMED_FRAMES}" ]]; then
+    echo "[FAIL] capture-to-consumer sample count does not match consumed frames"
+    exit 1
+fi
+
+if [[ "${CAPTURE_SEND_SAMPLES}" != "${TCP_SENT_FRAMES}" ]]; then
+    echo "[FAIL] capture-to-send sample count does not match sent frames"
+    exit 1
+fi
+
+if [[ "${LATENCY_CLOCK_ERRORS}" != "0" ]]; then
+    echo "[FAIL] receiver observed invalid clock ordering"
+    exit 1
+fi
+
+if [[ "${E2E_LATENCY_SAMPLES}" != "${RECEIVER_FRAMES}" ]]; then
+    echo "[FAIL] end-to-end latency sample count does not match received frames"
     exit 1
 fi
 

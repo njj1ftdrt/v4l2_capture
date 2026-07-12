@@ -26,3 +26,7 @@ The camera wrapper records a host-side timestamp immediately after `VIDIOC_DQBUF
 ## What does jitter mean in this project?
 
 The reported jitter is the population standard deviation of the measured latency samples. The definition is documented explicitly so the metric is reproducible and is not confused with an undocumented networking-jitter formula.
+
+## Why not set a hard P95 latency threshold in the regression script?
+
+A functional regression should remain stable across different laptops, kernels, CPU governors, cameras, and CI hosts. The automated test therefore validates sample completeness, clock ordering, percentile ordering, and finite values. Performance thresholds should be established separately on a fixed hardware and software baseline, then compared under controlled load.

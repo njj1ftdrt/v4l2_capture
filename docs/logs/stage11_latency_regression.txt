@@ -1,0 +1,16 @@
+[PASS] protocol v3 latency statistics are complete and ordered
+========== Latency Verification ==========
+sender exit code : 0
+receiver exit code: 0
+latency samples   : 30
+mean us           : 19894.814
+p50 us            : 19673.76
+p95 us            : 21325.323
+p99 us            : 22514.133
+max us            : 22923.93
+jitter us         : 832.172
+received files    : 30
+bad-size files    : 0
+temporary files   : 0
+stats json        : /home/gfc/v4l2_capture/output/stage11_latency/receiver_stats.json
+==========================================

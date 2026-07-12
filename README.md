@@ -201,3 +201,15 @@ Receiver JSON reports:
 Each latency group contains sample count, minimum, mean, P50, P95, P99, maximum, and jitter in microseconds. Jitter is defined as the population standard deviation of latency samples.
 
 Same-host tests use the same system clock and can be interpreted directly. Cross-device measurements require synchronized clocks such as NTP or PTP; otherwise receiver-side end-to-end values must not be presented as strict physical latency.
+
+Run the host-only latency regression without a camera:
+
+```bash
+./scripts/tcp_latency_regression_test.sh
+```
+
+Run the real V4L2 test with latency sample-count and percentile validation:
+
+```bash
+./scripts/tcp_v4l2_regression_test.sh
+```

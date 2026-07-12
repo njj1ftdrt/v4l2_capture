@@ -1,0 +1,170 @@
+========== TCP V4L2 Regression Test ==========
+device             : /dev/video0
+resolution         : 640x360
+format             : YUYV
+frames             : 300
+ring capacity      : 8
+tcp queue capacity : 8
+port               : 9000
+connect attempts   : 5
+retry delay ms     : 500
+expected size      : 460800
+output             : /home/gfc/v4l2_capture/output/tcp_regression_300
+sender stats json  : /home/gfc/v4l2_capture/output/stats/pipeline_stats.json
+receiver stats json: /home/gfc/v4l2_capture/output/stats/receiver_stats.json
+==============================================
+[2026-07-12 09:27:39.722][INFO][MAIN] logger initialized with level=INFO
+[2026-07-12 09:27:39.722][INFO][CONFIG] ========== Effective AppConfig ==========
+[2026-07-12 09:27:39.722][INFO][CONFIG] config path        : /home/gfc/v4l2_capture/config/v4l2_tcp_pipeline.conf
+[2026-07-12 09:27:39.722][INFO][CONFIG] device             : /dev/video0
+[2026-07-12 09:27:39.722][INFO][CONFIG] list formats       : no
+[2026-07-12 09:27:39.722][INFO][CONFIG] width              : 640
+[2026-07-12 09:27:39.722][INFO][CONFIG] height             : 360
+[2026-07-12 09:27:39.722][INFO][CONFIG] format             : YUYV
+[2026-07-12 09:27:39.722][INFO][CONFIG] mmap buffers       : 4
+[2026-07-12 09:27:39.722][INFO][CONFIG] capture one        : no
+[2026-07-12 09:27:39.722][INFO][CONFIG] save one           : no
+[2026-07-12 09:27:39.722][INFO][CONFIG] capture frames     : 0
+[2026-07-12 09:27:39.722][INFO][CONFIG] pipeline frames    : 300
+[2026-07-12 09:27:39.722][INFO][CONFIG] ring capacity      : 8
+[2026-07-12 09:27:39.722][INFO][CONFIG] tcp queue capacity : 8
+[2026-07-12 09:27:39.722][INFO][CONFIG] tcp connect attempts: 5
+[2026-07-12 09:27:39.722][INFO][CONFIG] tcp retry delay ms  : 500
+[2026-07-12 09:27:39.722][INFO][CONFIG] consumer delay ms  : 0
+[2026-07-12 09:27:39.722][INFO][CONFIG] pipeline save      : no
+[2026-07-12 09:27:39.722][INFO][CONFIG] save limit         : 5
+[2026-07-12 09:27:39.722][INFO][CONFIG] output dir         : output
+[2026-07-12 09:27:39.722][INFO][CONFIG] stats output       : /home/gfc/v4l2_capture/output/stats/pipeline_stats.json
+[2026-07-12 09:27:39.722][INFO][CONFIG] tcp host           : 127.0.0.1
+[2026-07-12 09:27:39.722][INFO][CONFIG] tcp port           : 9000
+[2026-07-12 09:27:39.722][INFO][CONFIG] timeout ms         : 2000
+[2026-07-12 09:27:39.722][INFO][CONFIG] log level          : INFO
+[2026-07-12 09:27:39.722][INFO][CONFIG] =========================================
+[INFO] Opened device: /dev/video0
+========== V4L2 Capability ==========
+driver      : uvcvideo
+card        : HP Wide Vision HD Camera: HP Wi
+bus_info    : usb-0000:03:00.0-2
+version     : 6.17.13
+capabilities: 0x84a00001
+device_caps : 0x4200001
+---------- Effective Capabilities ----------
+  V4L2_CAP_VIDEO_CAPTURE: yes
+  V4L2_CAP_VIDEO_OUTPUT: no
+  V4L2_CAP_READWRITE: no
+  V4L2_CAP_STREAMING: yes
+=====================================
+========== Set Format ==========
+requested   : 640x360 YUYV
+accepted    : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+colorspace  : 8
+---------- Current Format ----------
+current     : 640x360 YUYV
+bytesperline: 1280
+sizeimage   : 460800
+================================
+========== Init MMAP Buffers ==========
+requested buffers: 4
+driver buffers   : 4
+buffer[0] length=460800 offset=0 mapped_addr=0x76852dea6000
+buffer[1] length=460800 offset=32768 mapped_addr=0x76852de35000
+buffer[2] length=460800 offset=65536 mapped_addr=0x76852db8f000
+buffer[3] length=460800 offset=98304 mapped_addr=0x76852db1e000
+queued buffer[0]
+queued buffer[1]
+queued buffer[2]
+queued buffer[3]
+MMAP buffer initialization done.
+=======================================
+[INFO] Streaming started.
+[2026-07-12 09:27:39.839][INFO][PIPELINE] ========== Pipeline Capture ==========
+[2026-07-12 09:27:39.839][INFO][PIPELINE] target frames      : 300
+[2026-07-12 09:27:39.839][INFO][PIPELINE] ring capacity      : 8
+[2026-07-12 09:27:39.839][INFO][PIPELINE] poll timeout       : 2000 ms
+[2026-07-12 09:27:39.839][INFO][PIPELINE] consumer delay     : 0 ms
+[2026-07-12 09:27:39.839][INFO][PIPELINE] pipeline save      : no
+[2026-07-12 09:27:39.839][INFO][PIPELINE] save limit         : 5
+[2026-07-12 09:27:39.839][INFO][PIPELINE] output dir         : output
+[2026-07-12 09:27:39.839][INFO][PIPELINE] stats output       : /home/gfc/v4l2_capture/output/stats/pipeline_stats.json
+[2026-07-12 09:27:39.839][INFO][PIPELINE] tcp send           : yes
+[2026-07-12 09:27:39.839][INFO][PIPELINE] tcp target         : 127.0.0.1:9000
+[2026-07-12 09:27:39.839][INFO][PIPELINE] tcp queue capacity : 8
+[2026-07-12 09:27:39.839][INFO][PIPELINE] tcp connect attempts: 5
+[2026-07-12 09:27:39.839][INFO][PIPELINE] tcp retry delay ms  : 500
+[2026-07-12 09:27:39.839][INFO][TCP] connected to 127.0.0.1:9000 attempt=1/5
+[2026-07-12 09:27:40.124][INFO][TCP_QUEUE] enqueued 1 queue_size=1 queue_dropped=0
+[2026-07-12 09:27:40.144][INFO][TCP] sent 1 frame_id=0 bytes=460844
+[2026-07-12 09:27:41.764][INFO][TCP_QUEUE] enqueued 50 queue_size=1 queue_dropped=0
+[2026-07-12 09:27:41.784][INFO][TCP] sent 50 frame_id=49 bytes=460844
+[2026-07-12 09:27:43.436][INFO][TCP_QUEUE] enqueued 100 queue_size=1 queue_dropped=0
+[2026-07-12 09:27:43.456][INFO][TCP] sent 100 frame_id=99 bytes=460844
+[2026-07-12 09:27:45.112][INFO][TCP_QUEUE] enqueued 150 queue_size=1 queue_dropped=0
+[2026-07-12 09:27:45.131][INFO][TCP] sent 150 frame_id=149 bytes=460844
+[2026-07-12 09:27:46.783][INFO][TCP_QUEUE] enqueued 200 queue_size=1 queue_dropped=0
+[2026-07-12 09:27:46.804][INFO][TCP] sent 200 frame_id=199 bytes=460844
+[2026-07-12 09:27:46.890][WARN][PIPELINE] skip invalid frame sequence=202 bytesused=290084 data_size=290084 reason=incomplete YUYV frame: got=290084, expected=460800
+[2026-07-12 09:27:46.894][WARN][PIPELINE] skip invalid frame sequence=203 bytesused=367808 data_size=367808 reason=incomplete YUYV frame: got=367808, expected=460800
+[2026-07-12 09:27:48.523][INFO][TCP_QUEUE] enqueued 250 queue_size=1 queue_dropped=0
+[2026-07-12 09:27:48.543][INFO][TCP] sent 250 frame_id=251 bytes=460844
+[2026-07-12 09:27:50.149][INFO][STATS] ========== Pipeline Statistics ==========
+[2026-07-12 09:27:50.149][INFO][STATS] produced frames      : 300
+[2026-07-12 09:27:50.149][INFO][STATS] consumed frames      : 300
+[2026-07-12 09:27:50.149][INFO][STATS] ring dropped frames  : 0
+[2026-07-12 09:27:50.149][INFO][STATS] remaining ring size  : 0
+[2026-07-12 09:27:50.149][INFO][STATS] elapsed seconds      : 10.310
+[2026-07-12 09:27:50.149][INFO][STATS] producer FPS         : 29.099
+[2026-07-12 09:27:50.149][INFO][STATS] consumer FPS         : 29.099
+[2026-07-12 09:27:50.149][INFO][STATS] saved frames         : 0
+[2026-07-12 09:27:50.149][INFO][STATS] tcp queued frames    : 298
+[2026-07-12 09:27:50.149][INFO][STATS] tcp queue dropped    : 0
+[2026-07-12 09:27:50.149][INFO][STATS] tcp queue remaining  : 0
+[2026-07-12 09:27:50.149][INFO][STATS] tcp sent frames      : 298
+[2026-07-12 09:27:50.149][INFO][STATS] tcp sent bytes       : 137331512
+[2026-07-12 09:27:50.149][INFO][STATS] tcp send errors      : 0
+[2026-07-12 09:27:50.149][INFO][STATS] tcp connect attempts : 1
+[2026-07-12 09:27:50.149][INFO][STATS] tcp connect retries  : 0
+[2026-07-12 09:27:50.149][INFO][STATS] received frames      : 0
+[2026-07-12 09:27:50.149][INFO][STATS] reconnect count      : 0
+[2026-07-12 09:27:50.149][INFO][STATS] invalid frames       : 2
+[2026-07-12 09:27:50.149][INFO][STATS] consumed bytes       : 137976292
+[2026-07-12 09:27:50.149][INFO][LATENCY] capture_to_consumer samples=300 min_us=72.077 mean_us=151.252 p50_us=105.265 p95_us=314.974 p99_us=628.719 max_us=1433.631 jitter_us=120.605
+[2026-07-12 09:27:50.149][INFO][LATENCY] capture_to_send samples=298 min_us=18913.620 mean_us=20162.503 p50_us=20083.321 p95_us=21376.133 p99_us=22562.134 max_us=25819.693 jitter_us=809.878
+[2026-07-12 09:27:50.149][INFO][STATS] =========================================
+[2026-07-12 09:27:50.149][INFO][STATS] wrote machine-readable stats to /home/gfc/v4l2_capture/output/stats/pipeline_stats.json
+[INFO] Streaming stopped.
+========== Verification ==========
+produced frames      : 300
+consumed frames      : 300
+tcp sent frames      : 298
+tcp send errors      : 0
+tcp connect attempts : 1
+tcp connect retries  : 0
+invalid frames       : 2
+ring dropped frames  : 0
+tcp queue dropped    : 0
+capture->consumer n  : 300
+capture->consumer p95: 314.974 us
+capture->send n      : 298
+capture->send p95    : 21376.133 us
+capture->send p99    : 22562.134 us
+capture->send jitter : 809.878 us
+receiver frames      : 298
+latency clock errors : 0
+e2e latency samples  : 298
+e2e mean             : 40378.374 us
+e2e p50              : 40139.118 us
+e2e p95              : 42701.125 us
+e2e p99              : 45388.748 us
+e2e max              : 49682.533 us
+e2e jitter           : 1536.509 us
+crc errors           : 0
+header errors        : 0
+rejected frames      : 0
+received files       : 298
+bad size files       : 0
+expected file size   : 460800
+==================================
+[WARN] camera produced 2 invalid frame(s); valid transmitted frames still passed end-to-end verification
+[PASS] TCP V4L2 regression test passed.

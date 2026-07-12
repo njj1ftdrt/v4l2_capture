@@ -8,6 +8,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(diagnostic_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 set(V4L2_CAPTURE_CORE_INCLUDE_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/../../../include")
@@ -33,7 +34,18 @@ target_include_directories(v4l2_diagnostics_node PRIVATE
 ament_target_dependencies(v4l2_diagnostics_node
   rclcpp
   diagnostic_msgs
+  sensor_msgs
 )
+
+if(BUILD_TESTING)
+  enable_testing()
+  add_executable(test_yuyv_conversion
+    tests/test_yuyv_conversion.cpp
+  )
+  target_compile_features(test_yuyv_conversion PRIVATE cxx_std_17)
+  target_include_directories(test_yuyv_conversion PRIVATE include)
+  add_test(NAME test_yuyv_conversion COMMAND test_yuyv_conversion)
+endif()
 
 install(TARGETS v4l2_diagnostics_node
   DESTINATION lib/${PROJECT_NAME}

@@ -1,0 +1,69 @@
+[INFO] tcp_sender connecting to 127.0.0.1:9800
+[INFO] test frame: 640x360 format=YUYV frames=60
+[INFO] connected attempt=1/1
+[SEND] frame_id=0 size=640x360 format=YUYV payload=460800 crc32=0x953554f0
+[SEND] frame_id=1 size=640x360 format=YUYV payload=460800 crc32=0x8b7e5db2
+[SEND] frame_id=2 size=640x360 format=YUYV payload=460800 crc32=0x9cc7044e
+[SEND] frame_id=3 size=640x360 format=YUYV payload=460800 crc32=0xeab48266
+[SEND] frame_id=4 size=640x360 format=YUYV payload=460800 crc32=0xf2b3f27e
+[SEND] frame_id=5 size=640x360 format=YUYV payload=460800 crc32=0xa401e71a
+[SEND] frame_id=6 size=640x360 format=YUYV payload=460800 crc32=0xc4442941
+[SEND] frame_id=7 size=640x360 format=YUYV payload=460800 crc32=0x1cc5c04c
+[SEND] frame_id=8 size=640x360 format=YUYV payload=460800 crc32=0x91efd78
+[SEND] frame_id=9 size=640x360 format=YUYV payload=460800 crc32=0x57bdce5
+[SEND] frame_id=10 size=640x360 format=YUYV payload=460800 crc32=0xe98f91ec
+[SEND] frame_id=11 size=640x360 format=YUYV payload=460800 crc32=0x773f656d
+[SEND] frame_id=12 size=640x360 format=YUYV payload=460800 crc32=0x9c06a5ca
+[SEND] frame_id=13 size=640x360 format=YUYV payload=460800 crc32=0x982d9c66
+[SEND] frame_id=14 size=640x360 format=YUYV payload=460800 crc32=0x350f35f
+[SEND] frame_id=15 size=640x360 format=YUYV payload=460800 crc32=0x56474722
+[SEND] frame_id=16 size=640x360 format=YUYV payload=460800 crc32=0xa6dc45a1
+[SEND] frame_id=17 size=640x360 format=YUYV payload=460800 crc32=0xedd59136
+[SEND] frame_id=18 size=640x360 format=YUYV payload=460800 crc32=0x41f8213f
+[SEND] frame_id=19 size=640x360 format=YUYV payload=460800 crc32=0x9a3d7bb1
+[SEND] frame_id=20 size=640x360 format=YUYV payload=460800 crc32=0xc5ae2884
+[SEND] frame_id=21 size=640x360 format=YUYV payload=460800 crc32=0xc054c26c
+[SEND] frame_id=22 size=640x360 format=YUYV payload=460800 crc32=0x6728987a
+[SEND] frame_id=23 size=640x360 format=YUYV payload=460800 crc32=0x83c3b8c7
+[SEND] frame_id=24 size=640x360 format=YUYV payload=460800 crc32=0x840f9da7
+[SEND] frame_id=25 size=640x360 format=YUYV payload=460800 crc32=0x63062fc4
+[SEND] frame_id=26 size=640x360 format=YUYV payload=460800 crc32=0x7a693bf3
+[SEND] frame_id=27 size=640x360 format=YUYV payload=460800 crc32=0x2cab1de2
+[SEND] frame_id=28 size=640x360 format=YUYV payload=460800 crc32=0x7f3d9079
+[SEND] frame_id=29 size=640x360 format=YUYV payload=460800 crc32=0x8fab529a
+[SEND] frame_id=30 size=640x360 format=YUYV payload=460800 crc32=0x36d1c0b7
+[SEND] frame_id=31 size=640x360 format=YUYV payload=460800 crc32=0x7fbdf469
+[SEND] frame_id=32 size=640x360 format=YUYV payload=460800 crc32=0x9d32cd48
+[SEND] frame_id=33 size=640x360 format=YUYV payload=460800 crc32=0x4f5ac752
+[SEND] frame_id=34 size=640x360 format=YUYV payload=460800 crc32=0x702302d9
+[SEND] frame_id=35 size=640x360 format=YUYV payload=460800 crc32=0x72656819
+[SEND] frame_id=36 size=640x360 format=YUYV payload=460800 crc32=0x8bba194d
+[SEND] frame_id=37 size=640x360 format=YUYV payload=460800 crc32=0xed9c1785
+[SEND] frame_id=38 size=640x360 format=YUYV payload=460800 crc32=0x40749b7d
+[SEND] frame_id=39 size=640x360 format=YUYV payload=460800 crc32=0x921be954
+[SEND] frame_id=40 size=640x360 format=YUYV payload=460800 crc32=0x835199d9
+[SEND] frame_id=41 size=640x360 format=YUYV payload=460800 crc32=0x2b3c295d
+[SEND] frame_id=42 size=640x360 format=YUYV payload=460800 crc32=0xa4b4528f
+[SEND] frame_id=43 size=640x360 format=YUYV payload=460800 crc32=0xe55fc4c
+[SEND] frame_id=44 size=640x360 format=YUYV payload=460800 crc32=0x2939d479
+[SEND] frame_id=45 size=640x360 format=YUYV payload=460800 crc32=0x14f62bc4
+[SEND] frame_id=46 size=640x360 format=YUYV payload=460800 crc32=0xfede53e7
+[SEND] frame_id=47 size=640x360 format=YUYV payload=460800 crc32=0x9ea7bea4
+[SEND] frame_id=48 size=640x360 format=YUYV payload=460800 crc32=0x628203e1
+[SEND] frame_id=49 size=640x360 format=YUYV payload=460800 crc32=0xa885b9bd
+[SEND] frame_id=50 size=640x360 format=YUYV payload=460800 crc32=0x4bc38645
+[SEND] frame_id=51 size=640x360 format=YUYV payload=460800 crc32=0x5c8cd8a7
+[SEND] frame_id=52 size=640x360 format=YUYV payload=460800 crc32=0x296a873d
+[SEND] frame_id=53 size=640x360 format=YUYV payload=460800 crc32=0xc746e38
+[SEND] frame_id=54 size=640x360 format=YUYV payload=460800 crc32=0xafce6ecc
+[SEND] frame_id=55 size=640x360 format=YUYV payload=460800 crc32=0x879faa29
+[SEND] frame_id=56 size=640x360 format=YUYV payload=460800 crc32=0xf327004c
+[SEND] frame_id=57 size=640x360 format=YUYV payload=460800 crc32=0xe4a11b9a
+[SEND] frame_id=58 size=640x360 format=YUYV payload=460800 crc32=0x974fb92b
+[SEND] frame_id=59 size=640x360 format=YUYV payload=460800 crc32=0xde9fdec
+========== TCP Sender Statistics ==========
+sent frames : 60
+sent bytes       : 27650640
+connect attempts : 1
+connect retries  : 0
+===========================================

@@ -8,3 +8,21 @@ v4l2_diagnostics_node:
     max_frames: 0
     max_sessions: 0
     diagnostic_topic: "/camera_link/diagnostics"
+
+    publish_images: true
+    image_topic: "/camera/image_raw"
+    camera_info_topic: "/camera/camera_info"
+    camera_frame_id: "camera_optical_frame"
+    output_encoding: "rgb8"
+
+    # Leave fx/fy at zero until the physical camera has been calibrated.
+    # CameraInfo then follows the standard uncalibrated convention K[0] == 0.
+    camera_fx: 0.0
+    camera_fy: 0.0
+    camera_cx: 0.0
+    camera_cy: 0.0
+    camera_k1: 0.0
+    camera_k2: 0.0
+    camera_p1: 0.0
+    camera_p2: 0.0
+    camera_k3: 0.0

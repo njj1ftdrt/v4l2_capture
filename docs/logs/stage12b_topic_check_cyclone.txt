@@ -1,0 +1,8 @@
+[PASS] matching Image and CameraInfo received
+image width       : 640
+image height      : 360
+image encoding    : rgb8
+image step        : 1920
+image payload     : 691200 bytes
+camera frame_id   : camera_optical_frame
+camera calibrated : false

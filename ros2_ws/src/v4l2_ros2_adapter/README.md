@@ -1,14 +1,18 @@
 # v4l2_ros2_adapter
 
-Stage 12A adds an optional ROS 2 Jazzy diagnostics adapter without linking ROS 2 into the original V4L2 capture executable.
+This optional ROS 2 Jazzy adapter keeps ROS 2 out of the original V4L2/TCP core. It listens for protocol version 3 TCP frames, validates headers before payload allocation, verifies CRC32, measures host-side end-to-end latency, and publishes standard ROS 2 camera messages.
 
-The node listens for protocol version 3 TCP frames, performs the same defensive header validation and CRC32 verification as `tcp_receiver`, measures host-side end-to-end latency, and publishes `diagnostic_msgs/msg/DiagnosticArray` on:
+## Topics
 
 ```text
-/camera_link/diagnostics
+/camera/image_raw             sensor_msgs/msg/Image
+/camera/camera_info           sensor_msgs/msg/CameraInfo
+/camera_link/diagnostics      diagnostic_msgs/msg/DiagnosticArray
 ```
 
-This stage does not publish image data yet. `sensor_msgs/Image` and `sensor_msgs/CameraInfo` are added in Stage 12B.
+The default image encoding is `rgb8`. The adapter converts the incoming packed YUYV payload to RGB8 so RViz2 and common vision consumers can display it directly. Set `output_encoding: yuv422_yuy2` to publish the original packed bytes without color conversion.
+
+Image and CameraInfo messages use the original host-side capture timestamp from protocol v3 and the same `camera_frame_id`. CameraInfo is intentionally uncalibrated while `camera_fx` and `camera_fy` remain zero; this follows the standard convention that `K[0] == 0` means no calibration is available. Fill the calibration parameters only with values measured for the actual camera and resolution.
 
 ## Build
 
@@ -39,16 +43,10 @@ cd ~/v4l2_capture
   --interval-ms 33
 ```
 
-Inspect diagnostics:
+For a real USB camera, start the adapter first and then run the core pipeline with `--tcp-port 9800`.
 
-```bash
-source /opt/ros/jazzy/setup.bash
-source ~/v4l2_capture/ros2_ws/install/setup.bash
-ros2 topic echo /camera_link/diagnostics diagnostic_msgs/msg/DiagnosticArray
-```
+## Diagnostics
 
-## Published values
-
-The diagnostic status contains connection state, rolling receive FPS, frame and byte counts, sequential session counters, header/CRC rejection counts, clock-order errors, last frame metadata, and E2E latency mean/P50/P95/P99/max/jitter values.
+The diagnostic status contains connection state, rolling receive FPS, frame and byte counts, sequential session counters, header/CRC rejection counts, clock-order errors, image publication counts, frame metadata, calibration state, and E2E latency mean/P50/P95/P99/max/jitter values.
 
 `max_frames=0` and `max_sessions=0` mean unlimited service-style operation. A malformed header closes only the current client session because its untrusted payload length is not consumed.

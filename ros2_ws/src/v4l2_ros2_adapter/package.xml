@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>v4l2_ros2_adapter</name>
-  <version>0.1.0</version>
-  <description>ROS 2 diagnostics adapter for the v4l2_capture TCP frame protocol.</description>
+  <version>0.2.0</version>
+  <description>ROS 2 Image, CameraInfo, and diagnostics adapter for the v4l2_capture TCP frame protocol.</description>
 
   <maintainer email="maintainer@example.com">v4l2_capture maintainer</maintainer>
   <license>MIT</license>
@@ -11,6 +11,7 @@
 
   <depend>rclcpp</depend>
   <depend>diagnostic_msgs</depend>
+  <depend>sensor_msgs</depend>
 
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>

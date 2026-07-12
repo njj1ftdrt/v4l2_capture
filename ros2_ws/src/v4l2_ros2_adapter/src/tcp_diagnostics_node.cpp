@@ -1,6 +1,7 @@
 #include "v4l2_ros2_adapter/tcp_diagnostics_node.hpp"
 
 #include "frame_protocol.hpp"
+#include "v4l2_ros2_adapter/yuyv_conversion.hpp"
 
 #include <arpa/inet.h>
 #include <poll.h>
@@ -66,6 +67,25 @@ TcpDiagnosticsNode::TcpDiagnosticsNode(const rclcpp::NodeOptions& options)
       diagnostic_topic_(declare_parameter<std::string>(
           "diagnostic_topic", "/camera_link/diagnostics"
       )),
+      publish_images_(declare_parameter<bool>("publish_images", true)),
+      image_topic_(declare_parameter<std::string>("image_topic", "/camera/image_raw")),
+      camera_info_topic_(declare_parameter<std::string>(
+          "camera_info_topic", "/camera/camera_info"
+      )),
+      camera_frame_id_(declare_parameter<std::string>(
+          "camera_frame_id", "camera_optical_frame"
+      )),
+      output_encoding_(declare_parameter<std::string>("output_encoding", "rgb8")),
+      camera_fx_(declare_parameter<double>("camera_fx", 0.0)),
+      camera_fy_(declare_parameter<double>("camera_fy", 0.0)),
+      camera_cx_(declare_parameter<double>("camera_cx", 0.0)),
+      camera_cy_(declare_parameter<double>("camera_cy", 0.0)),
+      camera_k1_(declare_parameter<double>("camera_k1", 0.0)),
+      camera_k2_(declare_parameter<double>("camera_k2", 0.0)),
+      camera_p1_(declare_parameter<double>("camera_p1", 0.0)),
+      camera_p2_(declare_parameter<double>("camera_p2", 0.0)),
+      camera_k3_(declare_parameter<double>("camera_k3", 0.0)),
+      camera_calibrated_(camera_fx_ > 0.0 && camera_fy_ > 0.0),
       last_rate_time_(std::chrono::steady_clock::now()) {
     validate_parameters();
 
@@ -74,6 +94,18 @@ TcpDiagnosticsNode::TcpDiagnosticsNode(const rclcpp::NodeOptions& options)
         rclcpp::QoS(10).reliable()
     );
 
+    if (publish_images_) {
+        const rclcpp::SensorDataQoS sensor_qos;
+        image_publisher_ = create_publisher<sensor_msgs::msg::Image>(
+            image_topic_,
+            sensor_qos
+        );
+        camera_info_publisher_ = create_publisher<sensor_msgs::msg::CameraInfo>(
+            camera_info_topic_,
+            sensor_qos
+        );
+    }
+
     diagnostics_timer_ = create_wall_timer(
         std::chrono::milliseconds(publish_period_ms_),
         std::bind(&TcpDiagnosticsNode::publish_diagnostics, this)
@@ -81,12 +113,25 @@ TcpDiagnosticsNode::TcpDiagnosticsNode(const rclcpp::NodeOptions& options)
 
     RCLCPP_INFO(
         get_logger(),
-        "starting protocol v%u diagnostics receiver on %s:%d, topic=%s",
+        "starting protocol v%u camera adapter on %s:%d, diagnostics=%s",
         static_cast<unsigned>(frame_protocol::kVersion),
         listen_address_.c_str(),
         static_cast<int>(listen_port_),
         diagnostic_topic_.c_str()
     );
+    if (publish_images_) {
+        RCLCPP_INFO(
+            get_logger(),
+            "publishing images on %s (%s), CameraInfo on %s, frame_id=%s, calibrated=%s",
+            image_topic_.c_str(),
+            output_encoding_.c_str(),
+            camera_info_topic_.c_str(),
+            camera_frame_id_.c_str(),
+            camera_calibrated_ ? "true" : "false"
+        );
+    } else {
+        RCLCPP_INFO(get_logger(), "image publication disabled by publish_images=false");
+    }
 
     receiver_thread_ = std::thread(&TcpDiagnosticsNode::receiver_loop, this);
 }
@@ -124,6 +169,43 @@ void TcpDiagnosticsNode::validate_parameters() const {
     }
     if (diagnostic_topic_.empty()) {
         throw std::invalid_argument("diagnostic_topic must not be empty");
+    }
+    if (publish_images_) {
+        if (image_topic_.empty()) {
+            throw std::invalid_argument("image_topic must not be empty");
+        }
+        if (camera_info_topic_.empty()) {
+            throw std::invalid_argument("camera_info_topic must not be empty");
+        }
+        if (camera_frame_id_.empty()) {
+            throw std::invalid_argument("camera_frame_id must not be empty");
+        }
+        if (output_encoding_ != "rgb8" && output_encoding_ != "yuv422_yuy2") {
+            throw std::invalid_argument(
+                "output_encoding must be rgb8 or yuv422_yuy2"
+            );
+        }
+    }
+
+    const bool fx_set = camera_fx_ > 0.0;
+    const bool fy_set = camera_fy_ > 0.0;
+    if (fx_set != fy_set) {
+        throw std::invalid_argument(
+            "camera_fx and camera_fy must both be positive or both be zero"
+        );
+    }
+    if (camera_cx_ < 0.0 || camera_cy_ < 0.0) {
+        throw std::invalid_argument("camera_cx and camera_cy must be non-negative");
+    }
+
+    const double calibration_values[] = {
+        camera_fx_, camera_fy_, camera_cx_, camera_cy_,
+        camera_k1_, camera_k2_, camera_p1_, camera_p2_, camera_k3_
+    };
+    for (double value : calibration_values) {
+        if (!std::isfinite(value)) {
+            throw std::invalid_argument("camera calibration parameters must be finite");
+        }
     }
 }
 
@@ -404,7 +486,106 @@ void TcpDiagnosticsNode::handle_client(int client_fd, std::uint64_t session_inde
         last_pixel_format_.store(header.pixel_format);
         last_capture_timestamp_ns_.store(header.capture_timestamp_ns);
         last_receive_timestamp_ns_.store(receive_timestamp_ns);
+
+        publish_frame(header, payload);
     }
+}
+
+void TcpDiagnosticsNode::publish_frame(
+    const frame_protocol::FrameHeader& header,
+    const std::vector<std::uint8_t>& payload
+) {
+    if (!publish_images_) {
+        return;
+    }
+
+    if (header.pixel_format != V4L2_PIX_FMT_YUYV) {
+        ++image_publish_errors_;
+        set_last_error(
+            "ROS image publication supports only YUYV input, got " +
+            fourcc_to_string(header.pixel_format)
+        );
+        return;
+    }
+
+    try {
+        sensor_msgs::msg::Image image;
+        image.header.stamp = to_ros_time(header.capture_timestamp_ns);
+        image.header.frame_id = camera_frame_id_;
+        image.height = header.height;
+        image.width = header.width;
+        image.is_bigendian = 0;
+
+        if (output_encoding_ == "rgb8") {
+            image.encoding = "rgb8";
+            image.step = header.width * 3u;
+            image.data = convert_yuyv_to_rgb8(payload, header.width, header.height);
+        } else {
+            image.encoding = "yuv422_yuy2";
+            image.step = header.width * 2u;
+            image.data = payload;
+        }
+
+        sensor_msgs::msg::CameraInfo camera_info = make_camera_info(
+            header.width,
+            header.height,
+            image.header.stamp
+        );
+
+        image_publisher_->publish(image);
+        camera_info_publisher_->publish(camera_info);
+        ++published_images_;
+    } catch (const std::exception& error) {
+        ++image_publish_errors_;
+        set_last_error(
+            "failed to publish ROS image for frame " +
+            std::to_string(header.frame_id) + ": " + error.what()
+        );
+        RCLCPP_WARN(
+            get_logger(),
+            "failed to publish ROS image for frame %llu: %s",
+            static_cast<unsigned long long>(header.frame_id),
+            error.what()
+        );
+    }
+}
+
+sensor_msgs::msg::CameraInfo TcpDiagnosticsNode::make_camera_info(
+    std::uint32_t width,
+    std::uint32_t height,
+    const builtin_interfaces::msg::Time& stamp
+) const {
+    sensor_msgs::msg::CameraInfo info;
+    info.header.stamp = stamp;
+    info.header.frame_id = camera_frame_id_;
+    info.width = width;
+    info.height = height;
+    info.distortion_model = "plumb_bob";
+
+    info.k.fill(0.0);
+    info.r.fill(0.0);
+    info.p.fill(0.0);
+    info.r[0] = 1.0;
+    info.r[4] = 1.0;
+    info.r[8] = 1.0;
+
+    if (camera_calibrated_) {
+        info.d = {camera_k1_, camera_k2_, camera_p1_, camera_p2_, camera_k3_};
+
+        info.k[0] = camera_fx_;
+        info.k[2] = camera_cx_;
+        info.k[4] = camera_fy_;
+        info.k[5] = camera_cy_;
+        info.k[8] = 1.0;
+
+        info.p[0] = camera_fx_;
+        info.p[2] = camera_cx_;
+        info.p[5] = camera_fy_;
+        info.p[6] = camera_cy_;
+        info.p[10] = 1.0;
+    }
+
+    return info;
 }
 
 TcpDiagnosticsNode::ReadResult TcpDiagnosticsNode::read_exact_interruptible(
@@ -497,7 +678,9 @@ void TcpDiagnosticsNode::publish_diagnostics() {
     const std::uint64_t crc_errors = crc_errors_.load();
     const std::uint64_t header_errors = header_errors_.load();
     const std::uint64_t clock_errors = latency_clock_errors_.load();
-    const std::uint64_t total_errors = crc_errors + header_errors + clock_errors;
+    const std::uint64_t image_errors = image_publish_errors_.load();
+    const std::uint64_t total_errors =
+        crc_errors + header_errors + clock_errors + image_errors;
 
     diagnostic_msgs::msg::DiagnosticArray message;
     message.header.stamp = get_clock()->now();
@@ -520,6 +703,12 @@ void TcpDiagnosticsNode::publish_diagnostics() {
     add_value(status, "connected", to_string_bool(connection_state == "connected"));
     add_value(status, "listen_address", listen_address_);
     add_value(status, "listen_port", std::to_string(listen_port_));
+    add_value(status, "publish_images", to_string_bool(publish_images_));
+    add_value(status, "image_topic", image_topic_);
+    add_value(status, "camera_info_topic", camera_info_topic_);
+    add_value(status, "camera_frame_id", camera_frame_id_);
+    add_value(status, "output_encoding", output_encoding_);
+    add_value(status, "camera_calibrated", to_string_bool(camera_calibrated_));
     add_value(status, "receive_fps", format_double(receive_fps));
     add_value(status, "received_frames", std::to_string(frame_count));
     add_value(status, "received_bytes", std::to_string(received_bytes_.load()));
@@ -529,6 +718,8 @@ void TcpDiagnosticsNode::publish_diagnostics() {
     add_value(status, "header_errors", std::to_string(header_errors));
     add_value(status, "crc_errors", std::to_string(crc_errors));
     add_value(status, "rejected_frames", std::to_string(rejected_frames_.load()));
+    add_value(status, "published_images", std::to_string(published_images_.load()));
+    add_value(status, "image_publish_errors", std::to_string(image_errors));
     add_value(status, "latency_clock_errors", std::to_string(clock_errors));
     add_value(status, "e2e_latency_samples", std::to_string(latency.sample_count));
     add_value(status, "e2e_latency_mean_us", format_double(latency.mean_us));
@@ -610,6 +801,15 @@ std::uint64_t TcpDiagnosticsNode::system_time_ns() {
     return static_cast<std::uint64_t>(
         std::chrono::duration_cast<std::chrono::nanoseconds>(now).count()
     );
+}
+
+builtin_interfaces::msg::Time TcpDiagnosticsNode::to_ros_time(
+    std::uint64_t timestamp_ns
+) {
+    builtin_interfaces::msg::Time stamp;
+    stamp.sec = static_cast<std::int32_t>(timestamp_ns / 1000000000ull);
+    stamp.nanosec = static_cast<std::uint32_t>(timestamp_ns % 1000000000ull);
+    return stamp;
 }
 
 std::string TcpDiagnosticsNode::fourcc_to_string(std::uint32_t fourcc) {

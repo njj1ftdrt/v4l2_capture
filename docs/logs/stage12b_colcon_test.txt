@@ -1,0 +1,31 @@
+Starting >>> v4l2_ros2_adapter
+UpdateCTestConfiguration  from :/home/gfc/v4l2_capture/ros2_ws/build/v4l2_ros2_adapter/CTestConfiguration.ini
+Parse Config file:/home/gfc/v4l2_capture/ros2_ws/build/v4l2_ros2_adapter/CTestConfiguration.ini
+   Site: gfc-pc
+   Build name: (empty)
+ Add coverage exclude regular expressions.
+Create new tag: 20260712-0301 - Experimental
+UpdateCTestConfiguration  from :/home/gfc/v4l2_capture/ros2_ws/build/v4l2_ros2_adapter/CTestConfiguration.ini
+Parse Config file:/home/gfc/v4l2_capture/ros2_ws/build/v4l2_ros2_adapter/CTestConfiguration.ini
+Test project /home/gfc/v4l2_capture/ros2_ws/build/v4l2_ros2_adapter
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: test_yuyv_conversion
+
+1: Test command: /home/gfc/v4l2_capture/ros2_ws/build/v4l2_ros2_adapter/test_yuyv_conversion
+1: Working Directory: /home/gfc/v4l2_capture/ros2_ws/build/v4l2_ros2_adapter
+1: Test timeout computed to be: 10000000
+1: [PASS] YUYV to RGB8 conversion tests passed
+1/1 Test #1: test_yuyv_conversion .............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec
+Finished <<< v4l2_ros2_adapter [0.05s]
+
+Summary: 1 package finished [0.28s]

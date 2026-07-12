@@ -1,0 +1,12 @@
+[INFO] [launch]: All log files can be found below /home/gfc/.ros/log/2026-07-12-11-27-13-780796-gfc-pc-13206
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [v4l2_diagnostics_node-1]: process started with pid [13210]
+[v4l2_diagnostics_node-1] [INFO] [1783826833.905898148] [v4l2_diagnostics_node]: starting protocol v3 camera adapter on 0.0.0.0:9800, diagnostics=/camera_link/diagnostics
+[v4l2_diagnostics_node-1] [INFO] [1783826833.905969123] [v4l2_diagnostics_node]: publishing images on /camera/image_raw (rgb8), CameraInfo on /camera/camera_info, frame_id=camera_optical_frame, calibrated=false
+[v4l2_diagnostics_node-1] [INFO] [1783826841.397458273] [v4l2_diagnostics_node]: accepted TCP frame session 1 from 127.0.0.1:59310
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[v4l2_diagnostics_node-1] [INFO] [1783826845.678233552] [v4l2_diagnostics_node]: peer closed session 1
+[ERROR] [v4l2_diagnostics_node-1]: process[v4l2_diagnostics_node-1] failed to terminate '5' seconds after receiving 'SIGINT', escalating to 'SIGTERM'
+[INFO] [v4l2_diagnostics_node-1]: sending signal 'SIGTERM' to process[v4l2_diagnostics_node-1]
+[v4l2_diagnostics_node-1] [INFO] [1783826850.662551936] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [v4l2_diagnostics_node-1]: process has finished cleanly [pid 13210]

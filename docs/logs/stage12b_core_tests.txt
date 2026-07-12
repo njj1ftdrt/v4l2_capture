@@ -1,0 +1,12 @@
+Internal ctest changing into directory: /home/gfc/v4l2_capture/build
+Test project /home/gfc/v4l2_capture/build
+    Start 1: test_ring_buffer
+1/3 Test #1: test_ring_buffer .................   Passed    0.00 sec
+    Start 2: test_frame_protocol
+2/3 Test #2: test_frame_protocol ..............   Passed    0.00 sec
+    Start 3: test_latency_stats
+3/3 Test #3: test_latency_stats ...............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.01 sec

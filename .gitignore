@@ -19,3 +19,7 @@ output_usb_cam/
 ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
+
+# Accidental root-level colcon outputs
+/install/
+/log/

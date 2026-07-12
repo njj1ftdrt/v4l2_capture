@@ -50,3 +50,29 @@ For a real USB camera, start the adapter first and then run the core pipeline wi
 The diagnostic status contains connection state, rolling receive FPS, frame and byte counts, sequential session counters, header/CRC rejection counts, clock-order errors, image publication counts, frame metadata, calibration state, and E2E latency mean/P50/P95/P99/max/jitter values.
 
 `max_frames=0` and `max_sessions=0` mean unlimited service-style operation. A malformed header closes only the current client session because its untrusted payload length is not consumed.
+
+## Validated DDS profile
+
+The validated Stage 12C profile is Cyclone DDS:
+
+```bash
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+```
+
+On the development host, default Fast DDS discovery and small CameraInfo delivery succeeded, but 640x360 RGB8 Image messages did not reach the subscriber until the RMW implementation was switched. This is documented as an environment-specific default-configuration compatibility issue, not a general limitation of Fast DDS.
+
+Image QoS can be configured with `image_qos_reliability` (`best_effort` or `reliable`) and `image_qos_depth`.
+
+Run the automated integration and rosbag2 checks from the project root:
+
+```bash
+./scripts/ros2_camera_integration_test.sh
+./scripts/ros2_camera_rosbag_test.sh
+```
+
+Start the adapter or adapter plus RViz2 through the validated wrappers:
+
+```bash
+./scripts/run_ros2_camera_adapter.sh
+./scripts/run_ros2_camera_rviz.sh
+```

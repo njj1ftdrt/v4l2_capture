@@ -16,6 +16,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstring>
+#include <cstdlib>
 #include <functional>
 #include <iomanip>
 #include <limits>
@@ -76,6 +77,10 @@ TcpDiagnosticsNode::TcpDiagnosticsNode(const rclcpp::NodeOptions& options)
           "camera_frame_id", "camera_optical_frame"
       )),
       output_encoding_(declare_parameter<std::string>("output_encoding", "rgb8")),
+      image_qos_reliability_(declare_parameter<std::string>(
+          "image_qos_reliability", "best_effort"
+      )),
+      image_qos_depth_(declare_parameter<std::int64_t>("image_qos_depth", 5)),
       camera_fx_(declare_parameter<double>("camera_fx", 0.0)),
       camera_fy_(declare_parameter<double>("camera_fy", 0.0)),
       camera_cx_(declare_parameter<double>("camera_cx", 0.0)),
@@ -95,14 +100,23 @@ TcpDiagnosticsNode::TcpDiagnosticsNode(const rclcpp::NodeOptions& options)
     );
 
     if (publish_images_) {
-        const rclcpp::SensorDataQoS sensor_qos;
+        rclcpp::QoS image_qos(rclcpp::KeepLast(
+            static_cast<std::size_t>(image_qos_depth_)
+        ));
+        image_qos.durability_volatile();
+        if (image_qos_reliability_ == "reliable") {
+            image_qos.reliable();
+        } else {
+            image_qos.best_effort();
+        }
+
         image_publisher_ = create_publisher<sensor_msgs::msg::Image>(
             image_topic_,
-            sensor_qos
+            image_qos
         );
         camera_info_publisher_ = create_publisher<sensor_msgs::msg::CameraInfo>(
             camera_info_topic_,
-            sensor_qos
+            image_qos
         );
     }
 
@@ -122,11 +136,13 @@ TcpDiagnosticsNode::TcpDiagnosticsNode(const rclcpp::NodeOptions& options)
     if (publish_images_) {
         RCLCPP_INFO(
             get_logger(),
-            "publishing images on %s (%s), CameraInfo on %s, frame_id=%s, calibrated=%s",
+            "publishing images on %s (%s), CameraInfo on %s, frame_id=%s, QoS=%s depth=%lld, calibrated=%s",
             image_topic_.c_str(),
             output_encoding_.c_str(),
             camera_info_topic_.c_str(),
             camera_frame_id_.c_str(),
+            image_qos_reliability_.c_str(),
+            static_cast<long long>(image_qos_depth_),
             camera_calibrated_ ? "true" : "false"
         );
     } else {
@@ -180,10 +196,24 @@ void TcpDiagnosticsNode::validate_parameters() const {
         if (camera_frame_id_.empty()) {
             throw std::invalid_argument("camera_frame_id must not be empty");
         }
-        if (output_encoding_ != "rgb8" && output_encoding_ != "yuv422_yuy2") {
+        if (
+            output_encoding_ != "rgb8" &&
+            output_encoding_ != "mono8" &&
+            output_encoding_ != "yuv422_yuy2"
+        ) {
             throw std::invalid_argument(
-                "output_encoding must be rgb8 or yuv422_yuy2"
+                "output_encoding must be rgb8, mono8, "
+                "or yuv422_yuy2"
             );
+        }
+        if (image_qos_reliability_ != "best_effort" &&
+            image_qos_reliability_ != "reliable") {
+            throw std::invalid_argument(
+                "image_qos_reliability must be best_effort or reliable"
+            );
+        }
+        if (image_qos_depth_ < 1 || image_qos_depth_ > 1000) {
+            throw std::invalid_argument("image_qos_depth must be between 1 and 1000");
         }
     }
 
@@ -519,7 +549,19 @@ void TcpDiagnosticsNode::publish_frame(
         if (output_encoding_ == "rgb8") {
             image.encoding = "rgb8";
             image.step = header.width * 3u;
-            image.data = convert_yuyv_to_rgb8(payload, header.width, header.height);
+            image.data = convert_yuyv_to_rgb8(
+                payload,
+                header.width,
+                header.height
+            );
+        } else if (output_encoding_ == "mono8") {
+            image.encoding = "mono8";
+            image.step = header.width;
+            image.data = convert_yuyv_to_mono8(
+                payload,
+                header.width,
+                header.height
+            );
         } else {
             image.encoding = "yuv422_yuy2";
             image.step = header.width * 2u;
@@ -698,6 +740,12 @@ void TcpDiagnosticsNode::publish_diagnostics() {
     }
     status.message = state_message;
 
+    const char* rmw_environment = std::getenv("RMW_IMPLEMENTATION");
+    add_value(
+        status,
+        "rmw_implementation",
+        rmw_environment != nullptr ? rmw_environment : "runtime-default"
+    );
     add_value(status, "protocol_version", std::to_string(frame_protocol::kVersion));
     add_value(status, "connection_state", connection_state);
     add_value(status, "connected", to_string_bool(connection_state == "connected"));
@@ -708,6 +756,8 @@ void TcpDiagnosticsNode::publish_diagnostics() {
     add_value(status, "camera_info_topic", camera_info_topic_);
     add_value(status, "camera_frame_id", camera_frame_id_);
     add_value(status, "output_encoding", output_encoding_);
+    add_value(status, "image_qos_reliability", image_qos_reliability_);
+    add_value(status, "image_qos_depth", std::to_string(image_qos_depth_));
     add_value(status, "camera_calibrated", to_string_bool(camera_calibrated_));
     add_value(status, "receive_fps", format_double(receive_fps));
     add_value(status, "received_frames", std::to_string(frame_count));

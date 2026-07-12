@@ -51,12 +51,34 @@ install(TARGETS v4l2_diagnostics_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY config launch
+install(DIRECTORY config launch rviz
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(PROGRAMS scripts/camera_topic_check.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 install(FILES README.md LICENSE
   DESTINATION share/${PROJECT_NAME}
+)
+
+
+# Stage 13A: C++ ROS2 Image throughput benchmark
+add_executable(
+  image_throughput_check
+  src/image_throughput_check.cpp
+)
+
+ament_target_dependencies(
+  image_throughput_check
+  rclcpp
+  sensor_msgs
+)
+
+install(
+  TARGETS image_throughput_check
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()

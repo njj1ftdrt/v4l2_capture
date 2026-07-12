@@ -59,7 +59,46 @@ int main() {
         }
         require(rejected_odd_width, "odd YUYV width was not rejected");
 
-        std::cout << "[PASS] YUYV to RGB8 conversion tests passed\n";
+
+        const std::vector<std::uint8_t> mono_source{
+            10, 90, 20, 180,
+            30, 70, 40, 200
+        };
+
+        const auto mono =
+            v4l2_ros2_adapter::convert_yuyv_to_mono8(
+                mono_source,
+                4,
+                1
+            );
+
+        const std::vector<std::uint8_t> expected_mono{
+            10, 20, 30, 40
+        };
+
+        require(
+            mono == expected_mono,
+            "mono conversion values mismatch"
+        );
+
+        bool mono_rejected_bad_size = false;
+
+        try {
+            (void)v4l2_ros2_adapter::convert_yuyv_to_mono8(
+                black_yuyv,
+                4,
+                1
+            );
+        } catch (const std::invalid_argument&) {
+            mono_rejected_bad_size = true;
+        }
+
+        require(
+            mono_rejected_bad_size,
+            "mono conversion accepted a bad payload size"
+        );
+
+        std::cout << "[PASS] YUYV conversion tests passed\n";
         return 0;
     } catch (const std::exception& error) {
         std::cerr << "[FAIL] " << error.what() << '\n';

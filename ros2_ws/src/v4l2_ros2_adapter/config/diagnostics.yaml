@@ -14,6 +14,8 @@ v4l2_diagnostics_node:
     camera_info_topic: "/camera/camera_info"
     camera_frame_id: "camera_optical_frame"
     output_encoding: "rgb8"
+    image_qos_reliability: "best_effort"
+    image_qos_depth: 5
 
     # Leave fx/fy at zero until the physical camera has been calibrated.
     # CameraInfo then follows the standard uncalibrated convention K[0] == 0.

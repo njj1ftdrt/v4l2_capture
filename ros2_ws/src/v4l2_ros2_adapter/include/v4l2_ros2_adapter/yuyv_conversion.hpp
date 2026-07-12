@@ -68,4 +68,44 @@ inline std::vector<std::uint8_t> convert_yuyv_to_rgb8(
     return rgb;
 }
 
+
+inline std::vector<std::uint8_t> convert_yuyv_to_mono8(
+    const std::vector<std::uint8_t>& payload,
+    std::uint32_t width,
+    std::uint32_t height
+) {
+    const std::size_t expected =
+        static_cast<std::size_t>(width) *
+        static_cast<std::size_t>(height) *
+        2u;
+
+    if (payload.size() != expected) {
+        throw std::invalid_argument(
+            "YUYV payload size does not match width and height"
+        );
+    }
+
+    if ((width % 2u) != 0u) {
+        throw std::invalid_argument(
+            "YUYV width must be even"
+        );
+    }
+
+    std::vector<std::uint8_t> mono(
+        static_cast<std::size_t>(width) *
+        static_cast<std::size_t>(height)
+    );
+
+    std::size_t source = 0;
+    std::size_t destination = 0;
+
+    while (source < payload.size()) {
+        mono[destination++] = payload[source + 0];
+        mono[destination++] = payload[source + 2];
+        source += 4;
+    }
+
+    return mono;
+}
+
 }  // namespace v4l2_ros2_adapter

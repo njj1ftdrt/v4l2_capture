@@ -1,0 +1,44 @@
+========== stage13b_mono8 ==========
+RMW                   : rmw_cyclonedds_cpp
+frames                : 3000
+port                  : 9816
+warmup seconds        : 5
+benchmark seconds     : 120
+output encoding       : mono8
+==================================
+
+[INFO] [1783863767.271868100] [image_throughput_check]: topic=/camera/image_raw warmup=5.000s measurement=120.000s QoS=BEST_EFFORT/KEEP_LAST(1)
+
+========== C++ Image Throughput ==========
+topic                : /camera/image_raw
+warmup images        : 50
+measured images      : 1600
+valid images         : 1600
+invalid images       : 0
+callback span        : 119.947 s
+receive rate         : 13.331 Hz
+fixed-window rate    : 13.333 Hz
+QoS                   : BEST_EFFORT / KEEP_LAST(1)
+result                : PASS
+==========================================
+[CLEANUP] stopping ROS2 adapter
+
+========== Stage 13 Summary ==========
+produced frames          : 3000
+consumed frames          : 3000
+tcp sent frames          : 3000
+invalid frames           : 0
+producer FPS             : 13.897
+C++ subscriber rate      : 13.331 Hz
+C++ / producer ratio     : 95.9%
+ROS2 received frames     : 3000
+ROS2 published images    : 3000
+camera CPU mean/max      : 0.0% / 0.0%
+camera RSS mean/max      : 0 / 0 KiB
+adapter CPU mean/max     : 0.0% / 0.0%
+adapter RSS mean/max     : 0 / 0 KiB
+performance assessment  : TARGET MET
+[PASS] pipeline and ROS2 invariants satisfied
+======================================
+
+[PASS] stage13b_mono8 completed

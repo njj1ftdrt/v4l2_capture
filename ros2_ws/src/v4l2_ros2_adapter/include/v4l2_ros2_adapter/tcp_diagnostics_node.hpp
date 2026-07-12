@@ -81,6 +81,8 @@ private:
     const std::string camera_info_topic_;
     const std::string camera_frame_id_;
     const std::string output_encoding_;
+    const std::string image_qos_reliability_;
+    const std::int64_t image_qos_depth_;
 
     const double camera_fx_;
     const double camera_fy_;

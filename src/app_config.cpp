@@ -121,6 +121,10 @@ void apply_key_value(AppConfig& config, const std::string& key, const std::strin
         config.tcp_port = parse_non_negative_int(value, key, 65535);
     } else if (key == "tcp_queue_capacity") {
         config.tcp_queue_capacity = parse_positive_int(value, key);
+    } else if (key == "tcp_connect_max_attempts") {
+        config.tcp_connect_max_attempts = parse_positive_int(value, key, 1000);
+    } else if (key == "tcp_connect_retry_delay_ms") {
+        config.tcp_connect_retry_delay_ms = parse_non_negative_int(value, key, 60000);
     } else if (key == "timeout_ms") {
         config.timeout_ms = parse_positive_int(value, key);
     } else if (key == "log_level") {
@@ -239,6 +243,10 @@ void apply_cli_args(AppConfig& config, int argc, char* argv[]) {
             config.tcp_port = parse_positive_int(argv[++i], arg, 65535);
         } else if (arg == "--tcp-queue-capacity" && i + 1 < argc) {
             config.tcp_queue_capacity = parse_positive_int(argv[++i], arg);
+        } else if (arg == "--tcp-connect-max-attempts" && i + 1 < argc) {
+            config.tcp_connect_max_attempts = parse_positive_int(argv[++i], arg, 1000);
+        } else if (arg == "--tcp-connect-retry-delay-ms" && i + 1 < argc) {
+            config.tcp_connect_retry_delay_ms = parse_non_negative_int(argv[++i], arg, 60000);
         } else if (arg == "--timeout-ms" && i + 1 < argc) {
             config.timeout_ms = parse_positive_int(argv[++i], arg);
         } else if (arg == "--log-level" && i + 1 < argc) {
@@ -335,6 +343,14 @@ void validate_app_config(const AppConfig& config) {
         throw std::runtime_error("ring capacities must be positive");
     }
 
+    if (config.tcp_connect_max_attempts <= 0) {
+        throw std::runtime_error("tcp_connect_max_attempts must be positive");
+    }
+
+    if (config.tcp_connect_retry_delay_ms < 0) {
+        throw std::runtime_error("tcp_connect_retry_delay_ms must be non-negative");
+    }
+
     const std::set<std::string> allowed_log_levels{"DEBUG", "INFO", "WARN", "ERROR"};
     if (allowed_log_levels.count(config.log_level) == 0) {
         throw std::runtime_error("log_level must be one of DEBUG, INFO, WARN, ERROR");
@@ -356,6 +372,8 @@ void print_app_config(const AppConfig& config) {
     log_info("CONFIG", "pipeline frames    : ", config.pipeline_frames);
     log_info("CONFIG", "ring capacity      : ", config.ring_capacity);
     log_info("CONFIG", "tcp queue capacity : ", config.tcp_queue_capacity);
+    log_info("CONFIG", "tcp connect attempts: ", config.tcp_connect_max_attempts);
+    log_info("CONFIG", "tcp retry delay ms  : ", config.tcp_connect_retry_delay_ms);
     log_info("CONFIG", "consumer delay ms  : ", config.consumer_delay_ms);
     log_info("CONFIG", "pipeline save      : ", (config.pipeline_save ? "yes" : "no"));
     log_info("CONFIG", "save limit         : ", config.save_limit);

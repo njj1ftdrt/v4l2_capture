@@ -25,6 +25,8 @@ struct AppConfig {
     std::optional<std::string> tcp_host;
     int tcp_port = 0;
     int tcp_queue_capacity = 8;
+    int tcp_connect_max_attempts = 5;
+    int tcp_connect_retry_delay_ms = 500;
 
     std::optional<__u32> width;
     std::optional<__u32> height;

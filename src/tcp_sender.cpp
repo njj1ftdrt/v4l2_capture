@@ -36,6 +36,19 @@ int parse_int_arg(const char* text, const std::string& name) {
     }
 }
 
+int parse_non_negative_int_arg(const char* text, const std::string& name) {
+    try {
+        size_t pos = 0;
+        const long value = std::stol(text, &pos, 10);
+        if (pos != std::strlen(text) || value < 0 || value > 1000000) {
+            throw std::runtime_error("out of range");
+        }
+        return static_cast<int>(value);
+    } catch (...) {
+        throw std::invalid_argument("Invalid integer for " + name + ": " + text);
+    }
+}
+
 std::uint64_t now_ns() {
     const auto now = std::chrono::system_clock::now().time_since_epoch();
     return static_cast<std::uint64_t>(
@@ -153,6 +166,54 @@ int connect_to_server(const std::string& host, int port) {
     return fd;
 }
 
+int connect_to_server_with_retry(
+    const std::string& host,
+    int port,
+    int max_attempts,
+    int retry_delay_ms,
+    int& attempts_used,
+    int& retries_used
+) {
+    std::string last_error;
+    attempts_used = 0;
+    retries_used = 0;
+
+    for (int attempt = 1; attempt <= max_attempts; ++attempt) {
+        attempts_used = attempt;
+
+        try {
+            const int fd = connect_to_server(host, port);
+            std::cout << "[INFO] connected attempt=" << attempt
+                      << "/" << max_attempts << "\n";
+            return fd;
+        } catch (const std::exception& e) {
+            last_error = e.what();
+
+            if (attempt >= max_attempts) {
+                break;
+            }
+
+            ++retries_used;
+            std::cout << "[WARN] connect attempt " << attempt
+                      << "/" << max_attempts
+                      << " failed: " << last_error
+                      << "; retrying in " << retry_delay_ms << " ms\n";
+
+            if (retry_delay_ms > 0) {
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(retry_delay_ms)
+                );
+            }
+        }
+    }
+
+    throw std::runtime_error(
+        "connect to " + host + ":" + std::to_string(port) +
+        " failed after " + std::to_string(max_attempts) +
+        " attempt(s): " + last_error
+    );
+}
+
 void apply_header_fault(
     frame_protocol::FrameHeader& header,
     const std::string& fault
@@ -184,9 +245,13 @@ void apply_header_fault(
 void print_usage(const char* program) {
     std::cout << "Usage:\n"
               << "  " << program
-              << " --host 127.0.0.1 --port 9000 --frames 3 --width 640 --height 360 --format YUYV [--corrupt-frame-id 2]\n"
+              << " --host 127.0.0.1 --port 9000 --frames 3 --width 640 --height 360 --format YUYV [--connect-max-attempts 5] [--connect-retry-delay-ms 500] [--corrupt-frame-id 2]\n"
               << "  " << program
               << " --host 127.0.0.1 --port 9000 --frames 1 --header-fault bad-magic\n"
+              << "\n"
+              << "Connection options:\n"
+              << "  --connect-max-attempts N     Total connection attempts, including the first attempt.\n"
+              << "  --connect-retry-delay-ms N   Delay between failed attempts.\n"
               << "\n"
               << "Test-only options:\n"
               << "  --corrupt-frame-id N  Calculate the CRC first, then flip one payload byte for frame N.\n"
@@ -204,6 +269,8 @@ int main(int argc, char** argv) {
         int height = 360;
         std::string format_text = "YUYV";
         int interval_ms = 33;
+        int connect_max_attempts = 1;
+        int connect_retry_delay_ms = 500;
         int corrupt_frame_id = -1;
         std::string header_fault;
 
@@ -227,6 +294,10 @@ int main(int argc, char** argv) {
                 format_text = argv[++i];
             } else if (arg == "--interval-ms" && i + 1 < argc) {
                 interval_ms = parse_int_arg(argv[++i], arg);
+            } else if (arg == "--connect-max-attempts" && i + 1 < argc) {
+                connect_max_attempts = parse_int_arg(argv[++i], arg);
+            } else if (arg == "--connect-retry-delay-ms" && i + 1 < argc) {
+                connect_retry_delay_ms = parse_non_negative_int_arg(argv[++i], arg);
             } else if (arg == "--corrupt-frame-id" && i + 1 < argc) {
                 corrupt_frame_id = parse_int_arg(argv[++i], arg);
             } else if (arg == "--header-fault" && i + 1 < argc) {
@@ -249,8 +320,16 @@ int main(int argc, char** argv) {
                   << " format=" << format_text
                   << " frames=" << frames << "\n";
 
-        const int fd = connect_to_server(host, port);
-        std::cout << "[INFO] connected\n";
+        int connect_attempts = 0;
+        int connect_retries = 0;
+        const int fd = connect_to_server_with_retry(
+            host,
+            port,
+            connect_max_attempts,
+            connect_retry_delay_ms,
+            connect_attempts,
+            connect_retries
+        );
 
         std::uint64_t sent_bytes = 0;
 
@@ -318,7 +397,9 @@ int main(int argc, char** argv) {
         } else {
             std::cout << "sent malformed headers : 1\n";
         }
-        std::cout << "sent bytes  : " << sent_bytes << "\n";
+        std::cout << "sent bytes       : " << sent_bytes << "\n";
+        std::cout << "connect attempts : " << connect_attempts << "\n";
+        std::cout << "connect retries  : " << connect_retries << "\n";
         std::cout << "===========================================" << "\n";
         return 0;
     } catch (const std::exception& e) {

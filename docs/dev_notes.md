@@ -249,3 +249,18 @@ DQBUF returns
 The sender also uses `steady_clock` locally for capture-to-consumer and capture-to-send timing. Receiver end-to-end timing uses the transmitted system-clock timestamp so that separate processes can compare timestamps. Cross-device use requires clock synchronization.
 
 Percentiles use linear interpolation over sorted samples. `jitter_us` is the population standard deviation of the latency samples.
+
+## ROS 2 Adapter Boundary
+
+The ROS 2 integration is implemented as a separate `ament_cmake` package instead of adding ROS 2 dependencies to the original core executable:
+
+```text
+v4l2_capture core TCP sender
+  → protocol v3 Header + Payload + CRC32
+  → v4l2_ros2_adapter TCP receiver
+  → diagnostic_msgs/DiagnosticArray
+```
+
+Stage 12A publishes `/camera_link/diagnostics` and reuses the core protocol and latency headers during compilation. The ROS node runs socket reception on a worker thread while the ROS executor remains available for periodic diagnostics publication and shutdown handling.
+
+A malformed header terminates only its current TCP session. This preserves the rule that an untrusted payload length is never allocated or consumed. A CRC mismatch can be rejected without closing the session because the complete payload has already been read and stream alignment is known.

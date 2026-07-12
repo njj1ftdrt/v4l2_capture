@@ -1,0 +1,11 @@
+[INFO] [launch]: All log files can be found below /home/gfc/.ros/log/2026-07-12-10-24-53-499538-gfc-pc-10952
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [v4l2_diagnostics_node-1]: process started with pid [10956]
+[v4l2_diagnostics_node-1] [INFO] [1783823093.638339897] [v4l2_diagnostics_node]: starting protocol v3 diagnostics receiver on 0.0.0.0:9800, topic=/camera_link/diagnostics
+[v4l2_diagnostics_node-1] [INFO] [1783823095.141907960] [v4l2_diagnostics_node]: accepted TCP frame session 1 from 127.0.0.1:48008
+[v4l2_diagnostics_node-1] [INFO] [1783823096.767060115] [v4l2_diagnostics_node]: peer closed session 1
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[ERROR] [v4l2_diagnostics_node-1]: process[v4l2_diagnostics_node-1] failed to terminate '5' seconds after receiving 'SIGINT', escalating to 'SIGTERM'
+[INFO] [v4l2_diagnostics_node-1]: sending signal 'SIGTERM' to process[v4l2_diagnostics_node-1]
+[v4l2_diagnostics_node-1] [INFO] [1783823104.836129484] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [v4l2_diagnostics_node-1]: process has finished cleanly [pid 10956]

@@ -1,0 +1,10 @@
+v4l2_diagnostics_node:
+  ros__parameters:
+    listen_address: "0.0.0.0"
+    listen_port: 9800
+    max_payload_bytes: 16777216
+    publish_period_ms: 1000
+    socket_poll_timeout_ms: 200
+    max_frames: 0
+    max_sessions: 0
+    diagnostic_topic: "/camera_link/diagnostics"

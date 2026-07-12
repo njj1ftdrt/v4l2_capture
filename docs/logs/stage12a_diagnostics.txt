@@ -1,0 +1,70 @@
+header:
+  stamp:
+    sec: 1783823099
+    nanosec: 639149630
+  frame_id: ''
+status:
+- level: "\0"
+  name: v4l2_capture/camera_link
+  message: waiting for the next TCP frame sender
+  hardware_id: tcp://0.0.0.0:9800
+  values:
+  - key: protocol_version
+    value: '3'
+  - key: connection_state
+    value: listening
+  - key: connected
+    value: 'false'
+  - key: listen_address
+    value: 0.0.0.0
+  - key: listen_port
+    value: '9800'
+  - key: receive_fps
+    value: '0.000'
+  - key: received_frames
+    value: '30'
+  - key: received_bytes
+    value: '13824000'
+  - key: accepted_sessions
+    value: '1'
+  - key: completed_sessions
+    value: '1'
+  - key: peer_disconnects
+    value: '1'
+  - key: header_errors
+    value: '0'
+  - key: crc_errors
+    value: '0'
+  - key: rejected_frames
+    value: '0'
+  - key: latency_clock_errors
+    value: '0'
+  - key: e2e_latency_samples
+    value: '30'
+  - key: e2e_latency_mean_us
+    value: '19676.859'
+  - key: e2e_latency_p50_us
+    value: '19661.794'
+  - key: e2e_latency_p95_us
+    value: '20379.427'
+  - key: e2e_latency_p99_us
+    value: '20625.973'
+  - key: e2e_latency_max_us
+    value: '20698.620'
+  - key: e2e_latency_jitter_us
+    value: '444.240'
+  - key: last_frame_id
+    value: '29'
+  - key: last_width
+    value: '640'
+  - key: last_height
+    value: '360'
+  - key: last_pixel_format
+    value: YUYV
+  - key: last_capture_timestamp_ns
+    value: '1783823096747079886'
+  - key: last_receive_timestamp_ns
+    value: '1783823096767039946'
+  - key: last_error
+    value: ''
+---

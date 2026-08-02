@@ -1,0 +1,17 @@
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+
+set(AARCH64_TOOLCHAIN_PREFIX "aarch64-linux-gnu" CACHE STRING
+    "GNU cross-toolchain prefix for AArch64 Linux")
+
+set(CMAKE_C_COMPILER "${AARCH64_TOOLCHAIN_PREFIX}-gcc")
+set(CMAKE_CXX_COMPILER "${AARCH64_TOOLCHAIN_PREFIX}-g++")
+
+# The Debian/Ubuntu cross compiler carries its own sysroot search paths.
+# A custom sysroot can still be supplied with -DCMAKE_SYSROOT=/path/to/sysroot.
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)

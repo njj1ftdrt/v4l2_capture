@@ -159,6 +159,8 @@ int main(int argc, char** argv) {
     int client_fd = -1;
 
     try {
+        frame_protocol::require_supported_host_layout();
+
         int port = 9000;
         std::string output_dir = "output/tcp_recv";
         int max_frames = 0;

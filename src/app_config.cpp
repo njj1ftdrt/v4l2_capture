@@ -125,8 +125,24 @@ void apply_key_value(AppConfig& config, const std::string& key, const std::strin
         config.tcp_connect_max_attempts = parse_positive_int(value, key, 1000);
     } else if (key == "tcp_connect_retry_delay_ms") {
         config.tcp_connect_retry_delay_ms = parse_non_negative_int(value, key, 60000);
+    } else if (key == "tcp_send_timeout_ms") {
+        config.tcp_send_timeout_ms = parse_positive_int(value, key, 600000);
     } else if (key == "timeout_ms") {
         config.timeout_ms = parse_positive_int(value, key);
+    } else if (key == "camera_recovery_enabled") {
+        config.camera_recovery_enabled = parse_bool(value, key);
+    } else if (key == "camera_timeout_recovery_threshold") {
+        config.camera_timeout_recovery_threshold = parse_positive_int(value, key, 1000);
+    } else if (key == "camera_invalid_frame_recovery_threshold") {
+        config.camera_invalid_frame_recovery_threshold = parse_positive_int(value, key, 1000);
+    } else if (key == "camera_invalid_frame_recovery_cooldown_frames") {
+        config.camera_invalid_frame_recovery_cooldown_frames = parse_non_negative_int(value, key, 1000000);
+    } else if (key == "camera_invalid_frame_recovery_max_count") {
+        config.camera_invalid_frame_recovery_max_count = parse_positive_int(value, key, 1000);
+    } else if (key == "camera_recovery_max_attempts") {
+        config.camera_recovery_max_attempts = parse_positive_int(value, key, 1000);
+    } else if (key == "camera_recovery_retry_delay_ms") {
+        config.camera_recovery_retry_delay_ms = parse_non_negative_int(value, key, 600000);
     } else if (key == "log_level") {
         config.log_level = value;
     } else {
@@ -247,8 +263,26 @@ void apply_cli_args(AppConfig& config, int argc, char* argv[]) {
             config.tcp_connect_max_attempts = parse_positive_int(argv[++i], arg, 1000);
         } else if (arg == "--tcp-connect-retry-delay-ms" && i + 1 < argc) {
             config.tcp_connect_retry_delay_ms = parse_non_negative_int(argv[++i], arg, 60000);
+        } else if (arg == "--tcp-send-timeout-ms" && i + 1 < argc) {
+            config.tcp_send_timeout_ms = parse_positive_int(argv[++i], arg, 600000);
         } else if (arg == "--timeout-ms" && i + 1 < argc) {
             config.timeout_ms = parse_positive_int(argv[++i], arg);
+        } else if (arg == "--camera-recovery") {
+            config.camera_recovery_enabled = true;
+        } else if (arg == "--no-camera-recovery") {
+            config.camera_recovery_enabled = false;
+        } else if (arg == "--camera-timeout-recovery-threshold" && i + 1 < argc) {
+            config.camera_timeout_recovery_threshold = parse_positive_int(argv[++i], arg, 1000);
+        } else if (arg == "--camera-invalid-frame-recovery-threshold" && i + 1 < argc) {
+            config.camera_invalid_frame_recovery_threshold = parse_positive_int(argv[++i], arg, 1000);
+        } else if (arg == "--camera-invalid-frame-recovery-cooldown-frames" && i + 1 < argc) {
+            config.camera_invalid_frame_recovery_cooldown_frames = parse_non_negative_int(argv[++i], arg, 1000000);
+        } else if (arg == "--camera-invalid-frame-recovery-max-count" && i + 1 < argc) {
+            config.camera_invalid_frame_recovery_max_count = parse_positive_int(argv[++i], arg, 1000);
+        } else if (arg == "--camera-recovery-max-attempts" && i + 1 < argc) {
+            config.camera_recovery_max_attempts = parse_positive_int(argv[++i], arg, 1000);
+        } else if (arg == "--camera-recovery-retry-delay-ms" && i + 1 < argc) {
+            config.camera_recovery_retry_delay_ms = parse_non_negative_int(argv[++i], arg, 600000);
         } else if (arg == "--log-level" && i + 1 < argc) {
             config.log_level = argv[++i];
         } else if (arg == "--help" || arg == "-h") {
@@ -351,6 +385,34 @@ void validate_app_config(const AppConfig& config) {
         throw std::runtime_error("tcp_connect_retry_delay_ms must be non-negative");
     }
 
+    if (config.tcp_send_timeout_ms <= 0) {
+        throw std::runtime_error("tcp_send_timeout_ms must be positive");
+    }
+
+    if (config.camera_timeout_recovery_threshold <= 0) {
+        throw std::runtime_error("camera_timeout_recovery_threshold must be positive");
+    }
+
+    if (config.camera_invalid_frame_recovery_threshold <= 0) {
+        throw std::runtime_error("camera_invalid_frame_recovery_threshold must be positive");
+    }
+
+    if (config.camera_invalid_frame_recovery_cooldown_frames < 0) {
+        throw std::runtime_error("camera_invalid_frame_recovery_cooldown_frames must be non-negative");
+    }
+
+    if (config.camera_invalid_frame_recovery_max_count <= 0) {
+        throw std::runtime_error("camera_invalid_frame_recovery_max_count must be positive");
+    }
+
+    if (config.camera_recovery_max_attempts <= 0) {
+        throw std::runtime_error("camera_recovery_max_attempts must be positive");
+    }
+
+    if (config.camera_recovery_retry_delay_ms < 0) {
+        throw std::runtime_error("camera_recovery_retry_delay_ms must be non-negative");
+    }
+
     const std::set<std::string> allowed_log_levels{"DEBUG", "INFO", "WARN", "ERROR"};
     if (allowed_log_levels.count(config.log_level) == 0) {
         throw std::runtime_error("log_level must be one of DEBUG, INFO, WARN, ERROR");
@@ -374,6 +436,14 @@ void print_app_config(const AppConfig& config) {
     log_info("CONFIG", "tcp queue capacity : ", config.tcp_queue_capacity);
     log_info("CONFIG", "tcp connect attempts: ", config.tcp_connect_max_attempts);
     log_info("CONFIG", "tcp retry delay ms  : ", config.tcp_connect_retry_delay_ms);
+    log_info("CONFIG", "tcp send timeout ms : ", config.tcp_send_timeout_ms);
+    log_info("CONFIG", "camera recovery    : ", (config.camera_recovery_enabled ? "enabled" : "disabled"));
+    log_info("CONFIG", "camera timeout threshold: ", config.camera_timeout_recovery_threshold);
+    log_info("CONFIG", "camera invalid threshold: ", config.camera_invalid_frame_recovery_threshold);
+    log_info("CONFIG", "camera invalid cooldown frames: ", config.camera_invalid_frame_recovery_cooldown_frames);
+    log_info("CONFIG", "camera invalid recovery budget: ", config.camera_invalid_frame_recovery_max_count);
+    log_info("CONFIG", "camera recovery attempts: ", config.camera_recovery_max_attempts);
+    log_info("CONFIG", "camera recovery delay ms: ", config.camera_recovery_retry_delay_ms);
     log_info("CONFIG", "consumer delay ms  : ", config.consumer_delay_ms);
     log_info("CONFIG", "pipeline save      : ", (config.pipeline_save ? "yes" : "no"));
     log_info("CONFIG", "save limit         : ", config.save_limit);

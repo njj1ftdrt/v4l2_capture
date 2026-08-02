@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <stdexcept>
 #include <string>
 
 namespace frame_protocol {
@@ -30,6 +31,19 @@ struct FrameHeader {
 #pragma pack(pop)
 
 static_assert(sizeof(FrameHeader) == 44, "Unexpected FrameHeader size");
+
+inline bool is_little_endian_host() noexcept {
+    const std::uint16_t value = 0x1u;
+    return *reinterpret_cast<const std::uint8_t*>(&value) == 0x1u;
+}
+
+inline void require_supported_host_layout() {
+    if (!is_little_endian_host()) {
+        throw std::runtime_error(
+            "FrameHeader v3 currently requires a little-endian host"
+        );
+    }
+}
 
 inline std::uint32_t compute_crc32(const void* data, std::size_t size) {
     const auto* bytes = static_cast<const std::uint8_t*>(data);

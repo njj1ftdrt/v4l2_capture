@@ -1,11 +1,13 @@
 #include "app_config.hpp"
 #include "camera_device.hpp"
+#include "capture_recovery.hpp"
 #include "frame.hpp"
 #include "frame_protocol.hpp"
 #include "logger.hpp"
 #include "pipeline_stats.hpp"
 #include "stats_json.hpp"
 #include "ring_buffer.hpp"
+#include "tcp_send.hpp"
 
 #include <linux/videodev2.h>
 
@@ -13,6 +15,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <cerrno>
@@ -142,41 +145,12 @@ static int connect_to_tcp_receiver_with_retry(
     );
 }
 
-static void send_all_tcp(int fd, const void* data, std::size_t size) {
-    const auto* ptr = static_cast<const std::uint8_t*>(data);
-    std::size_t sent = 0;
-
-    while (sent < size) {
-        const ssize_t n = send(
-            fd,
-            ptr + sent,
-            size - sent,
-#ifdef MSG_NOSIGNAL
-            MSG_NOSIGNAL
-#else
-            0
-#endif
-        );
-
-        if (n < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
-
-            throw std::runtime_error(
-                std::string("send failed: ") + std::strerror(errno)
-            );
-        }
-
-        if (n == 0) {
-            throw std::runtime_error("send returned 0, peer may have closed connection");
-        }
-
-        sent += static_cast<std::size_t>(n);
-    }
-}
-
-static std::uint64_t send_frame_over_tcp(int fd, const Frame& frame) {
+static std::uint64_t send_frame_over_tcp(
+    int fd,
+    const Frame& frame,
+    int send_timeout_ms,
+    const std::atomic<bool>& stop_requested
+) {
     if (frame.data.size() > std::numeric_limits<std::uint32_t>::max()) {
         throw std::runtime_error("Frame payload is too large for FrameHeader payload_size");
     }
@@ -200,8 +174,23 @@ static std::uint64_t send_frame_over_tcp(int fd, const Frame& frame) {
         payload_crc32
     );
 
-    send_all_tcp(fd, &header, sizeof(header));
-    send_all_tcp(fd, frame.data.data(), frame.data.size());
+    const auto deadline = tcp_io::SendClock::now() +
+        std::chrono::milliseconds(send_timeout_ms);
+
+    tcp_io::send_all_until(
+        fd,
+        &header,
+        sizeof(header),
+        deadline,
+        &stop_requested
+    );
+    tcp_io::send_all_until(
+        fd,
+        frame.data.data(),
+        frame.data.size(),
+        deadline,
+        &stop_requested
+    );
 
     return static_cast<std::uint64_t>(sizeof(header)) + frame.data.size();
 }
@@ -285,7 +274,21 @@ static std::size_t expected_frame_size_bytes(const Frame& frame) {
     return 0;
 }
 
+static bool has_v4l2_buffer_error(const Frame& frame) noexcept {
+    return (frame.v4l2_flags & V4L2_BUF_FLAG_ERROR) != 0;
+}
+
+static bool is_incomplete_yuyv_frame(const Frame& frame) noexcept {
+    return frame.pixel_format == V4L2_PIX_FMT_YUYV &&
+           frame.data.size() < expected_frame_size_bytes(frame);
+}
+
 static bool is_frame_usable(const Frame& frame, std::string& reason) {
+    if (has_v4l2_buffer_error(frame)) {
+        reason = "V4L2 buffer marked with V4L2_BUF_FLAG_ERROR";
+        return false;
+    }
+
     if (frame.data.empty()) {
         reason = "empty frame data";
         return false;
@@ -296,15 +299,13 @@ static bool is_frame_usable(const Frame& frame, std::string& reason) {
         return false;
     }
 
-    if (frame.pixel_format == V4L2_PIX_FMT_YUYV) {
+    if (is_incomplete_yuyv_frame(frame)) {
         const std::size_t expected = expected_frame_size_bytes(frame);
-        if (frame.data.size() < expected) {
-            reason = "incomplete YUYV frame: got=" +
-                     std::to_string(frame.data.size()) +
-                     ", expected=" +
-                     std::to_string(expected);
-            return false;
-        }
+        reason = "incomplete YUYV frame: got=" +
+                 std::to_string(frame.data.size()) +
+                 ", expected=" +
+                 std::to_string(expected);
+        return false;
     }
 
     return true;
@@ -411,6 +412,43 @@ static void prepare_output_directory(const std::string& output_dir) {
     std::filesystem::remove(probe_path, ec);
 }
 
+static void initialize_pipeline_camera(
+    CameraDevice& camera,
+    const AppConfig& config
+) {
+    if (!config.width.has_value() ||
+        !config.height.has_value() ||
+        !config.pixel_format.has_value() ||
+        !config.mmap_buffers.has_value()) {
+        throw std::runtime_error(
+            "Pipeline camera initialization requires width, height, format and mmap_buffers"
+        );
+    }
+
+    camera.open_device();
+    camera.query_capability();
+    camera.set_format(*config.width, *config.height, *config.pixel_format);
+    camera.init_mmap_buffers(*config.mmap_buffers);
+    camera.start_streaming();
+}
+
+static bool sleep_interruptibly(
+    int total_delay_ms,
+    const std::atomic<bool>& stop_requested
+) {
+    constexpr int kSliceMs = 50;
+    int remaining_ms = total_delay_ms;
+    while (remaining_ms > 0) {
+        if (stop_requested.load()) {
+            return false;
+        }
+        const int slice_ms = std::min(remaining_ms, kSliceMs);
+        std::this_thread::sleep_for(std::chrono::milliseconds(slice_ms));
+        remaining_ms -= slice_ms;
+    }
+    return !stop_requested.load();
+}
+
 static void run_pipeline(
     CameraDevice& camera,
     int frame_count,
@@ -425,7 +463,9 @@ static void run_pipeline(
     int tcp_queue_capacity,
     int tcp_connect_max_attempts,
     int tcp_connect_retry_delay_ms,
-    const std::string& stats_output
+    int tcp_send_timeout_ms,
+    const std::string& stats_output,
+    const AppConfig& camera_config
 ) {
     if (frame_count <= 0) {
         throw std::runtime_error("Pipeline frame count must be positive");
@@ -445,6 +485,19 @@ static void run_pipeline(
 
     if (tcp_connect_retry_delay_ms < 0) {
         throw std::runtime_error("TCP connect retry delay must be non-negative");
+    }
+
+    if (tcp_send_timeout_ms <= 0) {
+        throw std::runtime_error("TCP send timeout must be positive");
+    }
+
+    if (camera_config.camera_timeout_recovery_threshold <= 0 ||
+        camera_config.camera_invalid_frame_recovery_threshold <= 0 ||
+        camera_config.camera_invalid_frame_recovery_cooldown_frames < 0 ||
+        camera_config.camera_invalid_frame_recovery_max_count <= 0 ||
+        camera_config.camera_recovery_max_attempts <= 0 ||
+        camera_config.camera_recovery_retry_delay_ms < 0) {
+        throw std::runtime_error("Invalid camera recovery configuration");
     }
 
     const bool tcp_enabled = tcp_host.has_value() && tcp_port > 0;
@@ -475,12 +528,27 @@ static void run_pipeline(
     log_info("PIPELINE", "save limit         : ", save_limit);
     log_info("PIPELINE", "output dir         : ", output_dir);
     log_info("PIPELINE", "stats output       : ", stats_output);
+    log_info("PIPELINE", "camera recovery    : ",
+             (camera_config.camera_recovery_enabled ? "enabled" : "disabled"));
+    log_info("PIPELINE", "camera timeout threshold: ",
+             camera_config.camera_timeout_recovery_threshold);
+    log_info("PIPELINE", "camera invalid threshold: ",
+             camera_config.camera_invalid_frame_recovery_threshold);
+    log_info("PIPELINE", "camera invalid cooldown frames: ",
+             camera_config.camera_invalid_frame_recovery_cooldown_frames);
+    log_info("PIPELINE", "camera invalid recovery budget: ",
+             camera_config.camera_invalid_frame_recovery_max_count);
+    log_info("PIPELINE", "camera recovery attempts: ",
+             camera_config.camera_recovery_max_attempts);
+    log_info("PIPELINE", "camera recovery delay ms: ",
+             camera_config.camera_recovery_retry_delay_ms);
     log_info("PIPELINE", "tcp send           : ", (tcp_enabled ? "yes" : "no"));
     if (tcp_enabled) {
         log_info("PIPELINE", "tcp target         : ", *tcp_host, ":", tcp_port);
         log_info("PIPELINE", "tcp queue capacity : ", tcp_queue_capacity);
         log_info("PIPELINE", "tcp connect attempts: ", tcp_connect_max_attempts);
         log_info("PIPELINE", "tcp retry delay ms  : ", tcp_connect_retry_delay_ms);
+        log_info("PIPELINE", "tcp send timeout ms : ", tcp_send_timeout_ms);
     }
 
     int connected_tcp_fd = -1;
@@ -518,7 +586,12 @@ static void run_pipeline(
 
                     if (tcp_ring.try_pop_oldest(frame)) {
                         try {
-                            const std::uint64_t bytes = send_frame_over_tcp(tcp_fd, frame);
+                            const std::uint64_t bytes = send_frame_over_tcp(
+                                tcp_fd,
+                                frame,
+                                tcp_send_timeout_ms,
+                                stop_requested
+                            );
                             stats.capture_to_send_latency.add_sample_us(
                                 elapsed_microseconds(
                                     frame.host_receive_time,
@@ -533,6 +606,28 @@ static void run_pipeline(
                                          " frame_id=", frame.sequence,
                                          " bytes=", bytes);
                             }
+                        } catch (const tcp_io::SendTimeout& e) {
+                            ++stats.tcp_send_errors;
+                            ++stats.tcp_send_timeouts;
+                            stats.set_last_error("send frame_id=" +
+                                                 std::to_string(frame.sequence) +
+                                                 " timed out after tcp_sent_frames=" +
+                                                 std::to_string(stats.tcp_sent.load()) +
+                                                 ": " + e.what());
+                            log_error("TCP", stats.last_error());
+                            stop_requested = true;
+                            cv.notify_all();
+                            tcp_cv.notify_all();
+                            break;
+                        } catch (const tcp_io::SendCancelled& e) {
+                            ++stats.tcp_send_cancellations;
+                            stats.set_last_error("send frame_id=" +
+                                                 std::to_string(frame.sequence) +
+                                                 " cancelled after tcp_sent_frames=" +
+                                                 std::to_string(stats.tcp_sent.load()) +
+                                                 ": " + e.what());
+                            log_warn("TCP", stats.last_error());
+                            break;
                         } catch (const std::exception& e) {
                             ++stats.tcp_send_errors;
                             stats.set_last_error("send frame_id=" +
@@ -589,6 +684,9 @@ static void run_pipeline(
                         if (invalid_count <= 5 || invalid_count % 50 == 0) {
                             log_warn("PIPELINE", "skip invalid frame",
                                  " sequence=", frame.sequence,
+                                 " buffer_index=", frame.buffer_index,
+                                 " flags=", frame.v4l2_flags,
+                                 " buffer_error=", (has_v4l2_buffer_error(frame) ? "yes" : "no"),
                                  " bytesused=", frame.bytesused,
                                  " data_size=", frame.data.size(),
                                  " reason=", invalid_reason);
@@ -648,21 +746,198 @@ static void run_pipeline(
 
     std::thread producer_thread([&]() {
         try {
-            for (int i = 0; i < frame_count && !stop_requested.load(); ++i) {
-                Frame frame = camera.capture_frame_copy(timeout_ms);
-                ring.push(std::move(frame));
+            CaptureRecoveryController recovery_controller(
+                camera_config.camera_timeout_recovery_threshold,
+                camera_config.camera_recovery_max_attempts
+            );
+            InvalidFrameRecoveryController invalid_frame_controller(
+                camera_config.camera_invalid_frame_recovery_threshold,
+                camera_config.camera_invalid_frame_recovery_cooldown_frames,
+                camera_config.camera_invalid_frame_recovery_max_count
+            );
 
-                const int count = static_cast<int>(++stats.captured);
-                if (count == 1 || count == frame_count || count % 50 == 0) {
-                    log_debug("PRODUCER", "produced ", count, "/", frame_count,
-                              " ring_size=", ring.size(),
-                              " dropped=", ring.dropped_count());
+            auto rebuild_camera = [&](const std::string& reason,
+                                      bool invalid_frame_trigger) {
+                bool recovered = false;
+                while (!stop_requested.load() &&
+                       recovery_controller.begin_recovery_attempt()) {
+                    const std::uint64_t attempt = ++stats.camera_recovery_attempts;
+                    log_warn(
+                        "CAMERA_RECOVERY",
+                        "reason=", reason,
+                        " attempt=", attempt,
+                        " incident_attempt=", recovery_controller.recovery_attempts(),
+                        "/", recovery_controller.max_recovery_attempts(),
+                        " delay_ms=", camera_config.camera_recovery_retry_delay_ms
+                    );
+
+                    if (!sleep_interruptibly(
+                            camera_config.camera_recovery_retry_delay_ms,
+                            stop_requested)) {
+                        break;
+                    }
+
+                    try {
+                        camera = CameraDevice(camera_config.device);
+                        initialize_pipeline_camera(camera, camera_config);
+                        ++stats.camera_recovery_successes;
+                        ++stats.reconnect_count;
+                        recovery_controller.on_recovery_success();
+                        if (invalid_frame_trigger) {
+                            invalid_frame_controller.on_invalid_frame_recovery_success();
+                        } else {
+                            invalid_frame_controller.on_external_recovery_success();
+                        }
+                        stats.set_last_error("");
+                        log_info(
+                            "CAMERA_RECOVERY",
+                            "stream rebuilt successfully; reason=", reason,
+                            " produced_frames=", stats.captured.load()
+                        );
+                        recovered = true;
+                        break;
+                    } catch (const std::exception& recovery_error) {
+                        ++stats.camera_recovery_failures;
+                        stats.set_last_error(
+                            "camera recovery attempt " +
+                            std::to_string(recovery_controller.recovery_attempts()) +
+                            " failed: " + recovery_error.what()
+                        );
+                        log_error("CAMERA_RECOVERY", stats.last_error());
+                    }
                 }
+                return recovered;
+            };
 
-                cv.notify_one();
+            int produced = 0;
+            while (produced < frame_count && !stop_requested.load()) {
+                try {
+                    Frame frame = camera.capture_frame_copy(timeout_ms);
+                    recovery_controller.on_capture_success();
+
+                    std::string validation_reason;
+                    const bool frame_valid = is_frame_usable(frame, validation_reason);
+                    if (has_v4l2_buffer_error(frame)) {
+                        ++stats.camera_buffer_error_frames;
+                    }
+                    if (is_incomplete_yuyv_frame(frame)) {
+                        ++stats.camera_incomplete_frames;
+                    }
+
+                    const InvalidFrameDecision invalid_decision =
+                        invalid_frame_controller.observe(frame_valid);
+                    const std::uint64_t invalid_peak = static_cast<std::uint64_t>(
+                        invalid_frame_controller.peak_invalid()
+                    );
+                    if (invalid_peak > stats.camera_consecutive_invalid_peak.load()) {
+                        stats.camera_consecutive_invalid_peak.store(invalid_peak);
+                    }
+
+                    ring.push(std::move(frame));
+
+                    ++produced;
+                    const int count = static_cast<int>(++stats.captured);
+                    if (count == 1 || count == frame_count || count % 50 == 0) {
+                        log_debug("PRODUCER", "produced ", count, "/", frame_count,
+                                  " ring_size=", ring.size(),
+                                  " dropped=", ring.dropped_count());
+                    }
+
+                    cv.notify_one();
+
+                    if (invalid_decision != InvalidFrameDecision::None) {
+                        const std::string reason =
+                            "consecutive invalid frames reached threshold=" +
+                            std::to_string(
+                                camera_config.camera_invalid_frame_recovery_threshold
+                            );
+
+                        if (invalid_decision == InvalidFrameDecision::Recover) {
+                            log_warn("CAMERA", reason);
+                            if (camera_config.camera_recovery_enabled) {
+                                ++stats.camera_invalid_frame_recoveries;
+                                if (!rebuild_camera(reason, true) &&
+                                    !stop_requested.load()) {
+                                    throw std::runtime_error(
+                                        "camera recovery exhausted after " +
+                                        std::to_string(
+                                            camera_config.camera_recovery_max_attempts
+                                        ) +
+                                        " attempt(s): " + stats.last_error()
+                                    );
+                                }
+                            } else {
+                                log_warn(
+                                    "CAMERA_RECOVERY",
+                                    "recovery disabled; continuing after invalid-frame threshold"
+                                );
+                            }
+                        } else if (
+                            invalid_decision ==
+                            InvalidFrameDecision::SuppressedByCooldown) {
+                            ++stats.camera_invalid_recovery_suppressed_cooldown;
+                            log_warn(
+                                "CAMERA_RECOVERY",
+                                reason,
+                                " but rebuild suppressed by cooldown; remaining_frames=",
+                                invalid_frame_controller.cooldown_remaining()
+                            );
+                        } else {
+                            ++stats.camera_invalid_recovery_suppressed_budget;
+                            log_warn(
+                                "CAMERA_RECOVERY",
+                                reason,
+                                " but rebuild suppressed by per-process budget; completed=",
+                                invalid_frame_controller.recoveries_completed(),
+                                "/",
+                                invalid_frame_controller.max_recoveries()
+                            );
+                        }
+                    }
+
+                    continue;
+                } catch (const CameraCaptureError& e) {
+                    const auto kind = e.kind();
+                    const std::string kind_name = camera_capture_error_kind_name(kind);
+
+                    if (kind == CameraCaptureErrorKind::Timeout) {
+                        ++stats.camera_capture_timeouts;
+                    } else if (kind == CameraCaptureErrorKind::TemporaryUnavailable) {
+                        ++stats.camera_temporary_unavailable;
+                    } else {
+                        ++stats.camera_device_errors;
+                    }
+
+                    stats.set_last_error(
+                        "camera capture error kind=" + kind_name +
+                        " errno=" + std::to_string(e.error_code()) +
+                        ": " + e.what()
+                    );
+                    log_warn("CAMERA", stats.last_error());
+
+                    const bool should_reinitialize =
+                        recovery_controller.should_reinitialize(kind);
+                    if (!should_reinitialize) {
+                        continue;
+                    }
+
+                    if (!camera_config.camera_recovery_enabled) {
+                        throw;
+                    }
+
+                    if (!rebuild_camera(kind_name, false) && !stop_requested.load()) {
+                        throw std::runtime_error(
+                            "camera recovery exhausted after " +
+                            std::to_string(camera_config.camera_recovery_max_attempts) +
+                            " attempt(s): " + stats.last_error()
+                        );
+                    }
+                }
             }
         } catch (...) {
             producer_error = std::current_exception();
+            stop_requested = true;
+            tcp_cv.notify_all();
         }
 
         producer_done = true;
@@ -708,8 +983,24 @@ static void run_pipeline(
     log_info("STATS", "tcp sent frames      : ", snapshot.tcp_sent);
     log_info("STATS", "tcp sent bytes       : ", snapshot.tcp_sent_bytes);
     log_info("STATS", "tcp send errors      : ", snapshot.tcp_send_errors);
+    log_info("STATS", "tcp send timeouts    : ", snapshot.tcp_send_timeouts);
+    log_info("STATS", "tcp send cancellations: ", snapshot.tcp_send_cancellations);
     log_info("STATS", "tcp connect attempts : ", snapshot.tcp_connect_attempts);
     log_info("STATS", "tcp connect retries  : ", snapshot.tcp_connect_retries);
+    log_info("STATS", "camera capture timeouts: ", snapshot.camera_capture_timeouts);
+    log_info("STATS", "camera temporary unavailable: ", snapshot.camera_temporary_unavailable);
+    log_info("STATS", "camera device errors : ", snapshot.camera_device_errors);
+    log_info("STATS", "camera buffer error frames: ", snapshot.camera_buffer_error_frames);
+    log_info("STATS", "camera incomplete frames: ", snapshot.camera_incomplete_frames);
+    log_info("STATS", "camera invalid streak peak: ", snapshot.camera_consecutive_invalid_peak);
+    log_info("STATS", "camera invalid recoveries: ", snapshot.camera_invalid_frame_recoveries);
+    log_info("STATS", "camera invalid recovery cooldown suppressions: ",
+             snapshot.camera_invalid_recovery_suppressed_cooldown);
+    log_info("STATS", "camera invalid recovery budget suppressions: ",
+             snapshot.camera_invalid_recovery_suppressed_budget);
+    log_info("STATS", "camera recovery attempts: ", snapshot.camera_recovery_attempts);
+    log_info("STATS", "camera recovery successes: ", snapshot.camera_recovery_successes);
+    log_info("STATS", "camera recovery failures: ", snapshot.camera_recovery_failures);
     log_info("STATS", "received frames      : ", snapshot.received);
     log_info("STATS", "reconnect count      : ", snapshot.reconnect_count);
     if (!snapshot.last_error.empty()) {
@@ -755,12 +1046,14 @@ static void print_usage(const char* program) {
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 2 --consumer-delay-ms 50 --timeout-ms 2000\n"
               << "  " << program << " --device /dev/video10 --width 640 --height 480 --format YUYV --mmap-buffers 4 --pipeline-frames 300 --ring-capacity 8 --pipeline-save --save-limit 5 --output output/pipeline --timeout-ms 2000\n"
-              << "  " << program << " --device /dev/video0 --width 640 --height 360 --format YUYV --mmap-buffers 4 --pipeline-frames 30 --ring-capacity 8 --tcp-host 127.0.0.1 --tcp-port 9000 --tcp-queue-capacity 8 --tcp-connect-max-attempts 5 --tcp-connect-retry-delay-ms 500 --timeout-ms 2000\n"
+              << "  " << program << " --device /dev/video0 --width 640 --height 360 --format YUYV --mmap-buffers 4 --pipeline-frames 30 --ring-capacity 8 --tcp-host 127.0.0.1 --tcp-port 9000 --tcp-queue-capacity 8 --tcp-connect-max-attempts 5 --tcp-connect-retry-delay-ms 500 --tcp-send-timeout-ms 2000 --camera-timeout-recovery-threshold 3 --camera-invalid-frame-recovery-threshold 30 --camera-invalid-frame-recovery-cooldown-frames 300 --camera-invalid-frame-recovery-max-count 3 --camera-recovery-max-attempts 5 --camera-recovery-retry-delay-ms 1000 --timeout-ms 2000\n"
               << "  " << program << " --config config/v4l2_tcp_pipeline.conf --pipeline-frames 300\n";
 }
 
 int main(int argc, char* argv[]) {
     try {
+        frame_protocol::require_supported_host_layout();
+
         for (int i = 1; i < argc; ++i) {
             const std::string arg = argv[i];
             if (arg == "--help" || arg == "-h") {
@@ -824,7 +1117,9 @@ int main(int argc, char* argv[]) {
                     config.tcp_queue_capacity,
                     config.tcp_connect_max_attempts,
                     config.tcp_connect_retry_delay_ms,
-                    config.stats_output
+                    config.tcp_send_timeout_ms,
+                    config.stats_output,
+                    config
                 );
             }
 

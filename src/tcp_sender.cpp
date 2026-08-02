@@ -1,4 +1,5 @@
 #include "frame_protocol.hpp"
+#include "tcp_send.hpp"
 
 #include <arpa/inet.h>
 #include <linux/videodev2.h>
@@ -73,39 +74,6 @@ std::uint32_t parse_format(const std::string& format) {
     throw std::invalid_argument(
         "Unsupported --format " + format + ". Current tcp_sender test mode only supports YUYV"
     );
-}
-
-void send_all(int fd, const void* data, std::size_t size) {
-    const auto* ptr = static_cast<const std::uint8_t*>(data);
-    std::size_t sent = 0;
-
-    while (sent < size) {
-        const ssize_t n = send(
-            fd,
-            ptr + sent,
-            size - sent,
-#ifdef MSG_NOSIGNAL
-            MSG_NOSIGNAL
-#else
-            0
-#endif
-        );
-
-        if (n < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
-            throw std::runtime_error(
-                std::string("send failed: ") + std::strerror(errno)
-            );
-        }
-
-        if (n == 0) {
-            throw std::runtime_error("send returned 0, peer may have closed connection");
-        }
-
-        sent += static_cast<std::size_t>(n);
-    }
 }
 
 std::vector<std::uint8_t> make_test_yuyv_payload(int width, int height, int frame_id) {
@@ -245,13 +213,14 @@ void apply_header_fault(
 void print_usage(const char* program) {
     std::cout << "Usage:\n"
               << "  " << program
-              << " --host 127.0.0.1 --port 9000 --frames 3 --width 640 --height 360 --format YUYV [--connect-max-attempts 5] [--connect-retry-delay-ms 500] [--corrupt-frame-id 2]\n"
+              << " --host 127.0.0.1 --port 9000 --frames 3 --width 640 --height 360 --format YUYV [--connect-max-attempts 5] [--connect-retry-delay-ms 500] [--send-timeout-ms 2000] [--corrupt-frame-id 2]\n"
               << "  " << program
               << " --host 127.0.0.1 --port 9000 --frames 1 --header-fault bad-magic\n"
               << "\n"
               << "Connection options:\n"
               << "  --connect-max-attempts N     Total connection attempts, including the first attempt.\n"
               << "  --connect-retry-delay-ms N   Delay between failed attempts.\n"
+              << "  --send-timeout-ms N          Deadline for one complete frame send.\n"
               << "\n"
               << "Test-only options:\n"
               << "  --corrupt-frame-id N  Calculate the CRC first, then flip one payload byte for frame N.\n"
@@ -262,6 +231,8 @@ void print_usage(const char* program) {
 
 int main(int argc, char** argv) {
     try {
+        frame_protocol::require_supported_host_layout();
+
         std::string host = "127.0.0.1";
         int port = 9000;
         int frames = 1;
@@ -271,6 +242,7 @@ int main(int argc, char** argv) {
         int interval_ms = 33;
         int connect_max_attempts = 1;
         int connect_retry_delay_ms = 500;
+        int send_timeout_ms = 2000;
         int corrupt_frame_id = -1;
         std::string header_fault;
 
@@ -298,6 +270,8 @@ int main(int argc, char** argv) {
                 connect_max_attempts = parse_int_arg(argv[++i], arg);
             } else if (arg == "--connect-retry-delay-ms" && i + 1 < argc) {
                 connect_retry_delay_ms = parse_non_negative_int_arg(argv[++i], arg);
+            } else if (arg == "--send-timeout-ms" && i + 1 < argc) {
+                send_timeout_ms = parse_int_arg(argv[++i], arg);
             } else if (arg == "--corrupt-frame-id" && i + 1 < argc) {
                 corrupt_frame_id = parse_int_arg(argv[++i], arg);
             } else if (arg == "--header-fault" && i + 1 < argc) {
@@ -332,6 +306,7 @@ int main(int argc, char** argv) {
         );
 
         std::uint64_t sent_bytes = 0;
+        std::cout << "[INFO] send timeout: " << send_timeout_ms << " ms\n";
 
         for (int i = 0; i < frames; ++i) {
             std::vector<std::uint8_t> payload = make_test_yuyv_payload(width, height, i);
@@ -353,7 +328,12 @@ int main(int argc, char** argv) {
 
             if (!header_fault.empty()) {
                 apply_header_fault(header, header_fault);
-                send_all(fd, &header, sizeof(header));
+                tcp_io::send_all_with_timeout(
+                    fd,
+                    &header,
+                    sizeof(header),
+                    std::chrono::milliseconds(send_timeout_ms)
+                );
                 sent_bytes += sizeof(header);
                 std::cout << "[TEST] sent malformed header"
                           << " fault=" << header_fault
@@ -372,8 +352,10 @@ int main(int argc, char** argv) {
                           << " after CRC calculation\n";
             }
 
-            send_all(fd, &header, sizeof(header));
-            send_all(fd, payload.data(), payload.size());
+            const auto send_deadline = tcp_io::SendClock::now() +
+                std::chrono::milliseconds(send_timeout_ms);
+            tcp_io::send_all_until(fd, &header, sizeof(header), send_deadline);
+            tcp_io::send_all_until(fd, payload.data(), payload.size(), send_deadline);
 
             sent_bytes += sizeof(header) + payload.size();
 

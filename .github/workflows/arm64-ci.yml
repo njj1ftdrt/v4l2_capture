@@ -1,0 +1,58 @@
+name: ARM64 build and acceptance
+
+"on":
+  workflow_dispatch:
+  push:
+    paths:
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "include/**"
+      - "src/**"
+      - "tests/**"
+      - "scripts/aarch64_*.sh"
+      - ".github/workflows/arm64-ci.yml"
+  pull_request:
+    paths:
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - "include/**"
+      - "src/**"
+      - "tests/**"
+      - "scripts/aarch64_*.sh"
+      - ".github/workflows/arm64-ci.yml"
+
+jobs:
+  cross-compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install AArch64 cross toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-aarch64-linux-gnu cmake ninja-build file
+      - name: Cross-build AArch64 package
+        run: ./scripts/aarch64_cross_build.sh
+      - name: Upload cross-build evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: aarch64-cross-build
+          path: |
+            output/aarch64-cross/evidence
+            output/v4l2_capture-aarch64-release.tar.gz
+            output/v4l2_capture-aarch64-release.tar.gz.sha256
+
+  native-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build file
+      - name: Run native ARM64 acceptance
+        run: ./scripts/aarch64_native_acceptance.sh
+      - name: Upload native ARM64 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: aarch64-native-acceptance
+          path: output/aarch64-native

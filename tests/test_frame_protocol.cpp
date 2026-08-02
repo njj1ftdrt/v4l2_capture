@@ -55,6 +55,10 @@ frame_protocol::FrameHeader make_valid_yuyv_header() {
 }  // namespace
 
 int main() {
+    if (!frame_protocol::is_little_endian_host()) {
+        std::cerr << "[FAIL] test host must be little-endian\n";
+        return 1;
+    }
     const auto valid = make_valid_yuyv_header();
     expect_valid(
         valid,

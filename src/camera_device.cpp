@@ -34,10 +34,18 @@ CameraDevice::CameraDevice(CameraDevice&& other) noexcept
     : device_path_(std::move(other.device_path_)),
       fd_(other.fd_),
       buffers_(std::move(other.buffers_)),
-      streaming_(other.streaming_) {
+      streaming_(other.streaming_),
+      current_width_(other.current_width_),
+      current_height_(other.current_height_),
+      current_pixelformat_(other.current_pixelformat_),
+      current_sizeimage_(other.current_sizeimage_) {
     other.fd_ = -1;
     other.streaming_ = false;
     other.buffers_.clear();
+    other.current_width_ = 0;
+    other.current_height_ = 0;
+    other.current_pixelformat_ = 0;
+    other.current_sizeimage_ = 0;
 }
 
 CameraDevice& CameraDevice::operator=(CameraDevice&& other) noexcept {
@@ -50,13 +58,54 @@ CameraDevice& CameraDevice::operator=(CameraDevice&& other) noexcept {
         fd_ = other.fd_;
         buffers_ = std::move(other.buffers_);
         streaming_ = other.streaming_;
+        current_width_ = other.current_width_;
+        current_height_ = other.current_height_;
+        current_pixelformat_ = other.current_pixelformat_;
+        current_sizeimage_ = other.current_sizeimage_;
 
         other.fd_ = -1;
         other.streaming_ = false;
         other.buffers_.clear();
+        other.current_width_ = 0;
+        other.current_height_ = 0;
+        other.current_pixelformat_ = 0;
+        other.current_sizeimage_ = 0;
     }
 
     return *this;
+}
+
+CameraDevice::DequeuedBufferGuard::DequeuedBufferGuard(
+    CameraDevice& camera,
+    __u32 index
+) noexcept
+    : camera_(&camera),
+      index_(index),
+      active_(true) {}
+
+CameraDevice::DequeuedBufferGuard::~DequeuedBufferGuard() noexcept {
+    if (active_ && camera_ != nullptr) {
+        camera_->try_requeue_buffer_noexcept(index_);
+    }
+}
+
+CameraDevice::DequeuedBufferGuard::DequeuedBufferGuard(
+    DequeuedBufferGuard&& other
+) noexcept
+    : camera_(other.camera_),
+      index_(other.index_),
+      active_(other.active_) {
+    other.camera_ = nullptr;
+    other.active_ = false;
+}
+
+void CameraDevice::DequeuedBufferGuard::requeue_or_throw() {
+    if (!active_ || camera_ == nullptr) {
+        return;
+    }
+
+    active_ = false;
+    camera_->requeue_buffer(index_);
 }
 
 void CameraDevice::close_device() {
@@ -498,6 +547,21 @@ void CameraDevice::requeue_buffer(__u32 index) {
     }
 }
 
+bool CameraDevice::try_requeue_buffer_noexcept(__u32 index) noexcept {
+    try {
+        requeue_buffer(index);
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "[ERROR] Failed to requeue V4L2 buffer "
+                  << index << ": " << e.what() << "\n";
+    } catch (...) {
+        std::cerr << "[ERROR] Failed to requeue V4L2 buffer "
+                  << index << ": unknown error\n";
+    }
+
+    return false;
+}
+
 void CameraDevice::start_streaming() {
     if (fd_ < 0) {
         throw std::runtime_error("Device is not opened");
@@ -598,6 +662,8 @@ void CameraDevice::capture_one_frame(int timeout_ms) {
     std::cout << "bytesused      : " << buf.bytesused << "\n";
     std::cout << "buffer length  : " << buffers_[buf.index].length << "\n";
     std::cout << "sequence       : " << buf.sequence << "\n";
+    std::cout << "buffer flags   : 0x" << std::hex << buf.flags << std::dec
+              << " error=" << ((buf.flags & V4L2_BUF_FLAG_ERROR) ? "yes" : "no") << "\n";
     std::cout << "timestamp      : "
               << buf.timestamp.tv_sec << "."
               << std::setw(6) << std::setfill('0') << buf.timestamp.tv_usec
@@ -638,20 +704,50 @@ CameraDevice::CapturedFrameInfo CameraDevice::dequeue_frame(int timeout_ms) {
     } while (poll_ret < 0 && errno == EINTR);
 
     if (poll_ret < 0) {
-        throw std::runtime_error("poll failed: " + std::string(std::strerror(errno)));
+        const int error_code = errno;
+        const CameraCaptureErrorKind kind =
+            (error_code == ENODEV || error_code == ENXIO || error_code == EBADF)
+                ? CameraCaptureErrorKind::DeviceUnavailable
+                : CameraCaptureErrorKind::StreamFailure;
+        throw CameraCaptureError(
+            kind,
+            error_code,
+            "poll failed: " + std::string(std::strerror(error_code))
+        );
     }
 
     if (poll_ret == 0) {
-        throw std::runtime_error("poll timed out: no frame received");
+        throw CameraCaptureError(
+            CameraCaptureErrorKind::Timeout,
+            0,
+            "poll timed out: no frame received"
+        );
     }
 
-    if (pfd.revents & POLLERR) {
-        std::cout << "[WARN] poll returned POLLERR\n";
+    if (pfd.revents & (POLLNVAL | POLLHUP)) {
+        throw CameraCaptureError(
+            CameraCaptureErrorKind::DeviceUnavailable,
+            0,
+            "poll reported device unavailable, revents=" +
+                std::to_string(pfd.revents)
+        );
+    }
+
+    if ((pfd.revents & POLLERR) && !(pfd.revents & POLLIN)) {
+        throw CameraCaptureError(
+            CameraCaptureErrorKind::StreamFailure,
+            0,
+            "poll reported stream error without readable data, revents=" +
+                std::to_string(pfd.revents)
+        );
     }
 
     if (!(pfd.revents & POLLIN)) {
-        throw std::runtime_error(
-            "poll returned but POLLIN is not set, revents=" + std::to_string(pfd.revents)
+        throw CameraCaptureError(
+            CameraCaptureErrorKind::StreamFailure,
+            0,
+            "poll returned but POLLIN is not set, revents=" +
+                std::to_string(pfd.revents)
         );
     }
 
@@ -660,18 +756,32 @@ CameraDevice::CapturedFrameInfo CameraDevice::dequeue_frame(int timeout_ms) {
     buf.memory = V4L2_MEMORY_MMAP;
 
     if (::ioctl(fd_, VIDIOC_DQBUF, &buf) < 0) {
-        if (errno == EAGAIN) {
-            throw std::runtime_error("VIDIOC_DQBUF returned EAGAIN: no buffer ready");
+        const int error_code = errno;
+        if (error_code == EAGAIN) {
+            throw CameraCaptureError(
+                CameraCaptureErrorKind::TemporaryUnavailable,
+                error_code,
+                "VIDIOC_DQBUF returned EAGAIN: no buffer ready"
+            );
         }
 
-        throw std::runtime_error(
-            "VIDIOC_DQBUF failed: " + std::string(std::strerror(errno))
+        const CameraCaptureErrorKind kind =
+            (error_code == ENODEV || error_code == ENXIO || error_code == EBADF)
+                ? CameraCaptureErrorKind::DeviceUnavailable
+                : CameraCaptureErrorKind::StreamFailure;
+        throw CameraCaptureError(
+            kind,
+            error_code,
+            "VIDIOC_DQBUF failed: " + std::string(std::strerror(error_code))
         );
     }
 
     if (buf.index >= buffers_.size()) {
-        throw std::runtime_error(
-            "VIDIOC_DQBUF returned invalid buffer index: " + std::to_string(buf.index)
+        throw CameraCaptureError(
+            CameraCaptureErrorKind::InvalidBufferMetadata,
+            0,
+            "VIDIOC_DQBUF returned invalid buffer index: " +
+                std::to_string(buf.index)
         );
     }
 
@@ -680,13 +790,19 @@ CameraDevice::CapturedFrameInfo CameraDevice::dequeue_frame(int timeout_ms) {
     }
 
     if (buf.bytesused > buffers_[buf.index].length) {
-        throw std::runtime_error("bytesused is larger than mapped buffer length");
+        try_requeue_buffer_noexcept(buf.index);
+        throw CameraCaptureError(
+            CameraCaptureErrorKind::InvalidBufferMetadata,
+            0,
+            "bytesused is larger than mapped buffer length"
+        );
     }
 
     CapturedFrameInfo info{};
     info.index = buf.index;
     info.bytesused = buf.bytesused;
     info.sequence = buf.sequence;
+    info.flags = buf.flags;
     info.timestamp = buf.timestamp;
     return info;
 }
@@ -825,11 +941,14 @@ void CameraDevice::capture_one_frame_to_files(int timeout_ms, const std::string&
     std::cout << "poll timeout: " << timeout_ms << " ms\n";
 
     CapturedFrameInfo frame = dequeue_frame(timeout_ms);
+    DequeuedBufferGuard buffer_guard(*this, frame.index);
 
     std::cout << "dequeued index : " << frame.index << "\n";
     std::cout << "bytesused      : " << frame.bytesused << "\n";
     std::cout << "buffer length  : " << buffers_[frame.index].length << "\n";
     std::cout << "sequence       : " << frame.sequence << "\n";
+    std::cout << "buffer flags   : 0x" << std::hex << frame.flags << std::dec
+              << " error=" << ((frame.flags & V4L2_BUF_FLAG_ERROR) ? "yes" : "no") << "\n";
     std::cout << "timestamp      : "
               << frame.timestamp.tv_sec << "."
               << std::setw(6) << std::setfill('0') << frame.timestamp.tv_usec
@@ -837,7 +956,7 @@ void CameraDevice::capture_one_frame_to_files(int timeout_ms, const std::string&
 
     save_current_frame_to_files(frame, output_dir);
 
-    requeue_buffer(frame.index);
+    buffer_guard.requeue_or_throw();
     std::cout << "requeued index : " << frame.index << "\n";
     std::cout << "===============================================\n";
 }
@@ -857,32 +976,30 @@ Frame CameraDevice::capture_frame_copy(int timeout_ms) {
     }
 
     CapturedFrameInfo info = dequeue_frame(timeout_ms);
+    DequeuedBufferGuard buffer_guard(*this, info.index);
     const auto host_receive_time = std::chrono::steady_clock::now();
     const auto capture_system_time = std::chrono::system_clock::now().time_since_epoch();
     const auto capture_timestamp_ns = static_cast<std::uint64_t>(
         std::chrono::duration_cast<std::chrono::nanoseconds>(capture_system_time).count()
     );
 
-    try {
-        const auto* data = static_cast<const std::uint8_t*>(buffers_[info.index].start);
+    const auto* data = static_cast<const std::uint8_t*>(buffers_[info.index].start);
 
-        Frame frame;
-        frame.data.assign(data, data + info.bytesused);
-        frame.width = current_width_;
-        frame.height = current_height_;
-        frame.pixel_format = current_pixelformat_;
-        frame.bytesused = info.bytesused;
-        frame.sequence = info.sequence;
-        frame.v4l2_timestamp = info.timestamp;
-        frame.capture_timestamp_ns = capture_timestamp_ns;
-        frame.host_receive_time = host_receive_time;
+    Frame frame;
+    frame.data.assign(data, data + info.bytesused);
+    frame.width = current_width_;
+    frame.height = current_height_;
+    frame.pixel_format = current_pixelformat_;
+    frame.bytesused = info.bytesused;
+    frame.sequence = info.sequence;
+    frame.buffer_index = info.index;
+    frame.v4l2_flags = info.flags;
+    frame.v4l2_timestamp = info.timestamp;
+    frame.capture_timestamp_ns = capture_timestamp_ns;
+    frame.host_receive_time = host_receive_time;
 
-        requeue_buffer(info.index);
-        return frame;
-    } catch (...) {
-        requeue_buffer(info.index);
-        throw;
-    }
+    buffer_guard.requeue_or_throw();
+    return frame;
 }
 
 void CameraDevice::capture_frames(int frame_count, int timeout_ms) {

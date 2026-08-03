@@ -82,3 +82,11 @@ Protocol version 3 now serializes every header field explicitly into a stable
 to AArch64 parsing, AArch64 to x86_64 parsing, CRC32, and byte-identical output.
 See `docs/cross_arch_protocol.md` for the evidence workflow and the separate
 real cross-machine network acceptance procedure.
+
+## Automated real-network cloud acceptance
+
+For an end-to-end x86_64-to-ARM64 test over a public network, use
+`scripts/cross_machine_cloud_acceptance.sh`. It deploys the exact source commit,
+performs native ARM64 build/CTest, runs a one-session receiver, retrieves the
+remote statistics, and produces a combined evidence archive. See
+`docs/cross_machine_cloud_acceptance.md`.

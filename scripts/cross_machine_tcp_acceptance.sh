@@ -10,6 +10,7 @@ WIDTH="${WIDTH:-64}"
 HEIGHT="${HEIGHT:-48}"
 INTERVAL_MS="${INTERVAL_MS:-1}"
 SEND_TIMEOUT_MS="${SEND_TIMEOUT_MS:-3000}"
+SAVE_PAYLOADS="${SAVE_PAYLOADS:-1}"
 TARGET_HOST="${TARGET_HOST:-}"
 OUTPUT_DIR="${OUTPUT_DIR:-${ROOT_DIR}/output/cross-machine-${ROLE:-unknown}}"
 
@@ -65,12 +66,17 @@ if [[ "${ROLE}" == "receiver" ]]; then
 
     stats_json="${OUTPUT_DIR}/receiver_stats.json"
     echo "[INFO] Receiver waiting on 0.0.0.0:${PORT}, frames=${FRAMES}"
-    "${receiver}" \
-        --port "${PORT}" \
-        --max-frames "${FRAMES}" \
-        --max-sessions 1 \
-        --output "${OUTPUT_DIR}/frames" \
-        --stats-output "${stats_json}" \
+    receiver_args=(
+        --port "${PORT}"
+        --max-frames "${FRAMES}"
+        --max-sessions 1
+        --output "${OUTPUT_DIR}/frames"
+        --stats-output "${stats_json}"
+    )
+    if [[ "${SAVE_PAYLOADS}" == "0" ]]; then
+        receiver_args+=(--discard-payload)
+    fi
+    "${receiver}" "${receiver_args[@]}" \
         2>&1 | tee "${OUTPUT_DIR}/receiver.log"
 
     python3 - "${stats_json}" "${FRAMES}" "${OUTPUT_DIR}/evidence/acceptance_manifest.json" <<'PY'
@@ -104,6 +110,7 @@ manifest = {
     "received_bytes": data.get("received_bytes"),
     "peer_disconnects": data.get("peer_disconnects"),
     "last_error": data.get("last_error"),
+    "saved_files": data.get("saved_files"),
 }
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
 print("[PASS] cross-machine receiver accounting:", ", ".join(f"{k}={v}" for k, v in checks.items()))

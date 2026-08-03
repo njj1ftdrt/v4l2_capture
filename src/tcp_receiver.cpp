@@ -149,7 +149,7 @@ void print_usage(const char* program) {
               << " --port 9000 --output output/tcp_recv"
               << " --stats-output output/stats/receiver_stats.json"
               << " --max-payload-bytes 16777216"
-              << " --max-sessions 2\n";
+              << " --max-sessions 2 [--discard-payload]\n";
 }
 
 }  // namespace
@@ -167,6 +167,7 @@ int main(int argc, char** argv) {
         int max_sessions = 1;
         std::string stats_output = "output/stats/receiver_stats.json";
         std::uint32_t max_payload_bytes = frame_protocol::kDefaultMaxPayloadBytes;
+        bool save_payloads = true;
 
         for (int i = 1; i < argc; ++i) {
             const std::string arg = argv[i];
@@ -186,6 +187,8 @@ int main(int argc, char** argv) {
                 stats_output = argv[++i];
             } else if (arg == "--max-payload-bytes" && i + 1 < argc) {
                 max_payload_bytes = parse_u32_arg(argv[++i], arg);
+            } else if (arg == "--discard-payload") {
+                save_payloads = false;
             } else {
                 throw std::invalid_argument("Unknown or incomplete argument: " + arg);
             }
@@ -228,11 +231,14 @@ int main(int argc, char** argv) {
         std::cout << "[INFO] tcp_receiver listening on port " << port << "\n";
         std::cout << "[INFO] output dir: " << output_dir << "\n";
         std::cout << "[INFO] stats output: " << stats_output << "\n";
+        std::cout << "[INFO] payload storage: "
+                  << (save_payloads ? "enabled" : "discard") << "\n";
         std::cout << "[INFO] max payload bytes: " << max_payload_bytes << "\n";
         std::cout << "[INFO] max sessions: " << max_sessions << "\n";
 
         std::uint64_t received_frames = 0;
         std::uint64_t received_bytes = 0;
+        std::uint64_t saved_files = 0;
         std::uint64_t crc_errors = 0;
         std::uint64_t header_errors = 0;
         std::uint64_t rejected_frames = 0;
@@ -379,7 +385,10 @@ int main(int argc, char** argv) {
                           << " crc32=0x" << std::hex << header.payload_crc32 << std::dec
                           << "\n";
 
-                save_payload(header, payload, output_dir, received_frames);
+                if (save_payloads) {
+                    save_payload(header, payload, output_dir, received_frames);
+                    ++saved_files;
+                }
             }
 
             close_fd(client_fd);
@@ -402,6 +411,7 @@ int main(int argc, char** argv) {
         std::cout << "========== TCP Receiver Statistics ==========\n";
         std::cout << "received frames    : " << received_frames << "\n";
         std::cout << "received bytes     : " << received_bytes << "\n";
+        std::cout << "saved files        : " << saved_files << "\n";
         std::cout << "crc errors         : " << crc_errors << "\n";
         std::cout << "header errors      : " << header_errors << "\n";
         std::cout << "rejected frames    : " << rejected_frames << "\n";
@@ -422,7 +432,7 @@ int main(int argc, char** argv) {
         snapshot.crc_errors = crc_errors;
         snapshot.header_errors = header_errors;
         snapshot.rejected_frames = rejected_frames;
-        snapshot.saved_files = received_frames;
+        snapshot.saved_files = saved_files;
         snapshot.accepted_sessions = accepted_sessions;
         snapshot.completed_sessions = completed_sessions;
         snapshot.peer_disconnects = peer_disconnects;

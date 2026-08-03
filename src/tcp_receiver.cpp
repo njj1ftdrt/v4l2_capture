@@ -273,9 +273,9 @@ int main(int argc, char** argv) {
             std::cout << "[INFO] client connected session=" << session_id << "\n";
 
             while (max_frames <= 0 || static_cast<int>(received_frames) < max_frames) {
-                frame_protocol::FrameHeader header{};
+                frame_protocol::WireHeader wire_header{};
 
-                if (!read_exact(client_fd, &header, sizeof(header))) {
+                if (!read_exact(client_fd, wire_header.data(), wire_header.size())) {
                     ++peer_disconnects;
                     std::cout << "[INFO] peer closed connection session="
                               << session_id
@@ -284,7 +284,24 @@ int main(int argc, char** argv) {
                     break;
                 }
 
+                frame_protocol::FrameHeader header{};
                 std::string header_error;
+                if (!frame_protocol::deserialize_header(
+                        wire_header,
+                        header,
+                        header_error
+                    )) {
+                    ++header_errors;
+                    ++rejected_frames;
+                    last_error = "failed to decode frame header: " + header_error;
+                    std::cerr << "[ERROR] " << last_error
+                              << " session=" << session_id
+                              << "\n";
+                    session_ok = false;
+                    fatal_protocol_error = true;
+                    break;
+                }
+
                 if (!frame_protocol::validate_header(header, max_payload_bytes, header_error)) {
                     ++header_errors;
                     ++rejected_frames;

@@ -56,6 +56,15 @@ cmake --build "${BUILD_DIR}" -j"${JOBS}" \
 ctest --test-dir "${BUILD_DIR}" --output-on-failure \
     2>&1 | tee "${OUTPUT_DIR}/evidence/ctest.log"
 
+LABEL=arm64 \
+BUILD_DIR="${BUILD_DIR}" \
+OUTPUT_DIR="${OUTPUT_DIR}/protocol-fixture" \
+FIXTURE_TOOL="${BUILD_DIR}/protocol_fixture" \
+CROSS_ARCH_FIXTURE="${CROSS_ARCH_FIXTURE:-}" \
+FRAMES="${FIXTURE_FRAMES:-32}" \
+"${ROOT_DIR}/scripts/protocol_fixture_acceptance.sh" \
+    2>&1 | tee "${OUTPUT_DIR}/evidence/protocol_fixture_acceptance.log"
+
 receiver_log="${OUTPUT_DIR}/receiver.log"
 sender_log="${OUTPUT_DIR}/sender.log"
 stats_json="${OUTPUT_DIR}/receiver_stats.json"
@@ -132,13 +141,17 @@ PY
     if command -v lscpu >/dev/null 2>&1; then lscpu; fi
     echo "cmake=$(cmake --version | head -n1)"
     echo "cxx=$(${CXX:-c++} --version | head -n1)"
-    for binary in v4l2_capture tcp_sender tcp_receiver; do
+    for binary in v4l2_capture tcp_sender tcp_receiver protocol_fixture; do
         printf '%s: ' "${binary}"
         file -b "${BUILD_DIR}/${binary}"
     done
 } > "${OUTPUT_DIR}/evidence/platform.txt"
 
-sha256sum "${BUILD_DIR}/v4l2_capture" "${BUILD_DIR}/tcp_sender" "${BUILD_DIR}/tcp_receiver" \
+sha256sum \
+    "${BUILD_DIR}/v4l2_capture" \
+    "${BUILD_DIR}/tcp_sender" \
+    "${BUILD_DIR}/tcp_receiver" \
+    "${BUILD_DIR}/protocol_fixture" \
     > "${OUTPUT_DIR}/evidence/binary_sha256sums.txt"
 
 python3 - "${OUTPUT_DIR}" "${arch}" "${BUILD_TYPE}" "${FRAMES}" <<'PY'

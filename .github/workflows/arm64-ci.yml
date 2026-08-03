@@ -1,4 +1,4 @@
-name: ARM64 build and acceptance
+name: ARM64 build and cross-architecture acceptance
 
 "on":
   workflow_dispatch:
@@ -10,6 +10,8 @@ name: ARM64 build and acceptance
       - "src/**"
       - "tests/**"
       - "scripts/aarch64_*.sh"
+      - "scripts/protocol_fixture_acceptance.sh"
+      - "scripts/cross_machine_tcp_acceptance.sh"
       - ".github/workflows/arm64-ci.yml"
   pull_request:
     paths:
@@ -19,13 +21,18 @@ name: ARM64 build and acceptance
       - "src/**"
       - "tests/**"
       - "scripts/aarch64_*.sh"
+      - "scripts/protocol_fixture_acceptance.sh"
+      - "scripts/cross_machine_tcp_acceptance.sh"
       - ".github/workflows/arm64-ci.yml"
+
+permissions:
+  contents: read
 
 jobs:
   cross-compile:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install AArch64 cross toolchain
         run: |
           sudo apt-get update
@@ -33,7 +40,7 @@ jobs:
       - name: Cross-build AArch64 package
         run: ./scripts/aarch64_cross_build.sh
       - name: Upload cross-build evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: aarch64-cross-build
           path: |
@@ -41,18 +48,97 @@ jobs:
             output/v4l2_capture-aarch64-release.tar.gz
             output/v4l2_capture-aarch64-release.tar.gz.sha256
 
+  x86-protocol-fixture:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build file python3
+      - name: Generate and self-verify x86_64 protocol fixture
+        run: |
+          LABEL=x86_64 \
+          OUTPUT_DIR="$GITHUB_WORKSPACE/output/protocol-fixture-x86" \
+          FRAMES=32 \
+          ./scripts/protocol_fixture_acceptance.sh
+      - name: Upload x86_64 fixture
+        uses: actions/upload-artifact@v7
+        with:
+          name: x86-protocol-fixture
+          path: output/protocol-fixture-x86
+
   native-arm64:
+    needs: x86-protocol-fixture
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - name: Download x86_64 fixture
+        uses: actions/download-artifact@v7
+        with:
+          name: x86-protocol-fixture
+          path: input/x86-protocol-fixture
+      - name: Locate x86_64 fixture
+        run: |
+          fixture="$(find input/x86-protocol-fixture -name 'x86_64_protocol_fixture.bin' -print -quit)"
+          test -n "$fixture"
+          echo "X86_FIXTURE=$GITHUB_WORKSPACE/$fixture" >> "$GITHUB_ENV"
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build file
-      - name: Run native ARM64 acceptance
-        run: ./scripts/aarch64_native_acceptance.sh
+          sudo apt-get install -y cmake ninja-build file python3
+      - name: Run native ARM64 acceptance and verify x86 fixture
+        run: CROSS_ARCH_FIXTURE="$X86_FIXTURE" ./scripts/aarch64_native_acceptance.sh
       - name: Upload native ARM64 evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: aarch64-native-acceptance
           path: output/aarch64-native
+
+  x86-verify-arm-fixture:
+    needs:
+      - x86-protocol-fixture
+      - native-arm64
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download x86_64 fixture
+        uses: actions/download-artifact@v7
+        with:
+          name: x86-protocol-fixture
+          path: input/x86-protocol-fixture
+      - name: Download ARM64 acceptance artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: aarch64-native-acceptance
+          path: input/aarch64-native-acceptance
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build file python3
+      - name: Verify ARM fixture on x86_64 and compare all bytes
+        run: |
+          x86_fixture="$(find input/x86-protocol-fixture -name 'x86_64_protocol_fixture.bin' -print -quit)"
+          arm_fixture="$(find input/aarch64-native-acceptance -name 'arm64_protocol_fixture.bin' -print -quit)"
+          test -n "$x86_fixture"
+          test -n "$arm_fixture"
+
+          LABEL=x86_64_recheck \
+          OUTPUT_DIR="$GITHUB_WORKSPACE/output/cross-arch-protocol" \
+          CROSS_ARCH_FIXTURE="$GITHUB_WORKSPACE/$arm_fixture" \
+          FRAMES=32 \
+          ./scripts/protocol_fixture_acceptance.sh
+
+          cmp "$x86_fixture" "$arm_fixture"
+          cp "$x86_fixture" output/cross-arch-protocol/x86_downloaded_protocol_fixture.bin
+          cp "$arm_fixture" output/cross-arch-protocol/arm64_downloaded_protocol_fixture.bin
+          sha256sum \
+            output/cross-arch-protocol/x86_downloaded_protocol_fixture.bin \
+            output/cross-arch-protocol/arm64_downloaded_protocol_fixture.bin \
+            > output/cross-arch-protocol/evidence/downloaded_fixture_sha256s.txt
+          echo "[PASS] x86_64 and ARM64 fixtures are byte-identical"
+      - name: Upload cross-architecture protocol evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: cross-arch-protocol-evidence
+          path: output/cross-arch-protocol

@@ -328,13 +328,14 @@ int main(int argc, char** argv) {
 
             if (!header_fault.empty()) {
                 apply_header_fault(header, header_fault);
+                const auto wire_header = frame_protocol::serialize_header(header);
                 tcp_io::send_all_with_timeout(
                     fd,
-                    &header,
-                    sizeof(header),
+                    wire_header.data(),
+                    wire_header.size(),
                     std::chrono::milliseconds(send_timeout_ms)
                 );
-                sent_bytes += sizeof(header);
+                sent_bytes += wire_header.size();
                 std::cout << "[TEST] sent malformed header"
                           << " fault=" << header_fault
                           << " frame_id=" << i
@@ -352,12 +353,18 @@ int main(int argc, char** argv) {
                           << " after CRC calculation\n";
             }
 
+            const auto wire_header = frame_protocol::serialize_header(header);
             const auto send_deadline = tcp_io::SendClock::now() +
                 std::chrono::milliseconds(send_timeout_ms);
-            tcp_io::send_all_until(fd, &header, sizeof(header), send_deadline);
+            tcp_io::send_all_until(
+                fd,
+                wire_header.data(),
+                wire_header.size(),
+                send_deadline
+            );
             tcp_io::send_all_until(fd, payload.data(), payload.size(), send_deadline);
 
-            sent_bytes += sizeof(header) + payload.size();
+            sent_bytes += wire_header.size() + payload.size();
 
             std::cout << "[SEND] frame_id=" << i
                       << " size=" << width << "x" << height

@@ -36,7 +36,7 @@ cmake -S "${ROOT_DIR}" -B "${BUILD_DIR}" \
 cmake --build "${BUILD_DIR}" -j"${JOBS}" \
     2>&1 | tee "${EVIDENCE_DIR}/build.log"
 
-binaries=(v4l2_capture tcp_sender tcp_receiver test_ring_buffer test_frame_protocol test_latency_stats test_tcp_send test_capture_recovery)
+binaries=(v4l2_capture tcp_sender tcp_receiver protocol_fixture test_ring_buffer test_frame_protocol test_latency_stats test_tcp_send test_capture_recovery)
 : > "${EVIDENCE_DIR}/file.txt"
 for binary in "${binaries[@]}"; do
     path="${BUILD_DIR}/${binary}"
@@ -71,9 +71,14 @@ cat > "${EVIDENCE_DIR}/manifest.json" <<EOF_MANIFEST
 EOF_MANIFEST
 
 PACKAGE="${ROOT_DIR}/output/v4l2_capture-aarch64-${BUILD_TYPE,,}.tar.gz"
-mkdir -p "$(dirname "${PACKAGE}")"
+PACKAGE_DIR="$(dirname "${PACKAGE}")"
+PACKAGE_NAME="$(basename "${PACKAGE}")"
+mkdir -p "${PACKAGE_DIR}"
 tar -C "${STAGE_DIR}" -czf "${PACKAGE}" .
-sha256sum "${PACKAGE}" | tee "${PACKAGE}.sha256"
+(
+    cd "${PACKAGE_DIR}"
+    sha256sum "${PACKAGE_NAME}" | tee "${PACKAGE_NAME}.sha256"
+)
 
 echo "[PASS] AArch64 cross build completed"
 echo "[INFO] Package: ${PACKAGE}"

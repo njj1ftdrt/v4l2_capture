@@ -65,6 +65,15 @@ target_link_libraries(tcp_sender PRIVATE
 )
 enable_project_warnings(tcp_sender)
 
+add_executable(protocol_fixture
+    src/protocol_fixture.cpp
+)
+target_include_directories(protocol_fixture PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_compile_features(protocol_fixture PRIVATE cxx_std_17)
+enable_project_warnings(protocol_fixture)
+
 if(BUILD_TESTING)
     add_executable(test_ring_buffer
         tests/test_ring_buffer.cpp
@@ -111,12 +120,35 @@ if(BUILD_TESTING)
     )
     enable_project_warnings(test_capture_recovery)
     add_test(NAME test_capture_recovery COMMAND test_capture_recovery)
+
+    set(PROTOCOL_FIXTURE_TEST_FILE
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_fixture_ctest.bin
+    )
+    add_test(
+        NAME test_protocol_fixture_write
+        COMMAND protocol_fixture
+            --write ${PROTOCOL_FIXTURE_TEST_FILE}
+            --frames 4
+    )
+    set_tests_properties(test_protocol_fixture_write PROPERTIES
+        FIXTURES_SETUP protocol_fixture_file
+    )
+    add_test(
+        NAME test_protocol_fixture_verify
+        COMMAND protocol_fixture
+            --verify ${PROTOCOL_FIXTURE_TEST_FILE}
+            --frames 4
+    )
+    set_tests_properties(test_protocol_fixture_verify PROPERTIES
+        FIXTURES_REQUIRED protocol_fixture_file
+    )
 endif()
 
 install(TARGETS
     v4l2_capture
     tcp_sender
     tcp_receiver
+    protocol_fixture
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 

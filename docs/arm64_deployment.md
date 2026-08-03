@@ -77,6 +77,8 @@ Run the sender on the other machine, replacing the address:
   --interval-ms 10
 ```
 
-The current protocol transmits a packed native-endian header. The verified
-deployment target is little-endian x86_64 and little-endian AArch64. Supporting
-big-endian systems requires explicit field serialization and byte-order conversion.
+Protocol version 3 now serializes every header field explicitly into a stable
+44-byte little-endian wire representation. The CI fixture chain verifies x86_64
+to AArch64 parsing, AArch64 to x86_64 parsing, CRC32, and byte-identical output.
+See `docs/cross_arch_protocol.md` for the evidence workflow and the separate
+real cross-machine network acceptance procedure.

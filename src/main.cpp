@@ -173,14 +173,15 @@ static std::uint64_t send_frame_over_tcp(
         static_cast<std::uint32_t>(frame.data.size()),
         payload_crc32
     );
+    const auto wire_header = frame_protocol::serialize_header(header);
 
     const auto deadline = tcp_io::SendClock::now() +
         std::chrono::milliseconds(send_timeout_ms);
 
     tcp_io::send_all_until(
         fd,
-        &header,
-        sizeof(header),
+        wire_header.data(),
+        wire_header.size(),
         deadline,
         &stop_requested
     );
@@ -192,7 +193,7 @@ static std::uint64_t send_frame_over_tcp(
         &stop_requested
     );
 
-    return static_cast<std::uint64_t>(sizeof(header)) + frame.data.size();
+    return static_cast<std::uint64_t>(wire_header.size()) + frame.data.size();
 }
 
 static std::string frame_fourcc_to_string(__u32 pixelformat) {

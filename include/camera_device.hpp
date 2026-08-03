@@ -1,5 +1,6 @@
 #pragma once
 
+#include "camera_capture_error.hpp"
 #include "frame.hpp"
 
 #include <linux/videodev2.h>
@@ -42,7 +43,27 @@ private:
         __u32 index{0};
         __u32 bytesused{0};
         __u32 sequence{0};
+        __u32 flags{0};
         timeval timestamp{};
+    };
+
+    class DequeuedBufferGuard {
+    public:
+        DequeuedBufferGuard(CameraDevice& camera, __u32 index) noexcept;
+        ~DequeuedBufferGuard() noexcept;
+
+        DequeuedBufferGuard(const DequeuedBufferGuard&) = delete;
+        DequeuedBufferGuard& operator=(const DequeuedBufferGuard&) = delete;
+
+        DequeuedBufferGuard(DequeuedBufferGuard&& other) noexcept;
+        DequeuedBufferGuard& operator=(DequeuedBufferGuard&&) = delete;
+
+        void requeue_or_throw();
+
+    private:
+        CameraDevice* camera_{nullptr};
+        __u32 index_{0};
+        bool active_{false};
     };
 
     std::string device_path_;
@@ -58,6 +79,7 @@ private:
     void close_device();
     void release_mmap_buffers();
     void requeue_buffer(__u32 index);
+    bool try_requeue_buffer_noexcept(__u32 index) noexcept;
     CapturedFrameInfo dequeue_frame(int timeout_ms);
 
     void save_current_frame_to_files(

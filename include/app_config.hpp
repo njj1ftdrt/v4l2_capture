@@ -19,6 +19,13 @@ struct AppConfig {
     bool pipeline_save = false;
     int save_limit = 5;
     int timeout_ms = 2000;
+    bool camera_recovery_enabled = true;
+    int camera_timeout_recovery_threshold = 3;
+    int camera_invalid_frame_recovery_threshold = 30;
+    int camera_invalid_frame_recovery_cooldown_frames = 300;
+    int camera_invalid_frame_recovery_max_count = 3;
+    int camera_recovery_max_attempts = 5;
+    int camera_recovery_retry_delay_ms = 1000;
     std::string output_dir = "output";
     std::string stats_output = "output/stats/pipeline_stats.json";
 
@@ -27,6 +34,7 @@ struct AppConfig {
     int tcp_queue_capacity = 8;
     int tcp_connect_max_attempts = 5;
     int tcp_connect_retry_delay_ms = 500;
+    int tcp_send_timeout_ms = 2000;
 
     std::optional<__u32> width;
     std::optional<__u32> height;

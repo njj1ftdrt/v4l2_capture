@@ -15,6 +15,8 @@ struct Frame {
 
     __u32 bytesused{0};
     __u32 sequence{0};
+    __u32 buffer_index{0};
+    __u32 v4l2_flags{0};
     timeval v4l2_timestamp{};
 
     // Host-side capture handoff timestamps recorded immediately after DQBUF.

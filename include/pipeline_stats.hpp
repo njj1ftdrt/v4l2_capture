@@ -30,8 +30,23 @@ struct PipelineStatsSnapshot {
     std::uint64_t tcp_sent = 0;
     std::uint64_t tcp_sent_bytes = 0;
     std::uint64_t tcp_send_errors = 0;
+    std::uint64_t tcp_send_timeouts = 0;
+    std::uint64_t tcp_send_cancellations = 0;
     std::uint64_t tcp_connect_attempts = 0;
     std::uint64_t tcp_connect_retries = 0;
+
+    std::uint64_t camera_capture_timeouts = 0;
+    std::uint64_t camera_temporary_unavailable = 0;
+    std::uint64_t camera_device_errors = 0;
+    std::uint64_t camera_buffer_error_frames = 0;
+    std::uint64_t camera_incomplete_frames = 0;
+    std::uint64_t camera_consecutive_invalid_peak = 0;
+    std::uint64_t camera_invalid_frame_recoveries = 0;
+    std::uint64_t camera_invalid_recovery_suppressed_cooldown = 0;
+    std::uint64_t camera_invalid_recovery_suppressed_budget = 0;
+    std::uint64_t camera_recovery_attempts = 0;
+    std::uint64_t camera_recovery_successes = 0;
+    std::uint64_t camera_recovery_failures = 0;
 
     // Reserved for tcp_receiver or future ROS2/status aggregation.
     std::uint64_t received = 0;
@@ -64,8 +79,23 @@ public:
     std::atomic<std::uint64_t> tcp_sent{0};
     std::atomic<std::uint64_t> tcp_sent_bytes{0};
     std::atomic<std::uint64_t> tcp_send_errors{0};
+    std::atomic<std::uint64_t> tcp_send_timeouts{0};
+    std::atomic<std::uint64_t> tcp_send_cancellations{0};
     std::atomic<std::uint64_t> tcp_connect_attempts{0};
     std::atomic<std::uint64_t> tcp_connect_retries{0};
+
+    std::atomic<std::uint64_t> camera_capture_timeouts{0};
+    std::atomic<std::uint64_t> camera_temporary_unavailable{0};
+    std::atomic<std::uint64_t> camera_device_errors{0};
+    std::atomic<std::uint64_t> camera_buffer_error_frames{0};
+    std::atomic<std::uint64_t> camera_incomplete_frames{0};
+    std::atomic<std::uint64_t> camera_consecutive_invalid_peak{0};
+    std::atomic<std::uint64_t> camera_invalid_frame_recoveries{0};
+    std::atomic<std::uint64_t> camera_invalid_recovery_suppressed_cooldown{0};
+    std::atomic<std::uint64_t> camera_invalid_recovery_suppressed_budget{0};
+    std::atomic<std::uint64_t> camera_recovery_attempts{0};
+    std::atomic<std::uint64_t> camera_recovery_successes{0};
+    std::atomic<std::uint64_t> camera_recovery_failures{0};
 
     std::atomic<std::uint64_t> received{0};
     std::atomic<std::uint64_t> reconnect_count{0};
@@ -98,8 +128,22 @@ public:
         s.tcp_sent = tcp_sent.load();
         s.tcp_sent_bytes = tcp_sent_bytes.load();
         s.tcp_send_errors = tcp_send_errors.load();
+        s.tcp_send_timeouts = tcp_send_timeouts.load();
+        s.tcp_send_cancellations = tcp_send_cancellations.load();
         s.tcp_connect_attempts = tcp_connect_attempts.load();
         s.tcp_connect_retries = tcp_connect_retries.load();
+        s.camera_capture_timeouts = camera_capture_timeouts.load();
+        s.camera_temporary_unavailable = camera_temporary_unavailable.load();
+        s.camera_device_errors = camera_device_errors.load();
+        s.camera_buffer_error_frames = camera_buffer_error_frames.load();
+        s.camera_incomplete_frames = camera_incomplete_frames.load();
+        s.camera_consecutive_invalid_peak = camera_consecutive_invalid_peak.load();
+        s.camera_invalid_frame_recoveries = camera_invalid_frame_recoveries.load();
+        s.camera_invalid_recovery_suppressed_cooldown = camera_invalid_recovery_suppressed_cooldown.load();
+        s.camera_invalid_recovery_suppressed_budget = camera_invalid_recovery_suppressed_budget.load();
+        s.camera_recovery_attempts = camera_recovery_attempts.load();
+        s.camera_recovery_successes = camera_recovery_successes.load();
+        s.camera_recovery_failures = camera_recovery_failures.load();
         s.received = received.load();
         s.reconnect_count = reconnect_count.load();
         s.elapsed_seconds = elapsed_seconds;

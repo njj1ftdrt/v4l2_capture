@@ -18,6 +18,7 @@ INTERVAL_MS="${INTERVAL_MS:-5}"
 DEVICE="${DEVICE:-/dev/video0}"
 CAMERA_WIDTH="${CAMERA_WIDTH:-640}"
 CAMERA_HEIGHT="${CAMERA_HEIGHT:-360}"
+TCP_QUEUE_CAPACITY="${TCP_QUEUE_CAPACITY:-8}"
 LOCAL_BUILD_DIR="${LOCAL_BUILD_DIR:-${ROOT_DIR}/build}"
 REMOTE_TIMEOUT_SECONDS="${REMOTE_TIMEOUT_SECONDS:-900}"
 ALLOW_DIRTY="${ALLOW_DIRTY:-0}"
@@ -215,7 +216,7 @@ else
         --ring-capacity 8 \
         --tcp-host "${TCP_TARGET_HOST}" \
         --tcp-port "${PORT}" \
-        --tcp-queue-capacity 8 \
+        --tcp-queue-capacity "${TCP_QUEUE_CAPACITY}" \
         --tcp-connect-max-attempts 20 \
         --tcp-connect-retry-delay-ms 500 \
         --tcp-send-timeout-ms 5000 \

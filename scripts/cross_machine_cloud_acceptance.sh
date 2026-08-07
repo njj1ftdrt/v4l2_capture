@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MODE="${MODE:-synthetic}"
 SSH_TARGET="${SSH_TARGET:-}"
 SSH_KEY="${SSH_KEY:-}"
+TCP_TARGET_HOST="${TCP_TARGET_HOST:-}"
 SSH_PORT="${SSH_PORT:-22}"
 REMOTE_ROOT="${REMOTE_ROOT:-}"
 REMOTE_BUILD_DIR_NAME="${REMOTE_BUILD_DIR_NAME:-build-arm64-cloud}"
@@ -39,6 +40,9 @@ USAGE
 if [[ -z "${SSH_TARGET}" ]]; then
     usage >&2
     exit 2
+fi
+if [[ -z "${TCP_TARGET_HOST}" ]]; then
+    TCP_TARGET_HOST="${TCP_TARGET_HOST}"
 fi
 if [[ "${MODE}" != "synthetic" && "${MODE}" != "camera" ]]; then
     echo "[ERROR] MODE must be synthetic or camera" >&2
@@ -186,7 +190,7 @@ fi
 
 if [[ "${MODE}" == "synthetic" ]]; then
     BUILD_DIR="${LOCAL_BUILD_DIR}" \
-    TARGET_HOST="${SSH_TARGET#*@}" \
+    TARGET_HOST="${TCP_TARGET_HOST}" \
     PORT="${PORT}" \
     FRAMES="${FRAMES}" \
     WIDTH="${WIDTH}" \
@@ -209,7 +213,7 @@ else
         --mmap-buffers 4 \
         --pipeline-frames "${FRAMES}" \
         --ring-capacity 8 \
-        --tcp-host "${SSH_TARGET#*@}" \
+        --tcp-host "${TCP_TARGET_HOST}" \
         --tcp-port "${PORT}" \
         --tcp-queue-capacity 8 \
         --tcp-connect-max-attempts 20 \
